@@ -1,8 +1,16 @@
 name: Release
 
-# Push a tag like v0.2.0 (matching Cargo.toml's version) to build Lantern for
-# Linux, macOS and Windows and publish the bundles as a GitHub Release.
-# Run it manually (workflow_dispatch) to build the bundles without publishing.
+# Builds Lantern for Linux, macOS and Windows and publishes a GitHub Release.
+#
+# Normal flow: bump the version with tools/bump-version.sh and merge that PR.
+# When main's Cargo.toml names a version whose tag (vX.Y.Z) doesn't exist yet,
+# this workflow builds it, creates the tag and publishes the release.
+#
+# Also supported:
+# - pushing a tag vX.Y.Z by hand (it must match Cargo.toml at that commit);
+# - running it from the Actions tab: builds the bundles as artifacts, and with
+#   "publish" ticked, releases the version in Cargo.toml (recovery button).
+#
 # Asset names carry no version, so README links to
 # releases/latest/download/<asset> always point at the newest release.
 
@@ -10,7 +18,17 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - main
+    # Branch pushes only; tag pushes ignore this filter.
+    paths:
+      - Cargo.toml
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish a release for the version in Cargo.toml (creates its tag if missing)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,8 +39,71 @@ env:
   CEF_CRATE_VERSION: "154.5.0"
 
 jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      tag: ${{ steps.plan.outputs.tag }}
+      build: ${{ steps.plan.outputs.build }}
+      publish: ${{ steps.plan.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Decide what to release
+        id: plan
+        env:
+          PUBLISH_INPUT: ${{ inputs.publish }}
+        run: |
+          version=$(sed -n 's/^version = "\([^"]*\)"$/\1/p' Cargo.toml | head -n1)
+          tag="v$version"
+          build=true
+          publish=false
+          # Commit the tag points at on GitHub (peeled if annotated), if it exists.
+          existing=$(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}" | tail -n1 | cut -f1)
+
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_TYPE" == tag ]]; then
+            if [[ "$GITHUB_REF_NAME" != "$tag" ]]; then
+              msg="Tag $GITHUB_REF_NAME was pushed, but Cargo.toml at that commit says version $version."
+              msg+=" Delete the $GITHUB_REF_NAME tag (and its release, if one was created),"
+              msg+=" then bump the version with tools/bump-version.sh and merge that pull request:"
+              msg+=" the release publishes itself, no tag needed."
+              echo "::error title=Tag does not match Cargo.toml::$msg"
+              echo "### Release not built" >> "$GITHUB_STEP_SUMMARY"
+              echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            publish=true
+          elif [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            # A push to main that changed Cargo.toml.
+            if [[ -n "$existing" ]]; then
+              build=false
+              echo "$tag already exists, so there is nothing new to release." >> "$GITHUB_STEP_SUMMARY"
+            else
+              publish=true
+            fi
+          elif [[ "$PUBLISH_INPUT" == true ]]; then
+            if [[ -n "$existing" && "$existing" != "$GITHUB_SHA" ]]; then
+              msg="$tag already points at ${existing:0:7}, not this commit (${GITHUB_SHA:0:7})."
+              msg+=" Delete that tag and its release first, or bump the version."
+              echo "::error title=Tag exists elsewhere::$msg"
+              exit 1
+            fi
+            publish=true
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "build=$build"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+          echo "Version $version: build=$build publish=$publish" >> "$GITHUB_STEP_SUMMARY"
+
   bundle:
     name: Bundle (${{ matrix.name }})
+    needs: plan
+    if: needs.plan.outputs.build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -39,16 +120,6 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
-
-      - name: Read version
-        id: version
-        run: |
-          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n1)
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "v$version" ]]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
-            exit 1
-          fi
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -98,7 +169,7 @@ jobs:
           bundle-cef-app lantern -o dist \
             -d Lantern \
             -i io.github.chrissnyder2337.lantern \
-            -v "${{ steps.version.outputs.version }}"
+            -v "${{ needs.plan.outputs.version }}"
           # The bundle is named after the executable; give it the app's name.
           # CEF locates its framework and helpers relative to the executable.
           mv dist/lantern.app dist/Lantern.app
@@ -128,9 +199,9 @@ jobs:
           if-no-files-found: error
 
   publish:
-    name: Publish release
-    needs: bundle
-    if: github.ref_type == 'tag'
+    name: Publish ${{ needs.plan.outputs.tag }}
+    needs: [plan, bundle]
+    if: needs.plan.outputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -144,8 +215,13 @@ jobs:
         working-directory: artifacts
         run: sha256sum lantern-* > SHA256SUMS.txt
 
+      # Creates the tag at this commit if it doesn't exist yet, and updates an
+      # existing release for the tag rather than making a second one.
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.plan.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Lantern ${{ needs.plan.outputs.version }}
           files: artifacts/*
           generate_release_notes: true
           fail_on_unmatched_files: true
