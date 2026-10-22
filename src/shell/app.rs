@@ -19,6 +19,11 @@ wrap_app! {
     }
 }
 
+/// Whether a boolean switch like `--geocities` was given.
+fn has_switch(command_line: &CommandLine, name: &str) -> bool {
+    command_line.has_switch(Some(&CefString::from(name))) == 1
+}
+
 /// The `--url=` command-line value, if any.
 fn url_switch(command_line: &CommandLine) -> Option<String> {
     let url =
@@ -56,14 +61,18 @@ wrap_browser_process_handler! {
             debug_assert_ne!(currently_on(ThreadId::UI), 0);
 
             let list = bookmarks::load();
-            let user_settings = settings::load();
+            let mut user_settings = settings::load();
+            let command_line = command_line_get_global();
+            // --geocities turns the mode on for this run without saving it.
+            if command_line.as_ref().is_some_and(|c| has_switch(c, "geocities")) {
+                user_settings.geocities = true;
+            }
             with_shell(|shell| {
                 shell.bookmarks = list.clone();
                 shell.settings = user_settings;
             });
 
             // The content view starts on the home page unless --url= was given.
-            let command_line = command_line_get_global();
             let start = command_line.as_ref().and_then(url_switch);
             let content_url = match start.as_deref().and_then(normalize_url_input) {
                 Some(url) => url,

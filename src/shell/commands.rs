@@ -2,7 +2,7 @@
 //! the navigation helpers they share.
 
 use super::{
-    bookmarks, dialup,
+    bookmarks, dialup, geocities,
     pages::{self, ACTION_HOST},
     settings,
     state::{
@@ -70,6 +70,7 @@ fn run_toolbar_command(name: &str, arg: &str) {
         "bookmark-add" => add_bookmark(),
         "bookmarks" => show_bookmarks(),
         "about" => show_about(),
+        "geocities" => geocities::toggle(),
         _ => eprintln!("lantern: unknown toolbar command {name:?}"),
     }
 }

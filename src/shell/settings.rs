@@ -1,4 +1,4 @@
-//! User settings (currently the dial-up simulator), stored as `key=value`
+//! User settings (the dial-up simulator and GeoCities mode), stored as `key=value`
 //! lines in `settings.txt` next to the bookmarks.
 
 use super::bookmarks::data_dir;
@@ -97,6 +97,8 @@ impl ModemSpeed {
 pub struct Settings {
     pub dialup_mode: DialupMode,
     pub modem_speed: ModemSpeed,
+    /// Restyle every page like a 1990s GeoCities homepage.
+    pub geocities: bool,
 }
 
 impl Settings {
@@ -114,6 +116,7 @@ impl Settings {
                 "modem_speed" => {
                     settings.modem_speed = ModemSpeed::from_key(value).unwrap_or_default()
                 }
+                "geocities" => settings.geocities = matches!(value, "1" | "true" | "on" | "yes"),
                 _ => {}
             }
         }
@@ -122,9 +125,10 @@ impl Settings {
 
     fn serialize(&self) -> String {
         format!(
-            "dialup_mode={}\nmodem_speed={}\n",
+            "dialup_mode={}\nmodem_speed={}\ngeocities={}\n",
             self.dialup_mode.key(),
-            self.modem_speed.key()
+            self.modem_speed.key(),
+            self.geocities
         )
     }
 
@@ -185,16 +189,19 @@ mod tests {
 
     #[test]
     fn parse_and_serialize() {
-        let settings = Settings::parse("dialup_mode=network\nmodem_speed=28.8\njunk\n");
+        let settings =
+            Settings::parse("dialup_mode=network\nmodem_speed=28.8\njunk\n geocities = on \r\n");
         assert_eq!(
             settings,
             Settings {
                 dialup_mode: DialupMode::Network,
-                modem_speed: ModemSpeed::K28_8
+                modem_speed: ModemSpeed::K28_8,
+                geocities: true,
             }
         );
         assert_eq!(Settings::parse(&settings.serialize()), settings);
         assert_eq!(Settings::parse("dialup_mode=warp\n"), Settings::default());
+        assert!(!Settings::parse("geocities=false\n").geocities);
     }
 
     #[test]
@@ -228,6 +235,7 @@ mod tests {
         let settings = Settings {
             dialup_mode: DialupMode::Images,
             modem_speed: ModemSpeed::K33_6,
+            geocities: true,
         };
         save_to(&path, &settings).unwrap();
         assert_eq!(load_from(&path), settings);
