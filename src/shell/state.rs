@@ -148,6 +148,7 @@ impl Shell {
             ("loading", Json::Bool(self.is_loading)),
             ("secure", Json::Bool(self.is_secure())),
             ("bookmarks", Json::Arr(quick)),
+            ("geocities", Json::Bool(self.settings.geocities)),
         ])
         .render()
     }

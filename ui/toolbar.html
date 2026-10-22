@@ -52,6 +52,12 @@
   .big.disabled svg.on { display: none; }
   .big.disabled svg.off { display: block; }
   .big.disabled span { color: #808080; text-shadow: 1px 1px #fff; }
+  /* Latched toggle (GeoCities mode): stays pressed in, on a dithered face. */
+  .big.latched, .big.latched:hover:not(.disabled) {
+    box-shadow: var(--pressed);
+    background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
+  }
+  .big.latched > * { transform: translate(1px, 1px); }
 
   /* ---- Throbber ---- */
   #throbber {
@@ -127,6 +133,8 @@
       <button class="big" id="mark" data-cmd="bookmark-add" title="Bookmark this page (Ctrl+D)">{{ICON_MARK}}<span>Mark</span></button>
       <div class="sep"></div>
       <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_STOP}}<span>Stop</span></button>
+      <div class="sep"></div>
+      <button class="big" id="geocities" data-cmd="geocities" title="Make every page look like it's 1998" aria-pressed="false">{{ICON_GEOCITIES}}<span>GeoCities</span></button>
     </div>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       <div class="glow">
@@ -168,7 +176,8 @@
   var buttons = {
     back: document.getElementById("back"),
     forward: document.getElementById("forward"),
-    stop: document.getElementById("stop")
+    stop: document.getElementById("stop"),
+    geocities: document.getElementById("geocities")
   };
   var state = { url: "" };
   var editing = false;
@@ -244,6 +253,10 @@
         throbber.classList.toggle("loading", !!s.loading);
       }
       if ("secure" in s) field.classList.toggle("secure", !!s.secure);
+      if ("geocities" in s) {
+        buttons.geocities.classList.toggle("latched", !!s.geocities);
+        buttons.geocities.setAttribute("aria-pressed", s.geocities ? "true" : "false");
+      }
       if (s.bookmarks) {
         var key = JSON.stringify(s.bookmarks);
         if (key !== lastLinks) { lastLinks = key; renderLinks(s.bookmarks); }

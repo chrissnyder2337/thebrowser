@@ -9,6 +9,7 @@ pub mod bookmarks;
 pub mod client;
 pub mod commands;
 pub mod dialup;
+pub mod geocities;
 pub mod pages;
 pub mod resources;
 pub mod settings;

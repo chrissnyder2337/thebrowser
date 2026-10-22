@@ -105,6 +105,7 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
 
 - `--url=<address>`: open this instead of the start page. URL-bar rules apply,
   so `--url=example.com` works.
+- `--geocities`: start with GeoCities mode on for this run (see below).
 
 ### Tests
 
@@ -117,7 +118,8 @@ release bundle on Linux (uploaded as a build artifact), and builds on macOS and
 Windows. It needs Rust 1.88 or newer.
 
 The unit tests cover URL normalization, percent and HTML/JS escaping, the title
-channel parser, template filling, bookmark storage and the pixel-art sheets.
+channel parser, template filling, bookmark and settings storage, the
+GeoCities script wrapper and the pixel-art sheets.
 
 ### Releasing
 
@@ -146,6 +148,25 @@ it under System Settings → Privacy & Security → Open Anyway.
 | Stop (while loading) | Esc | Esc |
 | Bookmark this page | Ctrl+D | Cmd+D |
 | Start page | Alt+Home | Alt+Home |
+
+### GeoCities mode
+
+The **GeoCities** button at the end of the toolbar restyles every page like a
+late-90s personal homepage: a starfield background, lime Comic Sans text,
+rainbow headings, blinking links, ridged image borders, a scrolling "Welcome!"
+marquee with an UNDER CONSTRUCTION sign and a visitor counter, and a sparkle
+trail behind the mouse. The button stays pressed in while the mode is on.
+Click it again to put the page back. The choice is saved in `settings.txt`, so
+it survives restarts.
+
+It works by running `ui/geocities.js` in each frame of the content view after
+every load (and in all frames right away when toggled). The styles are
+constructed stylesheets (`adoptedStyleSheets`), which page Content Security
+Policies don't block, and the banner lives in a closed shadow root so the page
+can't restyle it. The styles also go into the page's open shadow trees (custom
+elements), and menus, cookie banners and other floating boxes that had a solid
+background get a solid navy one so they stay readable. Both are rechecked as
+the page changes.
 
 The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `view-source`), bare host names (`example.com`, `localhost:8080`, which get
@@ -179,7 +200,9 @@ the page view, never the toolbar, and the setting is remembered between runs.
 | Windows | `%APPDATA%\Lantern\bookmarks.tsv` | `%APPDATA%\Lantern\cache` |
 | Linux | `$XDG_CONFIG_HOME/lantern/bookmarks.tsv` (default `~/.config/lantern`) | `…/lantern/cache` |
 
-Settings (the dial-up simulator) live in `settings.txt` next to the bookmarks.
+Settings (the dial-up simulator and GeoCities mode) live in `settings.txt` next
+to the bookmarks, as `key=value` lines.
+
 Bookmarks are plain text, one `title<TAB>url` per line, so you can edit the file
 by hand while Lantern is closed. A few defaults are written on first run.
 
@@ -205,7 +228,7 @@ building browser UI with web tech on top of Chromium. They talk to Rust like thi
   `lantern|<seq>|<command>|<encodeURIComponent(arg)>`. The toolbar's display
   handler sees it in `on_title_change`, decodes it and acts on the content
   browser. Commands: `ready`, `back`, `forward`, `reload`, `stop`, `home`,
-  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`.
+  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`, `geocities`.
 - **Rust → chrome page.** `execute_java_script("lantern.update({...})")` pushes
   state (URL, nav buttons, loading, quick links; status text, progress, padlock).
 - **Internal page → Rust.** The bookmarks, about and error pages link to
@@ -239,10 +262,12 @@ src/shell/commands.rs           title-channel commands, lantern.invalid actions,
 src/shell/pages.rs              data: URIs for chrome and internal pages
 src/shell/art.rs                pixel-art text → inline SVG
 src/shell/bookmarks.rs          bookmark TSV + per-OS data directory
-src/shell/settings.rs           user settings (dial-up mode and modem speed profiles)
+src/shell/settings.rs           user settings (dial-up mode, modem speed profiles, GeoCities mode)
 src/shell/dialup.rs             dial-up simulator: network emulation and the image pacer
+src/shell/geocities.rs          GeoCities mode: toggling and running ui/geocities.js
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
+ui/geocities.js                 GeoCities mode stylesheet and decorations, injected into pages
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
 ui/dialup-images.js             "slow images" pacer injected into content pages
 ui/lantern.txt, icons.txt       pixel art: the lantern (5 frames) and the toolbar icons

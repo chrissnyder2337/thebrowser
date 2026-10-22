@@ -2,7 +2,7 @@
 //! browser view it serves.
 
 use super::{
-    commands, dialup,
+    commands, dialup, geocities,
     state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
 };
 use cef::*;
@@ -247,6 +247,20 @@ wrap_load_handler! {
                 }
             });
             push_all();
+        }
+
+        fn on_load_end(
+            &self,
+            _browser: Option<&mut Browser>,
+            frame: Option<&mut Frame>,
+            _http_status_code: ::std::os::raw::c_int,
+        ) {
+            if self.role != Role::Content {
+                return;
+            }
+            if let Some(frame) = frame {
+                geocities::on_frame_loaded(frame);
+            }
         }
 
         fn on_load_error(

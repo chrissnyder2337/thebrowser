@@ -99,6 +99,7 @@ pub fn toolbar_uri() -> String {
             "bookmarks",
             "mark",
             "stop",
+            "geocities",
         ] {
             let key = format!("ICON_{}", name.to_ascii_uppercase());
             let html = format!(
