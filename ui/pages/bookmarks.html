@@ -1,1 +1,46 @@
-<!doctype html><title>stub</title><body style='background:#c0c0c0'>pages/bookmarks</body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Bookmarks</title>
+<style>
+{{STYLE}}
+  .panel { max-width: 860px; }
+  .foot { max-width: 860px; }
+  .list { padding: 2px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th {
+    text-align: left; font-weight: normal; height: 20px; padding: 0 6px; background: #c0c0c0;
+    box-shadow: inset 1px 1px #fff, inset -1px -1px #808080;
+  }
+  td { padding: 3px 6px; height: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tr.odd td { background: #f0f0f0; }
+  td.n, th.n { width: 34px; text-align: right; color: #404040; }
+  td.act { overflow: visible; text-overflow: clip; }
+  td.u { color: #404040; font-family: "Courier New", Courier, monospace; }
+  td.empty { text-align: center; color: #808080; padding: 18px; }
+  col.t { width: 34%; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="caption">{{PAGE_ICON}}Bookmarks ({{COUNT}})</div>
+    <div class="inner">
+      <div class="head">
+        <div>
+          <h1>Your Bookmarks</h1>
+          <p>Use <b>Mark</b> on the toolbar (or Ctrl+D) to add the page you are viewing. The first eight appear as Quick links.</p>
+        </div>
+      </div>
+      <div class="list sunken">
+        <table>
+          <colgroup><col style="width:34px"><col class="t"><col><col style="width:124px"></colgroup>
+          <thead><tr><th class="n">#</th><th>Title</th><th>Address</th><th class="act">&nbsp;</th></tr></thead>
+          <tbody>{{ROWS}}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Lantern {{VERSION}}</span><a href="{{HOME_URL}}">Back to the start page</a></div>
+</body>
+</html>

@@ -1,1 +1,61 @@
-<!doctype html><title>stub</title><body style='background:#c0c0c0'>pages/home</body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Start Page</title>
+<style>
+{{STYLE}}
+  .search { display: flex; gap: 6px; margin-top: 4px; }
+  .search input { flex: 1; min-width: 0; }
+  ul.marks { list-style: none; margin: 0; padding: 0; columns: 2 220px; column-gap: 24px; }
+  ul.marks li { display: flex; align-items: center; gap: 6px; padding: 3px 0; break-inside: avoid; }
+  ul.marks li::before { content: ""; width: 7px; height: 7px; flex: none; background: #008080;
+    box-shadow: inset -1px -1px #004040, inset 1px 1px #40c0c0; }
+  ul.marks a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tips { color: #404040; }
+  kbd { font: inherit; padding: 0 3px; background: #dfdfdf;
+    box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="caption">{{PAGE_ICON}}Lantern Start Page</div>
+    <div class="inner">
+      <div class="head">
+        {{LOGO}}
+        <div>
+          <h1>Welcome to Lantern <small>version {{VERSION}}</small></h1>
+          <p>A small light for finding your way around the Web.</p>
+        </div>
+      </div>
+      <fieldset>
+        <legend>Search the Web</legend>
+        <form class="search" action="https://duckduckgo.com/" method="get">
+          <input type="search" name="q" id="q" placeholder="Type a few words and press Enter" aria-label="Search terms" autocomplete="off">
+          <button type="submit">Search</button>
+        </form>
+      </fieldset>
+      <fieldset>
+        <legend>Bookmarks</legend>
+        <ul class="marks">{{BOOKMARK_LIST}}</ul>
+      </fieldset>
+      <hr>
+      <p class="tips">Tips: <kbd>Ctrl</kbd>+<kbd>L</kbd> jumps to the URL field, <kbd>Ctrl</kbd>+<kbd>D</kbd> bookmarks the
+        current page, <kbd>Alt</kbd>+<kbd>Home</kbd> comes back here. On a Mac, use <kbd>Cmd</kbd>.</p>
+    </div>
+  </div>
+<script>
+  (function () {
+    function focusSearch() {
+      if (location.hash.indexOf("#search") === 0) {
+        var q = document.getElementById("q");
+        q.focus();
+        q.select();
+      }
+    }
+    window.addEventListener("hashchange", focusSearch);
+    focusSearch();
+  })();
+</script>
+</body>
+</html>

@@ -1,1 +1,40 @@
-<!doctype html><title>stub</title><body style='background:#c0c0c0'>pages/error</body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page not reached</title>
+<style>
+{{STYLE}}
+  .panel { max-width: 600px; margin-top: 30px; }
+  .foot { max-width: 600px; }
+  .url { padding: 6px 8px; margin: 8px 0 10px; word-break: break-all; font-family: "Courier New", Courier, monospace; }
+  .code { color: #404040; }
+  ul { margin: 4px 0 12px; padding-left: 20px; line-height: 1.5; }
+  .actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .head svg.logo { width: 32px; height: 48px; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="caption">{{PAGE_ICON}}Lantern</div>
+    <div class="inner">
+      <div class="head">
+        {{LOGO}}
+        <div>
+          <h1>Couldn't reach this page</h1>
+          <p>Lantern tried to load the address below, but it didn't work out.</p>
+        </div>
+      </div>
+      <div class="url sunken">{{URL}}</div>
+      <p><b>{{ERROR_TEXT}}</b> <span class="code">(error {{ERROR_CODE}})</span></p>
+      <p>Some things to try:</p>
+      <ul>
+        <li>Check the address for typing mistakes.</li>
+        <li>Make sure your computer is connected to the network.</li>
+        <li>The site may be busy or down. Try again in a little while.</li>
+      </ul>
+      <div class="actions">{{RETRY}}<a class="btn" href="{{HOME_URL}}">Start Page</a></div>
+    </div>
+  </div>
+</body>
+</html>

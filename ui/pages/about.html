@@ -1,1 +1,48 @@
-<!doctype html><title>stub</title><body style='background:#c0c0c0'>pages/about</body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About Lantern</title>
+<style>
+{{STYLE}}
+  .panel { max-width: 560px; }
+  .foot { max-width: 560px; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; padding: 10px 12px; }
+  dt { color: #404040; }
+  dd { margin: 0; word-break: break-all; }
+  .credits p { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="caption">{{PAGE_ICON}}About Lantern</div>
+    <div class="inner">
+      <div class="head">
+        {{LOGO}}
+        <div>
+          <h1>Lantern</h1>
+          <p>Version {{VERSION}}</p>
+          <p>A small retro-styled web browser.</p>
+        </div>
+      </div>
+      <div class="sunken">
+        <dl>
+          <dt>Lantern</dt><dd>{{VERSION}}</dd>
+          <dt>CEF</dt><dd>{{CEF_VERSION}}</dd>
+          <dt>Chromium</dt><dd>{{CHROMIUM_VERSION}}</dd>
+          <dt>Profile</dt><dd>{{DATA_DIR}}</dd>
+        </dl>
+      </div>
+      <fieldset class="credits">
+        <legend>Credits</legend>
+        <p>Web pages are rendered by Chromium through the
+          <a href="https://bitbucket.org/chromiumembedded/cef">Chromium Embedded Framework</a> (BSD license).</p>
+        <p>Lantern drives CEF from Rust using
+          <a href="https://github.com/tauri-apps/cef-rs">cef-rs</a> by the Tauri team (Apache-2.0 or MIT).</p>
+        <p>Chromium itself includes many open source components; see their respective licenses.</p>
+      </fieldset>
+    </div>
+  </div>
+  <div class="foot"><span>Lantern {{VERSION}}</span><a href="{{HOME_URL}}">Back to the start page</a></div>
+</body>
+</html>

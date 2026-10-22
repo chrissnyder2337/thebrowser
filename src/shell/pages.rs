@@ -21,6 +21,7 @@ const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
 const BOOKMARKS_HTML: &str = include_str!("../../ui/pages/bookmarks.html");
 const ABOUT_HTML: &str = include_str!("../../ui/pages/about.html");
 const ERROR_HTML: &str = include_str!("../../ui/pages/error.html");
+const PAGE_CSS: &str = include_str!("../../ui/pages/common.css");
 
 /// Replace `{{NAME}}` placeholders in one pass. Values must already be safe
 /// HTML (use [`html_escape`] for text); inserted values are never re-scanned.
@@ -75,6 +76,7 @@ fn common_vars() -> Vec<(&'static str, String)> {
         ("VERSION", html_escape(env!("CARGO_PKG_VERSION"))),
         ("LOGO", logo(4)),
         ("PAGE_ICON", with_icons(|s| s.svg("page", 1, "pg"))),
+        ("STYLE", PAGE_CSS.to_owned()),
     ]
 }
 
@@ -141,8 +143,8 @@ fn bookmark_rows(bookmarks: &[Bookmark]) -> String {
             concat!(
                 r#"<tr class="{parity}"><td class="n">{n}</td><td>{title}</td>"#,
                 r#"<td class="u" title="{url}">{url_short}</td>"#,
-                r#"<td class="act"><a class="btn" href="{url}">Open</a> "#,
-                r#"<a class="btn" href="{delete}">Delete</a></td></tr>"#
+                r#"<td class="act"><a class="btn small" href="{url}">Open</a> "#,
+                r#"<a class="btn small" href="{delete}">Delete</a></td></tr>"#
             ),
             parity = if i % 2 == 0 { "even" } else { "odd" },
             n = i + 1,
