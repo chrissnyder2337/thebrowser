@@ -1,0 +1,57 @@
+* { box-sizing: border-box; }
+html { background: #c0c0c0; }
+body {
+  margin: 0; padding: 28px 16px 40px; color: #000;
+  font: 12px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: none; font-smooth: never;
+}
+a { color: #0000c0; }
+a:visited { color: #600080; }
+a:active { color: #c00000; }
+/* A beveled dialog-like panel with a navy caption bar. */
+.panel {
+  max-width: 720px; margin: 0 auto; background: #c0c0c0; padding: 3px;
+  box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #000, inset 2px 2px #fff, inset -2px -2px #808080;
+}
+.caption {
+  height: 20px; padding: 0 6px; display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold;
+}
+.caption svg { width: 12px; height: 12px; }
+.inner { padding: 16px 18px 18px; }
+.head { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+.head svg.logo { flex: none; }
+h1 { font: bold 22px Georgia, "Times New Roman", serif; margin: 0 0 4px; }
+h1 small { font: 12px "MS Sans Serif", Tahoma, sans-serif; color: #404040; }
+p { margin: 0 0 8px; line-height: 1.4; }
+fieldset {
+  border: 0; margin: 14px 0 0; padding: 14px 12px 10px; position: relative;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #fff, inset -2px -2px #808080;
+}
+legend { position: absolute; top: -7px; left: 8px; padding: 0 4px; background: #c0c0c0; }
+.sunken {
+  background: #fff;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+}
+input[type=text], input[type=search] {
+  font: inherit; height: 23px; padding: 3px 5px; border: 0; outline: none;
+  background: #fff;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+}
+input::selection { background: #000080; color: #fff; }
+button, .btn {
+  font: inherit; color: #000; text-decoration: none; display: inline-block;
+  min-width: 64px; height: 23px; line-height: 23px; padding: 0 10px; text-align: center;
+  border: 0; background: #c0c0c0; cursor: default; white-space: nowrap;
+  box-shadow: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+}
+.btn:visited { color: #000; }
+button:active, .btn:active {
+  box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+  padding: 1px 9px 0 11px;
+}
+button:focus-visible, .btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+.small { min-width: 0; height: 19px; line-height: 19px; padding: 0 7px; }
+.small:active { padding: 1px 6px 0 8px; }
+.foot { max-width: 720px; margin: 10px auto 0; color: #404040; display: flex; justify-content: space-between; }
+hr { border: 0; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 12px 0; }

@@ -1,0 +1,44 @@
+[package]
+name = "lantern"
+edition = "2024"
+rust-version = "1.88"
+version = "0.1.0"
+description = "A small retro-styled desktop web browser built on CEF"
+license = "Apache-2.0 OR MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[[bin]]
+name = "lantern"
+
+[[bin]]
+name = "lantern_helper"
+
+[features]
+default = ["sandbox"]
+sandbox = ["cef/sandbox"]
+
+[package.metadata.cef.bundle]
+helper_name = "lantern_helper"
+resources_path = "resources"
+
+[dependencies]
+# Pinned exactly: the generated bindings track a specific CEF release.
+cef = { version = "=154.5.0", default-features = false, features = ["build-util"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6.3"
+objc2-foundation = "0.3.2"
+objc2-app-kit = { version = "0.3.2", default-features = false, features = [
+    "NSApplication",
+    "NSEvent",
+    "NSResponder",
+    "NSUserInterfaceValidation",
+    "NSView",
+    "NSWindow",
+] }
+
+[target.'cfg(target_os = "windows")'.build-dependencies]
+winres = "0.1"

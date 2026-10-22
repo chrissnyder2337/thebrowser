@@ -1,0 +1,5 @@
+/* Localized versions of Info.plist keys */
+
+CFBundleName = "Lantern";
+CFBundleDisplayName = "Lantern";
+NSHumanReadableCopyright = "Lantern contributors. Built on the Chromium Embedded Framework.";

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<style>
+  :root {
+    --face: #c0c0c0;
+    --hi: #ffffff;
+    --light: #dfdfdf;
+    --shadow: #808080;
+    --dark: #000000;
+    --sel: #000080;
+    --raised: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+    --pressed: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+    --thin-raised: inset 1px 1px #fff, inset -1px -1px #808080;
+    --thin-pressed: inset 1px 1px #808080, inset -1px -1px #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #c0c0c0; color: #000;
+    font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-font-smoothing: none; font-smooth: never;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; border-top: 1px solid #fff; }
+  svg { display: block; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+  /* Etched rules between rows, etched bars between button groups. */
+  .rule { height: 2px; flex: none; border-top: 1px solid #808080; border-bottom: 1px solid #fff; }
+  .sep { width: 2px; height: 46px; margin: 0 3px; flex: none;
+         border-left: 1px solid #808080; border-right: 1px solid #fff; }
+
+  /* ---- Button row ---- */
+  #top { height: 56px; flex: none; display: flex; align-items: center; padding: 0 3px 0 4px; }
+  #buttons { flex: 1; display: flex; align-items: center; min-width: 0; overflow: hidden; }
+  .big {
+    min-width: 54px; height: 50px; flex: none; padding: 0 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .big svg { width: 24px; height: 24px; }
+  .big svg.off { display: none; width: 25px; height: 25px; }
+  .big:hover:not(.disabled) { box-shadow: var(--raised); }
+  .big:active:not(.disabled) { box-shadow: var(--pressed); }
+  .big:active:not(.disabled) > * { transform: translate(1px, 1px); }
+  .big:focus-visible span { outline: 1px dotted #000; }
+  .big.disabled svg.on { display: none; }
+  .big.disabled svg.off { display: block; }
+  .big.disabled span { color: #808080; text-shadow: 1px 1px #fff; }
+
+  /* ---- Throbber ---- */
+  #throbber {
+    width: 52px; height: 52px; flex: none; margin-left: 4px;
+    box-shadow: var(--sunken); padding: 2px;
+    display: flex; align-items: center; justify-content: center;
+    background: #202020;
+  }
+  #throbber .glow {
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    background: #303028;
+  }
+  #throbber.loading .glow { background: #5a3a10; animation: glow 1.2s steps(3) infinite alternate; }
+  @keyframes glow { from { background: #4a300c; } to { background: #7a5018; } }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+  #throbber:active .glow { transform: translate(1px, 1px); }
+
+  /* ---- Address row ---- */
+  #addr { height: 26px; flex: none; display: flex; align-items: center; padding: 0 4px 0 6px; gap: 4px; }
+  #addr label { flex: none; padding-right: 2px; }
+  .field {
+    flex: 1; min-width: 0; height: 22px; position: relative;
+    background: #fff; box-shadow: var(--sunken); padding: 2px;
+  }
+  .field svg.lock { position: absolute; left: 5px; top: 5px; display: none; }
+  .field.secure svg.lock { display: block; }
+  #url {
+    width: 100%; height: 18px; border: 0; outline: none; padding: 1px 3px;
+    font: inherit; color: #000; background: transparent; user-select: text;
+  }
+  .field.secure #url { padding-left: 17px; }
+  #url::selection { background: #000080; color: #fff; }
+  .push {
+    height: 22px; min-width: 40px; padding: 0 8px; flex: none;
+    box-shadow: var(--raised);
+  }
+  .push:active { box-shadow: var(--pressed); padding: 1px 7px 0 9px; }
+  .push:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+
+  /* ---- Quick links ---- */
+  #quick { height: 25px; flex: none; display: flex; align-items: center; padding: 0 4px 1px 6px; gap: 3px; overflow: hidden; }
+  #quick > label { flex: none; padding-right: 3px; }
+  #links { display: flex; gap: 3px; min-width: 0; overflow: hidden; }
+  .ql {
+    height: 20px; max-width: 132px; flex: none; padding: 0 6px 0 4px;
+    display: flex; align-items: center; gap: 4px;
+    box-shadow: var(--thin-raised);
+  }
+  .ql:hover { box-shadow: var(--raised); }
+  .ql:active { box-shadow: var(--pressed); }
+  .ql:active > * { transform: translate(1px, 1px); }
+  .ql:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .ql svg { flex: none; }
+  .ql span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #quick .none { color: #808080; text-shadow: 1px 1px #fff; }
+</style>
+</head>
+<body>
+  <div id="top">
+    <div id="buttons">
+      <button class="big disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_BACK}}<span>Back</span></button>
+      <button class="big disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_FORWARD}}<span>Forward</span></button>
+      <button class="big" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_RELOAD}}<span>Reload</span></button>
+      <div class="sep"></div>
+      <button class="big" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_HOME}}<span>Home</span></button>
+      <button class="big" id="search" data-cmd="search" title="Search the web">{{ICON_SEARCH}}<span>Search</span></button>
+      <div class="sep"></div>
+      <button class="big" id="bookmarks" data-cmd="bookmarks" title="Show bookmarks">{{ICON_BOOKMARKS}}<span>Bookmarks</span></button>
+      <button class="big" id="mark" data-cmd="bookmark-add" title="Bookmark this page (Ctrl+D)">{{ICON_MARK}}<span>Mark</span></button>
+      <div class="sep"></div>
+      <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_STOP}}<span>Stop</span></button>
+    </div>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      <div class="glow">
+        {{LANTERN_IDLE}}
+        <div class="lit-box">{{LANTERN_LIT}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <div id="addr">
+    <label for="url">URL:</label>
+    <div class="field" id="field">
+      {{ICON_LOCK}}
+      <input id="url" type="text" spellcheck="false" autocomplete="off" aria-label="Address">
+    </div>
+    <button class="push" id="go" title="Go to the address">Go</button>
+  </div>
+  <div class="rule"></div>
+  <div id="quick">
+    <label>Quick:</label>
+    <div id="links"></div>
+  </div>
+  <template id="page-icon">{{ICON_PAGE}}</template>
+<script>
+(function () {
+  "use strict";
+  var seq = 0;
+  // Title channel to Rust: "lantern|<seq>|<command>|<encoded arg>".
+  function send(cmd, arg) {
+    seq += 1;
+    document.title = "lantern|" + seq + "|" + cmd + "|" + encodeURIComponent(arg || "");
+  }
+
+  var url = document.getElementById("url");
+  var field = document.getElementById("field");
+  var throbber = document.getElementById("throbber");
+  var links = document.getElementById("links");
+  var pageIcon = document.getElementById("page-icon").innerHTML;
+  var buttons = {
+    back: document.getElementById("back"),
+    forward: document.getElementById("forward"),
+    stop: document.getElementById("stop")
+  };
+  var state = { url: "" };
+  var editing = false;
+
+  Array.prototype.forEach.call(document.querySelectorAll(".big"), function (b) {
+    b.addEventListener("click", function () {
+      if (!b.classList.contains("disabled")) send(b.dataset.cmd);
+    });
+  });
+  throbber.addEventListener("click", function () { send("about"); });
+
+  function go() {
+    var text = url.value.trim();
+    editing = false;
+    if (text) send("go", text);
+  }
+  document.getElementById("go").addEventListener("click", go);
+  url.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); go(); }
+    else if (e.key === "Escape") { editing = false; url.value = state.url; url.select(); }
+  });
+  url.addEventListener("input", function () { editing = true; });
+  url.addEventListener("focus", function () { setTimeout(function () { url.select(); }, 0); });
+  url.addEventListener("blur", function () {
+    if (editing && url.value.trim() === "") { editing = false; url.value = state.url; }
+  });
+
+  // Chrome pages have no context menu (except the URL field) and nothing to drag.
+  document.addEventListener("contextmenu", function (e) { if (e.target !== url) e.preventDefault(); });
+  document.addEventListener("dragstart", function (e) { if (e.target !== url) e.preventDefault(); });
+  document.addEventListener("dragover", function (e) { e.preventDefault(); });
+  document.addEventListener("drop", function (e) {
+    e.preventDefault();
+    var text = e.dataTransfer && (e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain"));
+    if (text) send("go", text.split("\n")[0]);
+  });
+
+  function setDisabled(el, disabled) { el.classList.toggle("disabled", !!disabled); }
+
+  function renderLinks(list) {
+    links.textContent = "";
+    if (!list.length) {
+      var none = document.createElement("span");
+      none.className = "none";
+      none.textContent = "(no bookmarks)";
+      links.appendChild(none);
+      return;
+    }
+    list.forEach(function (b) {
+      var btn = document.createElement("button");
+      btn.className = "ql";
+      btn.title = b.url;
+      btn.innerHTML = pageIcon;
+      var label = document.createElement("span");
+      label.textContent = b.title;
+      btn.appendChild(label);
+      btn.addEventListener("click", function () { send("open", b.url); });
+      links.appendChild(btn);
+    });
+  }
+
+  var lastLinks = null;
+  window.lantern = {
+    update: function (s) {
+      if ("url" in s) {
+        state.url = s.url;
+        if (!editing || document.activeElement !== url) { editing = false; url.value = s.url; }
+      }
+      if ("canBack" in s) setDisabled(buttons.back, !s.canBack);
+      if ("canFwd" in s) setDisabled(buttons.forward, !s.canFwd);
+      if ("loading" in s) {
+        setDisabled(buttons.stop, !s.loading);
+        throbber.classList.toggle("loading", !!s.loading);
+      }
+      if ("secure" in s) field.classList.toggle("secure", !!s.secure);
+      if (s.bookmarks) {
+        var key = JSON.stringify(s.bookmarks);
+        if (key !== lastLinks) { lastLinks = key; renderLinks(s.bookmarks); }
+      }
+    },
+    focusUrl: function () {
+      url.focus();
+      url.select();
+    }
+  };
+
+  send("ready");
+})();
+</script>
+</body>
+</html>

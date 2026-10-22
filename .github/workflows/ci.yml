@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Must match the `cef` pin in Cargo.toml.
+  CEF_CRATE_VERSION: "154.5.0"
+
+jobs:
+  linux:
+    name: Linux (fmt, clippy, test, bundle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq libglib2.0-dev ninja-build
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Set up CEF
+        uses: ./.github/actions/setup-cef
+        with:
+          version: ${{ env.CEF_CRATE_VERSION }}
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      # cef-dll-sys builds its C++ wrapper against $CEF_PATH here.
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Unit tests
+        run: cargo test --bin lantern
+
+      - name: Cache bundle-cef-app
+        id: bundler
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin/bundle-cef-app
+          key: bundle-cef-app-${{ env.CEF_CRATE_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install bundle-cef-app
+        if: steps.bundler.outputs.cache-hit != 'true'
+        run: cargo install cef --version "=$CEF_CRATE_VERSION" --bin bundle-cef-app --locked
+
+      - name: Bundle
+        run: bundle-cef-app lantern -o target/bundle --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lantern-linux-x86_64
+          path: target/bundle
+          retention-days: 7
+
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Set up CEF
+        uses: ./.github/actions/setup-cef
+        with:
+          version: ${{ env.CEF_CRATE_VERSION }}
+
+      - name: Build
+        run: cargo build --bins --lib
