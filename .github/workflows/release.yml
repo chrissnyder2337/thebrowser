@@ -1,0 +1,134 @@
+name: Release
+
+# Push a tag like v0.2.0 (matching Cargo.toml's version) to build Lantern for
+# Linux, macOS and Windows and publish the bundles as a GitHub Release.
+# Run it manually (workflow_dispatch) to build the bundles without publishing.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # Must match the `cef` pin in Cargo.toml.
+  CEF_CRATE_VERSION: "154.5.0"
+
+jobs:
+  bundle:
+    name: Bundle (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            os: ubuntu-latest
+          - name: macos-arm64
+            os: macos-latest
+          - name: windows-x86_64
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read version
+        id: version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
+            exit 1
+          fi
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq libglib2.0-dev ninja-build
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release
+
+      - name: Cache bundle-cef-app
+        id: bundler
+        uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cargo/bin/bundle-cef-app
+            ~/.cargo/bin/bundle-cef-app.exe
+          key: bundle-cef-app-${{ env.CEF_CRATE_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install bundle-cef-app
+        if: steps.bundler.outputs.cache-hit != 'true'
+        run: cargo install cef --version "=$CEF_CRATE_VERSION" --bin bundle-cef-app --locked
+
+      - name: Bundle (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          bundle-cef-app lantern -o dist/lantern --release
+          tar -C dist -czf "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.tar.gz" lantern
+
+      # bundle-cef-app always uses the dev profile on macOS, so give that
+      # profile release settings for this build.
+      - name: Bundle (macOS)
+        if: runner.os == 'macOS'
+        env:
+          CARGO_PROFILE_DEV_OPT_LEVEL: "3"
+          CARGO_PROFILE_DEV_DEBUG: "0"
+          CARGO_PROFILE_DEV_DEBUG_ASSERTIONS: "false"
+          CARGO_PROFILE_DEV_OVERFLOW_CHECKS: "false"
+          CARGO_PROFILE_DEV_INCREMENTAL: "false"
+        run: |
+          bundle-cef-app lantern -o dist \
+            -d Lantern \
+            -i io.github.chrissnyder2337.lantern \
+            -v "${{ steps.version.outputs.version }}"
+          # ditto keeps the framework's symlinks intact.
+          ditto -c -k --keepParent dist/lantern.app "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip"
+
+      - name: Bundle (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          bundle-cef-app lantern -o dist/lantern --release
+          Compress-Archive -Path dist/lantern -DestinationPath "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lantern-${{ matrix.name }}
+          path: |
+            lantern-*.tar.gz
+            lantern-*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: bundle
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: artifacts
+        run: sha256sum lantern-* > SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

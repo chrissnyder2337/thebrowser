@@ -93,6 +93,21 @@ Windows. It needs Rust 1.88 or newer.
 The unit tests cover URL normalization, percent and HTML/JS escaping, the title
 channel parser, template filling, bookmark storage and the pixel-art sheets.
 
+### Releasing
+
+1. Bump `version` in `Cargo.toml` and merge it to `main`.
+2. Tag that commit and push the tag: `git tag v0.2.0 && git push origin v0.2.0`.
+
+`.github/workflows/release.yml` then builds bundles for Linux x86_64
+(`.tar.gz`), macOS arm64 (`.zip` of `Lantern.app`) and Windows x86_64 (`.zip`),
+and publishes them with a `SHA256SUMS.txt` as a GitHub Release with generated
+notes. The tag must match the `Cargo.toml` version or the run fails. Running the
+workflow by hand from the Actions tab builds the same bundles as downloadable
+artifacts without publishing a release.
+
+The macOS app is not code-signed or notarized, so after downloading it, open it
+with right-click → Open (or run `xattr -dr com.apple.quarantine Lantern.app`).
+
 ## Using Lantern
 
 | Action | Linux / Windows | macOS |

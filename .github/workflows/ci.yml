@@ -13,6 +13,8 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: always
+  # Must match the `cef` pin in Cargo.toml.
+  CEF_CRATE_VERSION: "154.5.0"
 
 jobs:
   linux:
@@ -38,10 +40,19 @@ jobs:
       - name: Unit tests
         run: cargo test --bin lantern
 
+      - name: Cache bundle-cef-app
+        id: bundler
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin/bundle-cef-app
+          key: bundle-cef-app-${{ env.CEF_CRATE_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install bundle-cef-app
+        if: steps.bundler.outputs.cache-hit != 'true'
+        run: cargo install cef --version "=$CEF_CRATE_VERSION" --bin bundle-cef-app --locked
+
       - name: Bundle
-        run: |
-          cargo install cef --version "=154.5.0" --bin bundle-cef-app --locked
-          bundle-cef-app lantern -o target/bundle --release
+        run: bundle-cef-app lantern -o target/bundle --release
 
       - uses: actions/upload-artifact@v4
         with:
