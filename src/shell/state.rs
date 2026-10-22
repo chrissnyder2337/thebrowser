@@ -49,7 +49,7 @@ pub struct Shell {
     pub status_message: String,
     /// One-off message (e.g. "Bookmark added.") shown until the next navigation.
     pub notice: String,
-    /// Whether at least one page load has finished ("Page complete." vs "Ready.").
+    /// Whether a web page load has finished ("Page complete." vs "Ready.").
     pub load_finished: bool,
 
     /// What the URL bar shows while an internal `data:` page is displayed.
@@ -120,7 +120,7 @@ impl Shell {
             }
         } else if !self.notice.is_empty() {
             self.notice.clone()
-        } else if self.load_finished {
+        } else if self.load_finished && self.internal_label.is_none() {
             "Page complete.".to_owned()
         } else {
             "Ready.".to_owned()
