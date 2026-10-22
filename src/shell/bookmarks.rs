@@ -102,7 +102,10 @@ fn load_from(path: &Path) -> Vec<Bookmark> {
         Err(err) if err.kind() == io::ErrorKind::NotFound => {
             let list = defaults();
             if let Err(err) = save_to(path, &list) {
-                eprintln!("lantern: could not seed bookmarks at {}: {err}", path.display());
+                eprintln!(
+                    "lantern: could not seed bookmarks at {}: {err}",
+                    path.display()
+                );
             }
             list
         }
@@ -160,7 +163,10 @@ mod tests {
         let list = parse("A\thttps://a/\nbad line\nB\thttps://b/\r\nA2\thttps://a/\n");
         assert_eq!(
             list,
-            vec![Bookmark::new("A", "https://a/"), Bookmark::new("B", "https://b/")]
+            vec![
+                Bookmark::new("A", "https://a/"),
+                Bookmark::new("B", "https://b/")
+            ]
         );
         assert_eq!(parse(&serialize(&list)), list);
     }

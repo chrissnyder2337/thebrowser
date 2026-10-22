@@ -3,9 +3,7 @@
 
 use super::{
     commands,
-    state::{
-        Role, internal_url_key, push_all, push_status, update_window_title, with_shell,
-    },
+    state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
 };
 use cef::*;
 
@@ -326,7 +324,9 @@ fn handle_shortcut(event: &KeyEvent) -> bool {
     if event.type_ != KeyEventType::RAWKEYDOWN && event.type_ != KeyEventType::KEYDOWN {
         return false;
     }
-    let flag = |f: sys::cef_event_flags_t| event.modifiers & f.0 != 0;
+    // The flag enum is backed by u32 on Linux/macOS but i32 on Windows.
+    #[allow(clippy::unnecessary_cast)]
+    let flag = |f: sys::cef_event_flags_t| event.modifiers & (f.0 as u32) != 0;
     let ctrl = flag(sys::cef_event_flags_t::EVENTFLAG_CONTROL_DOWN);
     let alt = flag(sys::cef_event_flags_t::EVENTFLAG_ALT_DOWN);
     let shift = flag(sys::cef_event_flags_t::EVENTFLAG_SHIFT_DOWN);

@@ -84,7 +84,14 @@ pub fn toolbar_uri() -> String {
     let mut vars = vec![];
     with_icons(|sheet| {
         for name in [
-            "back", "forward", "reload", "home", "search", "bookmarks", "mark", "stop",
+            "back",
+            "forward",
+            "reload",
+            "home",
+            "search",
+            "bookmarks",
+            "mark",
+            "stop",
         ] {
             let key = format!("ICON_{}", name.to_ascii_uppercase());
             let html = format!(
@@ -114,7 +121,10 @@ pub fn status_uri() -> String {
 }
 
 fn action_url(action: &str, url: &str) -> String {
-    format!("https://{ACTION_HOST}/{action}?url={}", encode_component(url))
+    format!(
+        "https://{ACTION_HOST}/{action}?url={}",
+        encode_component(url)
+    )
 }
 
 pub fn home_uri(bookmarks: &[Bookmark]) -> String {
@@ -164,7 +174,10 @@ pub fn bookmarks_uri(bookmarks: &[Bookmark]) -> String {
     let mut vars = common_vars();
     vars.push(("ROWS", bookmark_rows(bookmarks)));
     vars.push(("COUNT", bookmarks.len().to_string()));
-    vars.push(("HOME_URL", html_escape(&format!("https://{ACTION_HOST}/home"))));
+    vars.push((
+        "HOME_URL",
+        html_escape(&format!("https://{ACTION_HOST}/home")),
+    ));
     html_uri(&fill(BOOKMARKS_HTML, &vars))
 }
 
@@ -174,7 +187,10 @@ pub fn about_uri(data_dir: &str) -> String {
     vars.push(("CEF_VERSION", html_escape(&cef)));
     vars.push(("CHROMIUM_VERSION", html_escape(&chromium)));
     vars.push(("DATA_DIR", html_escape(data_dir)));
-    vars.push(("HOME_URL", html_escape(&format!("https://{ACTION_HOST}/home"))));
+    vars.push((
+        "HOME_URL",
+        html_escape(&format!("https://{ACTION_HOST}/home")),
+    ));
     html_uri(&fill(ABOUT_HTML, &vars))
 }
 
@@ -183,7 +199,10 @@ pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String 
         .iter()
         .any(|scheme| failed_url.starts_with(scheme));
     let retry = if retryable {
-        format!(r#"<a class="btn" href="{}">Retry</a>"#, html_escape(failed_url))
+        format!(
+            r#"<a class="btn" href="{}">Retry</a>"#,
+            html_escape(failed_url)
+        )
     } else {
         String::new()
     };
@@ -197,7 +216,10 @@ pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String 
     vars.push(("ERROR_TEXT", html_escape(error_text)));
     vars.push(("ERROR_CODE", error_code.to_string()));
     vars.push(("RETRY", retry));
-    vars.push(("HOME_URL", html_escape(&format!("https://{ACTION_HOST}/home"))));
+    vars.push((
+        "HOME_URL",
+        html_escape(&format!("https://{ACTION_HOST}/home")),
+    ));
     html_uri(&fill(ERROR_HTML, &vars))
 }
 
@@ -223,8 +245,17 @@ mod tests {
     fn templates_have_no_unknown_placeholders() {
         let mut vars = common_vars();
         for key in [
-            "BOOKMARK_LIST", "ROWS", "COUNT", "HOME_URL", "CEF_VERSION", "CHROMIUM_VERSION",
-            "DATA_DIR", "URL", "ERROR_TEXT", "ERROR_CODE", "RETRY",
+            "BOOKMARK_LIST",
+            "ROWS",
+            "COUNT",
+            "HOME_URL",
+            "CEF_VERSION",
+            "CHROMIUM_VERSION",
+            "DATA_DIR",
+            "URL",
+            "ERROR_TEXT",
+            "ERROR_CODE",
+            "RETRY",
         ] {
             vars.push((key, String::new()));
         }

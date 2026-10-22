@@ -297,9 +297,12 @@ wrap_task! {
     }
 }
 
+/// A one-shot closure, shared so the task wrapper can be `Clone`.
+type Job = std::rc::Rc<RefCell<Option<Box<dyn FnOnce()>>>>;
+
 wrap_task! {
     struct Deferred {
-        job: std::rc::Rc<RefCell<Option<Box<dyn FnOnce()>>>>,
+        job: Job,
     }
 
     impl Task {

@@ -21,8 +21,8 @@ wrap_app! {
 
 /// The `--url=` command-line value, if any.
 fn url_switch(command_line: &CommandLine) -> Option<String> {
-    let url = CefString::from(&command_line.switch_value(Some(&CefString::from("url"))))
-        .to_string();
+    let url =
+        CefString::from(&command_line.switch_value(Some(&CefString::from("url")))).to_string();
     let url = url.trim();
     (!url.is_empty()).then(|| url.to_owned())
 }
@@ -30,7 +30,11 @@ fn url_switch(command_line: &CommandLine) -> Option<String> {
 fn create_browser_view(role: Role, url: &str) -> Option<BrowserView> {
     let mut client = client::new_client(role);
     let settings = BrowserSettings {
-        background_color: if role == Role::Content { 0xFFFFFFFF } else { FACE_GRAY },
+        background_color: if role == Role::Content {
+            0xFFFFFFFF
+        } else {
+            FACE_GRAY
+        },
         ..Default::default()
     };
     let mut delegate = LanternBrowserViewDelegate::new(role);
@@ -100,4 +104,3 @@ wrap_browser_process_handler! {
         }
     }
 }
-

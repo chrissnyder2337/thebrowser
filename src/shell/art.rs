@@ -24,10 +24,10 @@ impl Sheet {
             }
             if let Some(entry) = line.strip_prefix("= ") {
                 let mut parts = entry.split_whitespace();
-                if let (Some(key), Some(color)) = (parts.next(), parts.next()) {
-                    if let Some(key) = key.chars().next() {
-                        palette.insert(key, color.to_owned());
-                    }
+                if let (Some(key), Some(color)) = (parts.next(), parts.next())
+                    && let Some(key) = key.chars().next()
+                {
+                    palette.insert(key, color.to_owned());
                 }
             } else if let Some(name) = line.strip_prefix("frame ") {
                 frames.push((name.trim().to_owned(), Vec::new()));
@@ -68,10 +68,7 @@ impl Sheet {
                     continue;
                 };
                 let start = x;
-                while x < row.len()
-                    && row[x] != '.'
-                    && (recolor.is_some() || row[x] == cell)
-                {
+                while x < row.len() && row[x] != '.' && (recolor.is_some() || row[x] == cell) {
                     x += 1;
                 }
                 let _ = write!(
@@ -149,7 +146,14 @@ mod tests {
         }
         let icons = Sheet::parse(ICONS);
         for name in [
-            "back", "forward", "reload", "home", "search", "bookmarks", "mark", "stop",
+            "back",
+            "forward",
+            "reload",
+            "home",
+            "search",
+            "bookmarks",
+            "mark",
+            "stop",
         ] {
             assert_eq!(icons.size(name), (24, 24), "{name}");
         }

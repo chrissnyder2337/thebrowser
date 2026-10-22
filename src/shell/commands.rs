@@ -211,7 +211,10 @@ pub fn show_about() {
 }
 
 pub fn show_error(failed_url: &str, error_code: i32, error_text: &str) {
-    show_internal(failed_url, pages::error_uri(failed_url, error_code, error_text));
+    show_internal(
+        failed_url,
+        pages::error_uri(failed_url, error_code, error_text),
+    );
 }
 
 /// Re-render the current internal page if it lists bookmarks.
@@ -236,7 +239,13 @@ pub fn add_bookmark() {
         }
         let title = shell.current_title.clone();
         if bookmarks::add(&mut shell.bookmarks, &title, &url) {
-            Outcome::Added(shell.bookmarks.last().map(|b| b.title.clone()).unwrap_or_default())
+            Outcome::Added(
+                shell
+                    .bookmarks
+                    .last()
+                    .map(|b| b.title.clone())
+                    .unwrap_or_default(),
+            )
         } else {
             Outcome::Duplicate
         }
@@ -280,7 +289,8 @@ pub fn handle_action_url(url: &str) -> bool {
         "delete" => {
             if let Some(target) = param("url") {
                 defer(move || {
-                    let removed = with_shell(|shell| bookmarks::remove(&mut shell.bookmarks, &target));
+                    let removed =
+                        with_shell(|shell| bookmarks::remove(&mut shell.bookmarks, &target));
                     if removed {
                         save_bookmarks();
                         push_all();
