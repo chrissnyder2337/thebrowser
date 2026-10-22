@@ -102,6 +102,12 @@ jobs:
           # The bundle is named after the executable; give it the app's name.
           # CEF locates its framework and helpers relative to the executable.
           mv dist/lantern.app dist/Lantern.app
+          # Apple silicon won't run unsigned code, and Gatekeeper reports an
+          # unsigned or partly signed download as "damaged". An ad-hoc
+          # signature over the whole bundle (helpers and CEF framework
+          # included) turns that into the usual unidentified-developer prompt.
+          codesign --force --deep --sign - dist/Lantern.app
+          codesign --verify --deep --strict --verbose=2 dist/Lantern.app
           # ditto keeps the framework's symlinks intact.
           ditto -c -k --keepParent dist/Lantern.app "lantern-${{ matrix.name }}.zip"
 
