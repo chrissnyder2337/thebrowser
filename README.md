@@ -1,5 +1,7 @@
 # Lantern
 
+[![CI](https://github.com/chrissnyder2337/thebrowser/actions/workflows/ci.yml/badge.svg)](https://github.com/chrissnyder2337/thebrowser/actions/workflows/ci.yml)
+
 Lantern is a small desktop web browser with a late-1990s look: chunky gray
 bevels, big icon-over-label buttons and a pixel-art lantern that flickers while
 pages load. Pages are rendered by real Chromium through the
@@ -83,6 +85,10 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
 ```sh
 cargo test --bin lantern
 ```
+
+CI (`.github/workflows/ci.yml`) runs rustfmt, clippy, the unit tests and a
+release bundle on Linux (uploaded as a build artifact), and builds on macOS and
+Windows. It needs Rust 1.88 or newer.
 
 The unit tests cover URL normalization, percent and HTML/JS escaping, the title
 channel parser, template filling, bookmark storage and the pixel-art sheets.
@@ -192,7 +198,8 @@ time (disabled buttons get an embossed gray/white version). The throbber is a
 
 ## Credits and license
 
-Lantern is available under the Apache-2.0 or MIT license, at your option.
+Lantern is available under the [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT) license, at
+your option.
 
 - [Chromium Embedded Framework](https://bitbucket.org/chromiumembedded/cef), BSD license.
 - [cef-rs](https://github.com/tauri-apps/cef-rs) by the Tauri team, Apache-2.0 or MIT. Lantern's
