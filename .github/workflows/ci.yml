@@ -42,8 +42,10 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-targets -- -D warnings
 
+      # The test binary links libcef.so. A warm rust-cache skips the build step
+      # that copies CEF into target/, so load it from CEF_PATH instead.
       - name: Unit tests
-        run: cargo test --bin lantern
+        run: LD_LIBRARY_PATH="$CEF_PATH" cargo test --bin lantern
 
       - name: Cache bundle-cef-app
         id: bundler
