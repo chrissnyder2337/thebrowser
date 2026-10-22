@@ -134,16 +134,25 @@ main() {
         exit 0
     fi
 
-    git push --quiet -u origin "$(git branch --show-current)"
-    if command -v gh >/dev/null; then
-        gh pr create --base main --title "Release $tag" --body "Bumps the version to $next.
-
-    Merging this publishes **$tag**: the Release workflow builds Linux, macOS and
-    Windows, creates the tag and attaches the downloads."
+    local current_branch body compare
+    current_branch=$(git branch --show-current)
+    git push --quiet -u origin "$current_branch"
+    body=$(printf '%s\n' \
+        "Bumps the version to $next." \
+        "" \
+        "Merging this publishes **$tag**: the Release workflow builds Linux, macOS and" \
+        "Windows, creates the tag and attaches the downloads.")
+    if command -v gh >/dev/null &&
+        gh pr create --base main --head "$current_branch" --title "Release $tag" --body "$body"; then
+        return
+    fi
+    compare=$(git remote get-url origin |
+        sed -nE 's#^(git@github\.com:|https://github\.com/)([^/]+/[^/]+)$#\2#p' | sed 's#\.git$##')
+    echo "Pushed $current_branch. Open a pull request into main to publish $tag:"
+    if [[ -n "$compare" ]]; then
+        echo "  https://github.com/$compare/compare/main...$current_branch?expand=1"
     else
-        echo "Pushed. Open a pull request into main to publish $tag:"
-        git remote get-url origin |
-            sed -E 's#(git@github.com:|https://github.com/)([^/]+/[^.]+)(\.git)?#https://github.com/\2/compare/main...'"$(git branch --show-current)"'#'
+        echo "  (from $current_branch into main on GitHub)"
     fi
 }
 
