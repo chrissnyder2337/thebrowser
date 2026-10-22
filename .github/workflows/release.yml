@@ -105,6 +105,7 @@ jobs:
         shell: pwsh
         run: |
           bundle-cef-app lantern -o dist/lantern --release
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Compress-Archive -Path dist/lantern -DestinationPath "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip"
 
       - uses: actions/upload-artifact@v4
