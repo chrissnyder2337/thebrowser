@@ -58,6 +58,11 @@ jobs:
         with:
           key: release
 
+      - name: Set up CEF
+        uses: ./.github/actions/setup-cef
+        with:
+          version: ${{ env.CEF_CRATE_VERSION }}
+
       - name: Cache bundle-cef-app
         id: bundler
         uses: actions/cache@v6.1.0

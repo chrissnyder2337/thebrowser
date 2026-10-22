@@ -1,0 +1,30 @@
+name: Set up CEF
+description: >
+  Restore the CEF binary distribution from the cache (exporting it on a miss)
+  and point CEF_PATH at it, so builds and bundle-cef-app share one copy.
+
+inputs:
+  version:
+    description: The `cef` crate version (must match the pin in Cargo.toml).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set CEF_PATH
+      shell: bash
+      run: echo "CEF_PATH=${{ runner.temp }}/cef" >> "$GITHUB_ENV"
+
+    - name: Cache CEF
+      id: cache
+      uses: actions/cache@v6.1.0
+      with:
+        path: ${{ runner.temp }}/cef
+        key: cef-${{ inputs.version }}-${{ runner.os }}-${{ runner.arch }}
+
+    - name: Export CEF
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        cargo install export-cef-dir --version "=${{ inputs.version }}" --locked
+        export-cef-dir --force "$CEF_PATH"
