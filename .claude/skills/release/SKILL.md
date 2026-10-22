@@ -53,7 +53,9 @@ so the README's `releases/latest/download/<asset>` links always work.
    `Cargo.lock`, commits "Release vX.Y.Z", pushes, and opens the PR with `gh`.
    Without `gh`, it prints a compare URL; open the PR with your GitHub tools.
    If this session may only push to one branch (a Claude Code cloud session),
-   use `--branch <that branch>`. Run `--dry-run` first to preview.
+   check out that branch and use `--no-branch` to add the bump on top of it
+   (`--branch NAME` only starts a *fresh* branch from `origin/main`, and
+   refuses one that already has other commits). Run `--dry-run` first to preview.
 
 4. **Get the PR merged.** Wait for the three CI checks to go green, then merge
    it (merge commit). Don't merge while CI is red: fix the cause.

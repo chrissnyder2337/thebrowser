@@ -11,7 +11,7 @@
 # that the tag vX.Y.Z doesn't exist yet, builds all platforms, creates the tag
 # and publishes the downloads. There is no separate tagging step.
 #
-#   --branch NAME   commit on NAME instead of release/vX.Y.Z
+#   --branch NAME   commit on a fresh NAME instead of release/vX.Y.Z
 #   --no-branch     commit on the current branch (no fetch, no new branch)
 #   --push          push the branch and open a pull request
 #   --dry-run       print what would change, touch nothing
@@ -99,6 +99,14 @@ main() {
 
     if [[ $new_branch == 1 ]]; then
         git fetch --quiet origin main
+        # Never reset a branch that already carries other work.
+        local ref
+        for ref in "refs/heads/$branch" "refs/remotes/origin/$branch"; do
+            if git rev-parse --verify --quiet "$ref" >/dev/null &&
+                ! git merge-base --is-ancestor "$ref" origin/main; then
+                die "branch $branch already has commits that aren't on main. Check it out and rerun with --no-branch to add the bump on top."
+            fi
+        done
         git switch --quiet -C "$branch" origin/main
     fi
 
