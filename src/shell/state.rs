@@ -10,6 +10,7 @@
 
 use super::{
     bookmarks::{self, Bookmark},
+    settings::{DialupMode, Settings},
     util::{self, Json},
 };
 use cef::*;
@@ -59,6 +60,7 @@ pub struct Shell {
     pub internal_urls: HashMap<u64, String>,
 
     pub bookmarks: Vec<Bookmark>,
+    pub settings: Settings,
     pub toolbar_ready: bool,
     pub status_ready: bool,
 }
@@ -156,8 +158,31 @@ impl Shell {
             ("progress", Json::Num(self.progress.clamp(0.0, 1.0))),
             ("loading", Json::Bool(self.is_loading)),
             ("secure", Json::Bool(self.is_secure())),
+            ("modem", Json::str(self.modem_label())),
+            ("modemTip", Json::str(self.modem_tooltip())),
         ])
         .render()
+    }
+
+    /// Status bar label for the dial-up simulator ("" when it is off).
+    fn modem_label(&self) -> String {
+        match self.settings.dialup_mode {
+            DialupMode::Off => String::new(),
+            _ => self.settings.modem_speed.label(),
+        }
+    }
+
+    fn modem_tooltip(&self) -> String {
+        let speed = self.settings.modem_speed.label();
+        match self.settings.dialup_mode {
+            DialupMode::Off => "Dial-up simulator: off. Click to set it up.".to_owned(),
+            DialupMode::Images => {
+                format!("Dial-up simulator: images load at {speed}. Click to change.")
+            }
+            DialupMode::Network => {
+                format!("Dial-up simulator: network limited to {speed}. Click to change.")
+            }
+        }
     }
 
     /// Window title for the current content title.

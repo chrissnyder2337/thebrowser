@@ -1,7 +1,7 @@
 //! The CEF `App` and browser-process handler: builds the window and its three views.
 
 use super::{
-    bookmarks, client, commands, pages,
+    bookmarks, client, commands, pages, settings,
     state::{Role, with_shell},
     util::normalize_url_input,
     window::{FACE_GRAY, LanternBrowserViewDelegate, LanternWindowDelegate},
@@ -56,7 +56,11 @@ wrap_browser_process_handler! {
             debug_assert_ne!(currently_on(ThreadId::UI), 0);
 
             let list = bookmarks::load();
-            with_shell(|shell| shell.bookmarks = list.clone());
+            let user_settings = settings::load();
+            with_shell(|shell| {
+                shell.bookmarks = list.clone();
+                shell.settings = user_settings;
+            });
 
             // The content view starts on the home page unless --url= was given.
             let command_line = command_line_get_global();
