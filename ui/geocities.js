@@ -46,6 +46,7 @@
       "html body :is(img, video, canvas, iframe) { border: 3px ridge #ffff00 !important; }",
       "html body hr { height: 6px !important; border: 0 !important; background: " + RAINBOW + " !important; }",
       "html body :is(table, td, th) { border: 2px outset #c0c0c0 !important; }",
+      "html body button :where(:not(svg *)) { color: #000 !important; }",
       "html body :is(button, input, select, textarea) { color: #000 !important; background-color: #c0c0c0 !important;",
       "  border: 2px outset #ffffff !important; font-family: \"Times New Roman\", Times, serif !important; }",
       "html body :is(input:not([type]), input[type=text], input[type=search], input[type=email], input[type=url], textarea) {",
