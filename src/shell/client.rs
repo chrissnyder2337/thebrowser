@@ -2,7 +2,7 @@
 //! browser view it serves.
 
 use super::{
-    commands,
+    commands, dialup,
     state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
 };
 use cef::*;
@@ -160,10 +160,16 @@ wrap_life_span_handler! {
         fn on_after_created(&self, browser: Option<&mut Browser>) {
             debug_assert_ne!(currently_on(ThreadId::UI), 0);
             let browser = browser.cloned();
-            with_shell(|shell| {
-                shell.set_browser(self.role, browser);
+            let settings = with_shell(|shell| {
+                shell.set_browser(self.role, browser.clone());
                 shell.open_browsers += 1;
+                shell.settings
             });
+            if self.role == Role::Content
+                && let Some(browser) = browser.as_ref()
+            {
+                dialup::apply_network(browser, &settings);
+            }
         }
 
         fn do_close(&self, _browser: Option<&mut Browser>) -> ::std::os::raw::c_int {
@@ -199,6 +205,23 @@ wrap_load_handler! {
     }
 
     impl LoadHandler {
+        fn on_load_start(
+            &self,
+            _browser: Option<&mut Browser>,
+            frame: Option<&mut Frame>,
+            _transition_type: TransitionType,
+        ) {
+            if self.role != Role::Content {
+                return;
+            }
+            // Dial-up "slow images" mode: install the image pacer in every frame.
+            let settings = with_shell(|shell| shell.settings);
+            if let (Some(frame), Some(script)) = (frame, dialup::image_script(&settings)) {
+                let script = CefString::from(script.as_str());
+                frame.execute_java_script(Some(&script), Some(&CefString::from("")), 0);
+            }
+        }
+
         fn on_loading_state_change(
             &self,
             _browser: Option<&mut Browser>,

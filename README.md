@@ -145,8 +145,26 @@ with right-click → Open (or run `xattr -dr com.apple.quarantine Lantern.app`).
 The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `view-source`), bare host names (`example.com`, `localhost:8080`, which get
 `https://`) and anything else as a DuckDuckGo search. `lantern:home`,
-`lantern:bookmarks` and `lantern:about` open the internal pages. Clicking the
+`lantern:bookmarks`, `lantern:settings` and `lantern:about` open the internal pages. Clicking the
 lantern opens the About page.
+
+### Dial-up simulator
+
+Lantern can make the Web feel like 1998 again. Open **Settings** by clicking the
+little modem in the status bar (or type `lantern:settings`), pick a mode and a
+modem speed (14.4K, 28.8K, 33.6K or 56K), and press **Save**:
+
+- **Slow images**: pages and text arrive at full speed, but every picture starts
+  hidden and paints in from the top, a few lines at a time. Its speed comes from
+  the image's real size where the browser reports it, two downloads at a time
+  sharing the modem's bandwidth.
+- **Slow network**: everything the page loads goes through Chromium's network
+  emulation at real modem throughput and latency (56K is about 5.5 KB/s with
+  150 ms round trips), so text trickles in, images arrive last and big sites
+  take minutes.
+
+While the simulator is on, the status bar shows the modem speed. It only affects
+the page view, never the toolbar, and the setting is remembered between runs.
 
 ### Where data lives
 
@@ -156,6 +174,7 @@ lantern opens the About page.
 | Windows | `%APPDATA%\Lantern\bookmarks.tsv` | `%APPDATA%\Lantern\cache` |
 | Linux | `$XDG_CONFIG_HOME/lantern/bookmarks.tsv` (default `~/.config/lantern`) | `…/lantern/cache` |
 
+Settings (the dial-up simulator) live in `settings.txt` next to the bookmarks.
 Bookmarks are plain text, one `title<TAB>url` per line, so you can edit the file
 by hand while Lantern is closed. A few defaults are written on first run.
 
@@ -215,9 +234,12 @@ src/shell/commands.rs           title-channel commands, lantern.invalid actions,
 src/shell/pages.rs              data: URIs for chrome and internal pages
 src/shell/art.rs                pixel-art text → inline SVG
 src/shell/bookmarks.rs          bookmark TSV + per-OS data directory
+src/shell/settings.rs           user settings (dial-up mode and modem speed profiles)
+src/shell/dialup.rs             dial-up simulator: network emulation and the image pacer
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
+ui/dialup-images.js             "slow images" pacer injected into content pages
 ui/lantern.txt, icons.txt       pixel art: the lantern (5 frames) and the toolbar icons
 ui/appicon/                     generated window icons
 resources/mac, resources/win    bundle resources and generated .icns/.ico

@@ -2,8 +2,9 @@
 //! the navigation helpers they share.
 
 use super::{
-    bookmarks,
+    bookmarks, dialup,
     pages::{self, ACTION_HOST},
+    settings,
     state::{
         Role, content_browser, defer, exec_js, internal_url_key, push_all, push_status,
         push_toolbar, save_bookmarks, set_notice, with_shell,
@@ -49,6 +50,8 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
             push_status();
         }
         (Role::Toolbar, name) => run_toolbar_command(name, &command.arg),
+        // Clicking the modem pane in the status bar.
+        (Role::Status, "settings") => show_settings(false),
         _ => {}
     }
     true
@@ -153,6 +156,7 @@ fn internal_page_for(text: &str) -> Option<fn()> {
         pages::HOME => Some(show_home),
         pages::BOOKMARKS => Some(show_bookmarks),
         pages::ABOUT => Some(show_about),
+        pages::SETTINGS => Some(|| show_settings(false)),
         _ => None,
     }
 }
@@ -208,6 +212,26 @@ pub fn show_bookmarks() {
 pub fn show_about() {
     let dir = bookmarks::data_dir().display().to_string();
     show_internal(pages::ABOUT, pages::about_uri(&dir));
+}
+
+/// The settings page; `saved` adds a "Settings saved" confirmation.
+pub fn show_settings(saved: bool) {
+    let current = with_shell(|shell| shell.settings);
+    show_internal(pages::SETTINGS, pages::settings_uri(&current, saved));
+}
+
+/// Apply settings submitted from the settings page and remember them.
+fn save_settings(params: &[(String, String)]) {
+    let (updated, content) = with_shell(|shell| {
+        shell.settings.apply_query(params);
+        (shell.settings, shell.content.clone())
+    });
+    settings::save(&updated);
+    if let Some(content) = content {
+        dialup::apply_network(&content, &updated);
+    }
+    push_status();
+    show_settings(true);
 }
 
 pub fn show_error(failed_url: &str, error_code: i32, error_text: &str) {
@@ -302,6 +326,11 @@ pub fn handle_action_url(url: &str) -> bool {
         "home" => defer(show_home),
         "bookmarks" => defer(show_bookmarks),
         "about" => defer(show_about),
+        "open-settings" => defer(|| show_settings(false)),
+        "settings" => {
+            let params = params.clone();
+            defer(move || save_settings(&params));
+        }
         other => eprintln!("lantern: unknown action link {other:?}"),
     }
     true

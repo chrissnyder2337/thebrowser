@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Settings</title>
+<style>
+{{STYLE}}
+  .panel { max-width: 600px; }
+  .foot { max-width: 600px; }
+  .opt, .speed { display: flex; gap: 8px; align-items: flex-start; padding: 5px 2px; }
+  .opt input, .speed input { margin: 2px 0 0; flex: none; }
+  .opt small { color: #404040; line-height: 1.4; }
+  .speeds { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .speed small { color: #404040; }
+  .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+  .saved { margin: 0 0 12px; padding: 6px 10px; }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <div class="caption">{{PAGE_ICON}}Lantern Settings</div>
+    <div class="inner">
+      {{SAVED}}
+      <form action="{{ACTION_URL}}" method="get">
+        <fieldset>
+          <legend>Dial-up simulator</legend>
+          <p>Relive the modem days. This only slows down Lantern's web pages, not the rest of your computer.</p>
+          {{MODE_OPTIONS}}
+        </fieldset>
+        <fieldset>
+          <legend>Modem speed</legend>
+          <div class="speeds">{{SPEED_OPTIONS}}</div>
+        </fieldset>
+        <div class="actions">
+          <button type="submit">Save</button>
+          <a class="btn" href="{{HOME_URL}}">Start Page</a>
+        </div>
+      </form>
+      <hr>
+      <p>The status bar shows the modem speed while the simulator is on. Click it to come back here,
+        or type <b>lantern:settings</b> in the URL field.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Lantern {{VERSION}}</span><span>Settings are saved in your Lantern profile.</span></div>
+</body>
+</html>

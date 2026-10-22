@@ -4,6 +4,7 @@
 use super::{
     art::{with_icons, with_lantern},
     bookmarks::Bookmark,
+    settings::{DialupMode, ModemSpeed, Settings},
     util::{encode_component, get_data_uri, html_escape, truncate},
 };
 use std::fmt::Write;
@@ -11,6 +12,7 @@ use std::fmt::Write;
 pub const HOME: &str = "lantern:home";
 pub const BOOKMARKS: &str = "lantern:bookmarks";
 pub const ABOUT: &str = "lantern:about";
+pub const SETTINGS: &str = "lantern:settings";
 
 /// Host whose URLs internal pages use as "links back into Rust".
 pub const ACTION_HOST: &str = "lantern.invalid";
@@ -21,6 +23,7 @@ const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
 const BOOKMARKS_HTML: &str = include_str!("../../ui/pages/bookmarks.html");
 const ABOUT_HTML: &str = include_str!("../../ui/pages/about.html");
 const ERROR_HTML: &str = include_str!("../../ui/pages/error.html");
+const SETTINGS_HTML: &str = include_str!("../../ui/pages/settings.html");
 const PAGE_CSS: &str = include_str!("../../ui/pages/common.css");
 
 /// Replace `{{NAME}}` placeholders in one pass. Values must already be safe
@@ -77,6 +80,10 @@ fn common_vars() -> Vec<(&'static str, String)> {
         ("LOGO", logo(4)),
         ("PAGE_ICON", with_icons(|s| s.svg("page", 1, "pg"))),
         ("STYLE", PAGE_CSS.to_owned()),
+        (
+            "SETTINGS_URL",
+            html_escape(&format!("https://{ACTION_HOST}/open-settings")),
+        ),
     ]
 }
 
@@ -116,8 +123,20 @@ pub fn toolbar_uri() -> String {
 }
 
 pub fn status_uri() -> String {
-    let lock = with_icons(|sheet| sheet.svg("lock", 1, "lock"));
-    html_uri(&fill(STATUS_HTML, &[("ICON_LOCK", lock)]))
+    let (lock, modem) = with_icons(|sheet| {
+        (
+            sheet.svg("lock", 1, "lock"),
+            format!(
+                "{}{}",
+                sheet.svg("modem", 1, "on"),
+                sheet.embossed_svg("modem", 1, "off")
+            ),
+        )
+    });
+    html_uri(&fill(
+        STATUS_HTML,
+        &[("ICON_LOCK", lock), ("ICON_MODEM", modem)],
+    ))
 }
 
 fn action_url(action: &str, url: &str) -> String {
@@ -194,6 +213,85 @@ pub fn about_uri(data_dir: &str) -> String {
     html_uri(&fill(ABOUT_HTML, &vars))
 }
 
+fn mode_description(mode: DialupMode) -> (&'static str, &'static str) {
+    match mode {
+        DialupMode::Off => ("Off", "Pages load at your real connection speed."),
+        DialupMode::Images => (
+            "Slow images",
+            "Text appears right away, but every picture paints in from the top, \
+             a few lines at a time, as if it were still coming down the phone line.",
+        ),
+        DialupMode::Network => (
+            "Slow network",
+            "Everything the page loads is squeezed through a modem-sized pipe: \
+             text trickles in, images arrive last, and big sites take minutes.",
+        ),
+    }
+}
+
+fn speed_description(speed: ModemSpeed) -> &'static str {
+    match speed {
+        ModemSpeed::K14_4 => "about 1.6 KB/s",
+        ModemSpeed::K28_8 => "about 3.2 KB/s",
+        ModemSpeed::K33_6 => "about 3.8 KB/s",
+        ModemSpeed::K56 => "about 5.5 KB/s",
+    }
+}
+
+fn checked(on: bool) -> &'static str {
+    if on { " checked" } else { "" }
+}
+
+pub fn settings_uri(settings: &Settings, saved: bool) -> String {
+    let mut modes = String::new();
+    for mode in DialupMode::ALL {
+        let (name, description) = mode_description(mode);
+        let _ = write!(
+            modes,
+            concat!(
+                r#"<label class="opt"><input type="radio" name="dialup" value="{key}"{checked}>"#,
+                r#"<span><b>{name}</b><br><small>{description}</small></span></label>"#
+            ),
+            key = mode.key(),
+            checked = checked(settings.dialup_mode == mode),
+            name = html_escape(name),
+            description = html_escape(description),
+        );
+    }
+    let mut speeds = String::new();
+    for speed in ModemSpeed::ALL {
+        let _ = write!(
+            speeds,
+            concat!(
+                r#"<label class="speed"><input type="radio" name="speed" value="{key}"{checked}>"#,
+                r#"<span><b>{label}</b> <small>{description}</small></span></label>"#
+            ),
+            key = speed.key(),
+            checked = checked(settings.modem_speed == speed),
+            label = html_escape(&speed.label()),
+            description = html_escape(speed_description(speed)),
+        );
+    }
+    let saved = if saved {
+        r#"<p class="saved sunken">Settings saved.</p>"#.to_owned()
+    } else {
+        String::new()
+    };
+    let mut vars = common_vars();
+    vars.push(("MODE_OPTIONS", modes));
+    vars.push(("SPEED_OPTIONS", speeds));
+    vars.push(("SAVED", saved));
+    vars.push((
+        "ACTION_URL",
+        html_escape(&format!("https://{ACTION_HOST}/settings")),
+    ));
+    vars.push((
+        "HOME_URL",
+        html_escape(&format!("https://{ACTION_HOST}/home")),
+    ));
+    html_uri(&fill(SETTINGS_HTML, &vars))
+}
+
 pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String {
     let retryable = ["http://", "https://", "file://"]
         .iter()
@@ -256,10 +354,20 @@ mod tests {
             "ERROR_TEXT",
             "ERROR_CODE",
             "RETRY",
+            "MODE_OPTIONS",
+            "SPEED_OPTIONS",
+            "SAVED",
+            "ACTION_URL",
         ] {
             vars.push((key, String::new()));
         }
-        for template in [HOME_HTML, BOOKMARKS_HTML, ABOUT_HTML, ERROR_HTML] {
+        for template in [
+            HOME_HTML,
+            BOOKMARKS_HTML,
+            ABOUT_HTML,
+            ERROR_HTML,
+            SETTINGS_HTML,
+        ] {
             assert_filled(template, &vars);
         }
     }
