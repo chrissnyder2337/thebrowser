@@ -26,9 +26,13 @@ Get the latest build for your platform from
 Each release also has a `SHA256SUMS.txt` to verify the downloads.
 
 - **Windows:** unzip and run `lantern\lantern.exe`.
-- **macOS:** unzip and move `Lantern.app` to Applications. The app isn't signed
-  or notarized, so the first time, right-click it and choose **Open** (or run
-  `xattr -dr com.apple.quarantine /Applications/Lantern.app`).
+- **macOS:** unzip and move `Lantern.app` to Applications. The app is only
+  ad-hoc signed, not notarized, so macOS blocks it the first time. Either run
+  `xattr -dr com.apple.quarantine /Applications/Lantern.app`, or try to open it
+  once and then click **Open Anyway** in System Settings → Privacy & Security.
+  If macOS says the app "is damaged and can't be opened" (older builds
+  weren't signed at all), run the `xattr` command above; if it still
+  won't start, also run `codesign --force --deep --sign - /Applications/Lantern.app`.
 - **Linux:** `tar xzf lantern-linux-x86_64.tar.gz && ./lantern/lantern`. If it
   exits with a sandbox error (some distributions restrict the user namespaces
   Chromium's sandbox uses), give the bundled helper its setuid bit with
@@ -128,8 +132,9 @@ notes. The tag must match the `Cargo.toml` version or the run fails. Running the
 workflow by hand from the Actions tab builds the same bundles as downloadable
 artifacts without publishing a release.
 
-The macOS app is not code-signed or notarized, so after downloading it, open it
-with right-click → Open (or run `xattr -dr com.apple.quarantine Lantern.app`).
+The macOS app is ad-hoc signed (`codesign --sign -`) but not notarized, so
+after downloading it, run `xattr -dr com.apple.quarantine Lantern.app` or allow
+it under System Settings → Privacy & Security → Open Anyway.
 
 ## Using Lantern
 
