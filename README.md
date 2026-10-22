@@ -12,6 +12,28 @@ driven from Rust with the [`cef`](https://github.com/tauri-apps/cef-rs) crate.
 
 v1 is deliberately small: one window, one tab, and popups open in the same view.
 
+## Download
+
+Get the latest build for your platform from
+[Releases](https://github.com/chrissnyder2337/thebrowser/releases/latest):
+
+| Platform | Download |
+|---|---|
+| Windows (x86_64) | [lantern-windows-x86_64.zip](https://github.com/chrissnyder2337/thebrowser/releases/latest/download/lantern-windows-x86_64.zip) |
+| macOS (Apple silicon) | [lantern-macos-arm64.zip](https://github.com/chrissnyder2337/thebrowser/releases/latest/download/lantern-macos-arm64.zip) |
+| Linux (x86_64) | [lantern-linux-x86_64.tar.gz](https://github.com/chrissnyder2337/thebrowser/releases/latest/download/lantern-linux-x86_64.tar.gz) |
+
+Each release also has a `SHA256SUMS.txt` to verify the downloads.
+
+- **Windows:** unzip and run `lantern\lantern.exe`.
+- **macOS:** unzip and move `Lantern.app` to Applications. The app isn't signed
+  or notarized, so the first time, right-click it and choose **Open** (or run
+  `xattr -dr com.apple.quarantine /Applications/Lantern.app`).
+- **Linux:** `tar xzf lantern-linux-x86_64.tar.gz && ./lantern/lantern`. If it
+  exits with a sandbox error (some distributions restrict the user namespaces
+  Chromium's sandbox uses), give the bundled helper its setuid bit with
+  `sudo chown root:root lantern/chrome-sandbox && sudo chmod 4755 lantern/chrome-sandbox`.
+
 ## Building and running
 
 Lantern pins `cef = "=154.5.0"` (CEF 154.0.34, Chromium 154.0.8037.98). The
@@ -100,7 +122,8 @@ channel parser, template filling, bookmark storage and the pixel-art sheets.
 
 `.github/workflows/release.yml` then builds bundles for Linux x86_64
 (`.tar.gz`), macOS arm64 (`.zip` of `Lantern.app`) and Windows x86_64 (`.zip`),
-and publishes them with a `SHA256SUMS.txt` as a GitHub Release with generated
+and publishes them under fixed names (so the Download links above always point
+at the newest release) with a `SHA256SUMS.txt` as a GitHub Release with generated
 notes. The tag must match the `Cargo.toml` version or the run fails. Running the
 workflow by hand from the Actions tab builds the same bundles as downloadable
 artifacts without publishing a release.

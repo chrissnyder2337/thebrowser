@@ -3,6 +3,8 @@ name: Release
 # Push a tag like v0.2.0 (matching Cargo.toml's version) to build Lantern for
 # Linux, macOS and Windows and publish the bundles as a GitHub Release.
 # Run it manually (workflow_dispatch) to build the bundles without publishing.
+# Asset names carry no version, so README links to
+# releases/latest/download/<asset> always point at the newest release.
 
 on:
   push:
@@ -80,7 +82,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           bundle-cef-app lantern -o dist/lantern --release
-          tar -C dist -czf "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.tar.gz" lantern
+          tar -C dist -czf "lantern-${{ matrix.name }}.tar.gz" lantern
 
       # bundle-cef-app always uses the dev profile on macOS, so give that
       # profile release settings for this build.
@@ -97,8 +99,11 @@ jobs:
             -d Lantern \
             -i io.github.chrissnyder2337.lantern \
             -v "${{ steps.version.outputs.version }}"
+          # The bundle is named after the executable; give it the app's name.
+          # CEF locates its framework and helpers relative to the executable.
+          mv dist/lantern.app dist/Lantern.app
           # ditto keeps the framework's symlinks intact.
-          ditto -c -k --keepParent dist/lantern.app "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip"
+          ditto -c -k --keepParent dist/Lantern.app "lantern-${{ matrix.name }}.zip"
 
       - name: Bundle (Windows)
         if: runner.os == 'Windows'
@@ -106,7 +111,7 @@ jobs:
         run: |
           bundle-cef-app lantern -o dist/lantern --release
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          Compress-Archive -Path dist/lantern -DestinationPath "lantern-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip"
+          Compress-Archive -Path dist/lantern -DestinationPath "lantern-${{ matrix.name }}.zip"
 
       - uses: actions/upload-artifact@v4
         with:
