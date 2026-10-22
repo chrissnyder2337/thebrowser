@@ -21,40 +21,59 @@
       "radial-gradient(2px 2px at 181px 113px, #ffc0ff, transparent)",
       "radial-gradient(1px 1px at 11px 89px, #fff, transparent)"
     ].join(", ");
+    // Marks elements that float over the page (menus, cookie banners, sticky
+    // headers) and had a solid background, so they stay solid instead of
+    // turning see-through like everything else.
+    var SOLID = "data-lantern-geocities-solid";
     // Everything except SVG internals and icon-font glyphs, which would turn
     // into their ligature names if their font were swapped.
-    // :where() keeps this at the specificity of `body *`, so the rules below win.
-    var ALL = 'body, body :where(:not(svg *):not(i):not([class*="icon" i]):not([class*="fa-"]))';
+    var ANY = ':where(:not(svg *):not(i):not([class*="icon" i]):not([class*="fa-"]))';
+
+    // The same rules serve the document and open shadow trees (custom
+    // elements), which document styles don't reach. In the document `p` is
+    // "html body " and the catch-all is `body *`; in a shadow tree `p` is
+    // empty and the catch-all is `*`. :where() keeps the catch-all at the
+    // lowest specificity so every later rule beats it.
+    function css(p, all) {
+      return [
+        all + " { color: #00ff00 !important; background-color: transparent !important;",
+        "  font-family: " + FONT + " !important; text-shadow: none !important; border-color: #ff00ff !important; }",
+        p + "[" + SOLID + "] { background-color: #000080 !important; }",
+        p + "a, " + p + "a * { color: #00ffff !important; text-decoration: underline !important; }",
+        p + "a:visited, " + p + "a:visited * { color: #ff80ff !important; }",
+        p + "a:hover, " + p + "a:hover * { color: #ffff00 !important; animation: lgc-blink 0.5s steps(1) infinite; }",
+        p + ":is(h1, h2, h3) { background-image: " + RAINBOW + " !important; background-size: 200% 100% !important;",
+        "  -webkit-background-clip: text !important; background-clip: text !important;",
+        "  color: transparent !important; -webkit-text-fill-color: transparent;",
+        "  text-align: center !important; animation: lgc-slide 3s linear infinite; }",
+        // Text in nested tags must be transparent too, or it hides the rainbow.
+        p + ":is(h1, h2, h3) :where(:not(svg, svg *)) { color: transparent !important;",
+        "  -webkit-text-fill-color: transparent !important; }",
+        p + "h1 { font-size: 2.6em !important; }",
+        p + ":is(h4, h5, h6, b, strong, th) { color: #ffff00 !important; }",
+        p + ":is(em, i) { color: #ff80ff !important; }",
+        p + ":is(img, video, canvas, iframe) { border: 3px ridge #ffff00 !important; }",
+        p + "hr { height: 6px !important; border: 0 !important; background: " + RAINBOW + " !important; }",
+        p + ":is(table, td, th) { border: 2px outset #c0c0c0 !important; }",
+        p + "button :where(:not(svg *)) { color: #000 !important; }",
+        p + ":is(button, input, select, textarea) { color: #000 !important; background-color: #c0c0c0 !important;",
+        "  border: 2px outset #ffffff !important; font-family: \"Times New Roman\", Times, serif !important; }",
+        p + ":is(input:not([type]), input[type=text], input[type=search], input[type=email], input[type=url], textarea) {",
+        "  background-color: #ffffff !important; border-style: inset !important; }",
+        "::selection { color: #000 !important; background: #ff00ff !important; }",
+        "@keyframes lgc-blink { 50% { visibility: hidden; } }",
+        "@keyframes lgc-slide { to { background-position: -200% 0; } }"
+      ].join("\n");
+    }
 
     var pageCss = [
       "html { background-color: #000018 !important; background-image: " + STARS + " !important;",
       "  background-size: 200px 200px !important; background-repeat: repeat !important;",
       "  background-attachment: fixed !important; padding-bottom: 30px !important; }",
-      ALL + " { color: #00ff00 !important; background-color: transparent !important;",
-      "  font-family: " + FONT + " !important; text-shadow: none !important; border-color: #ff00ff !important; }",
       "html body { background: transparent !important; }",
-      "html body a, html body a * { color: #00ffff !important; text-decoration: underline !important; }",
-      "html body a:visited, html body a:visited * { color: #ff80ff !important; }",
-      "html body a:hover, html body a:hover * { color: #ffff00 !important; animation: lgc-blink 0.5s steps(1) infinite; }",
-      "html body :is(h1, h2, h3) { background-image: " + RAINBOW + " !important; background-size: 200% 100% !important;",
-      "  -webkit-background-clip: text !important; background-clip: text !important;",
-      "  color: transparent !important; -webkit-text-fill-color: transparent;",
-      "  text-align: center !important; animation: lgc-slide 3s linear infinite; }",
-      "html body h1 { font-size: 2.6em !important; }",
-      "html body :is(h4, h5, h6, b, strong, th) { color: #ffff00 !important; }",
-      "html body :is(em, i) { color: #ff80ff !important; }",
-      "html body :is(img, video, canvas, iframe) { border: 3px ridge #ffff00 !important; }",
-      "html body hr { height: 6px !important; border: 0 !important; background: " + RAINBOW + " !important; }",
-      "html body :is(table, td, th) { border: 2px outset #c0c0c0 !important; }",
-      "html body button :where(:not(svg *)) { color: #000 !important; }",
-      "html body :is(button, input, select, textarea) { color: #000 !important; background-color: #c0c0c0 !important;",
-      "  border: 2px outset #ffffff !important; font-family: \"Times New Roman\", Times, serif !important; }",
-      "html body :is(input:not([type]), input[type=text], input[type=search], input[type=email], input[type=url], textarea) {",
-      "  background-color: #ffffff !important; border-style: inset !important; }",
-      "::selection { color: #000 !important; background: #ff00ff !important; }",
-      "@keyframes lgc-blink { 50% { visibility: hidden; } }",
-      "@keyframes lgc-slide { to { background-position: -200% 0; } }"
+      css("html body ", "body, body " + ANY)
     ].join("\n");
+    var shadowCss = css("", ANY);
 
     var decorCss = [
       ":host { all: initial; }",
@@ -77,6 +96,8 @@
 
     var pageSheet = new CSSStyleSheet();
     pageSheet.replaceSync(pageCss);
+    var shadowSheet = new CSSStyleSheet();
+    shadowSheet.replaceSync(shadowCss);
     var decorSheet = new CSSStyleSheet();
     decorSheet.replaceSync(decorCss);
 
@@ -114,6 +135,81 @@
       root.appendChild(s);
     }
 
+    function adopt(target, sheet, enable) {
+      var sheets = target.adoptedStyleSheets.filter(function (s) { return s !== sheet; });
+      target.adoptedStyleSheets = enable ? sheets.concat([sheet]) : sheets;
+    }
+
+    // Pages keep adding content (and custom elements with shadow trees), so
+    // rescan after DOM changes, at most about once a second.
+    var OBSERVE = { childList: true, subtree: true };
+    var observer = new MutationObserver(schedule);
+    var roots = [];
+    var scanTimer = 0;
+    var lastScan = 0;
+
+    function schedule() {
+      if (!scanTimer) scanTimer = setTimeout(scan, Math.max(250, 1000 - (Date.now() - lastScan)));
+    }
+
+    // Every element of `scope` and of the open shadow trees inside it,
+    // styling and watching shadow trees not seen before.
+    function walk(scope, out) {
+      var all = scope.querySelectorAll("*");
+      for (var i = 0; i < all.length; i++) {
+        out.push(all[i]);
+        var shadow = all[i].shadowRoot;
+        if (shadow) {
+          if (roots.indexOf(shadow) < 0) {
+            roots.push(shadow);
+            adopt(shadow, shadowSheet, true);
+            observer.observe(shadow, OBSERVE);
+          }
+          walk(shadow, out);
+        }
+      }
+      return out;
+    }
+
+    function floatsWithSolidBackground(style) {
+      var floating = style.position === "fixed" || style.position === "sticky" ||
+        (style.position === "absolute" && parseInt(style.zIndex, 10) > 0);
+      if (!floating) return false;
+      var rgba = style.backgroundColor.match(/[\d.]+/g);
+      return !!rgba && (rgba.length < 4 || Number(rgba[3]) > 0.5);
+    }
+
+    function scan() {
+      scanTimer = 0;
+      lastScan = Date.now();
+      var elements = walk(document, []);
+      // Read the page's own backgrounds with our sheets switched off. Nothing
+      // paints in between, so this doesn't flicker.
+      pageSheet.disabled = shadowSheet.disabled = true;
+      var solid = elements.map(function (e) { return floatsWithSolidBackground(getComputedStyle(e)); });
+      pageSheet.disabled = shadowSheet.disabled = false;
+      elements.forEach(function (e, i) {
+        if (solid[i] !== e.hasAttribute(SOLID)) e.toggleAttribute(SOLID, solid[i]);
+      });
+    }
+
+    function restyle(enable) {
+      adopt(document, pageSheet, enable);
+      if (enable) {
+        observer.observe(document, OBSERVE);
+        scan();
+        return;
+      }
+      observer.disconnect();
+      clearTimeout(scanTimer);
+      scanTimer = 0;
+      roots.forEach(function (shadow) { adopt(shadow, shadowSheet, false); });
+      [document].concat(roots).forEach(function (scope) {
+        scope.querySelectorAll("[" + SOLID + "]").forEach(function (e) { e.removeAttribute(SOLID); });
+      });
+      roots = [];
+    }
+
     function decorate() {
       if (host && host.isConnected) return;
       host = document.createElement("lantern-geocities");
@@ -144,8 +240,7 @@
 
     self = window[KEY] = {
       set: function (enable) {
-        var sheets = document.adoptedStyleSheets.filter(function (s) { return s !== pageSheet; });
-        document.adoptedStyleSheets = enable ? sheets.concat([pageSheet]) : sheets;
+        restyle(enable);
         // The banner and cursor trail only go on the top-level page, not in iframes.
         if (enable && window === window.top && document.documentElement) decorate();
         else undecorate();

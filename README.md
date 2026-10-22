@@ -163,7 +163,10 @@ It works by running `ui/geocities.js` in each frame of the content view after
 every load (and in all frames right away when toggled). The styles are
 constructed stylesheets (`adoptedStyleSheets`), which page Content Security
 Policies don't block, and the banner lives in a closed shadow root so the page
-can't restyle it.
+can't restyle it. The styles also go into the page's open shadow trees (custom
+elements), and menus, cookie banners and other floating boxes that had a solid
+background get a solid navy one so they stay readable. Both are rechecked as
+the page changes.
 
 The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `view-source`), bare host names (`example.com`, `localhost:8080`, which get
