@@ -26,7 +26,7 @@ replaced**; the plan's
 [Constraints](software-factory.md#constraints-claude-pro-cloud-sessions-only)
 section has the details:
 - Code Review (Team/Enterprise only) → pre-push `/code-review`, plus a
-  labelled GitHub Action on your Pro token for tier-2 PRs;
+  GitHub Action you start from `main` on your Pro token, for tier-2 PRs;
 - `ultrareview` beyond the 3 free runs;
 - computer use in the Desktop app or CLI, and the API's computer-use tool
   (paid API) → an Xvfb + `xdotool` + screenshot helper, run by Claude Code

@@ -326,7 +326,7 @@ we skip it for now.
 |---|---|---|
 | Cloud sessions, `/goal`, auto mode, hooks, skills, subagents, plugins, Ultraplan, artifacts | Enabled | Within Pro usage. |
 | Routines (background loops) | Enabled, reduced | Weekly or monthly rather than nightly (Phase 3). |
-| Code Review (the GitHub app) | **Disabled**: Team/Enterprise only | `/code-review` run by the implementing session before each push. For tier-2 PRs, also a Claude Code GitHub Action that runs `/code-review --comment`, authenticated with your Pro subscription token and started by your label. |
+| Code Review (the GitHub app) | **Disabled**: Team/Enterprise only | `/code-review` run by the implementing session before each push. For tier-2 PRs, also a Claude Code GitHub Action that runs `/code-review --comment`, authenticated with your Pro subscription token and started by you from `main` (**Run workflow**). |
 | `claude ultrareview` | **Disabled** after the 3 free runs | Save the free runs for the largest tier-2 changes, such as a CEF upgrade. |
 | Black-box tester via the API's computer-use tool | **Alternative**: needs paid API billing | Claude Code in a GitHub Action, on your Pro token, drives Lantern under Xvfb through a small `bb` helper (`xdotool` input, screenshots it reads back). See Phase 1.6. |
 | Computer use in the Desktop app or CLI (macOS) | **Disabled**: no real desktop | The same `bb` helper inside the implementing cloud session, for screenshots of visual changes. |
@@ -430,14 +430,28 @@ Give every agent session the same starting context and a working toolchain.
     own branch before every push, and fix what it finds.
   - For tier-2 PRs, a `claude-review.yml` workflow runs the Claude Code
     GitHub Action with `/code-review --comment`, authenticated with a
-    `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token`. It starts only when
-    you add the `review` label, because it spends your Pro usage.
+    `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token`. You start it
+    yourself, with **Run workflow** and the PR number
+    (`workflow_dispatch`), because it spends your Pro usage. Run that way,
+    the workflow file always comes from `main`, so a PR can't rewrite the
+    job that holds your token. It checks out the PR head only as data to
+    review, with read-only tools plus posting comments, and never builds or
+    runs it.
 
   So far no PR has had an automated review.
-- **Guard the oracle at edit time:** a PreToolUse hook in
-  `.claude/settings.json` (with `onFailure: "block"`) that refuses edits to
-  `tests/golden/` unless the maintainer sets a flag. CI's check (Phase 1.5)
-  stays as the backstop. The black-box scenarios (Phase 1.6) aren't in this
+- **Guard the oracle at edit time (a speed bump, not the lock):** a
+  PreToolUse hook in `.claude/settings.json` (with `onFailure: "block"`). It
+  matches `Edit|Write|Bash` and returns an **ask** decision, rather than an
+  outright deny, for two things:
+  - an edit or write to an *existing* file under `tests/golden/`;
+  - a Bash command that updates snapshots (`--update-snapshots`, `-u`) or
+    writes into `tests/golden/`.
+
+  Adding new golden files is allowed. In an interactive session you can
+  approve an ask; in unattended runs (`--permission-prompts none`) an ask
+  is refused. A hook can't see every way a shell command might write a
+  file, so the real lock is the CI check in Phase 1.5, which runs outside
+  the agent's control. The black-box scenarios (Phase 1.6) aren't in this
   repo at all.
 - **Tune for unattended runs:** run `/auto-mode-setup` once after a full
   build; use `--permission-prompts none` in headless runs; run
@@ -447,7 +461,8 @@ Give every agent session the same starting context and a working toolchain.
   observable behavior ("with `--retro=portal`, the bookmarks page shows…"),
   out of scope, and a proposed risk tier.
 - **Labels:** `factory:ready` (the maintainer approved the spec), `tier:0`,
-  `tier:1`, `tier:2`, `factory:in-progress`, `factory:needs-human`.
+  `tier:1`, `tier:2`, `factory:in-progress`, `factory:needs-human`,
+  `oracle-change`.
 
 ### Phase 1: Build the oracle (about one to two weeks)
 
@@ -469,8 +484,14 @@ CI misses today. Cheapest first:
      files so Playwright can screenshot them.
 2. **Golden screenshots.** Playwright `toHaveScreenshot` for every chrome page,
    internal page, and look × fixture, stored in `tests/golden/`. Updating a
-   golden image is an explicit act that a human sees in the PR (see "holdouts"
-   below).
+   golden image is an explicit act that a human sees in the PR (see item 5).
+   For screenshots to match, they must render in the same environment
+   everywhere. So golden tests run inside the **official Playwright Docker
+   image at a pinned version** (`mcr.microsoft.com/playwright:v<X>`), the same
+   tag in CI and in cloud sessions (which have Docker). The `@playwright/test`
+   version in `package.json` matches that tag, and a small pixel tolerance is
+   allowed. Behavior tests that don't compare pixels may also run on the
+   preinstalled browser for speed.
 3. **Rust contract tests.** Table tests for the title-channel parser (already
    partly covered) and the `lantern.invalid` action router, including hostile
    input: oversized arguments, odd encodings, `javascript:` and `data:` URLs,
@@ -490,11 +511,14 @@ CI misses today. Cheapest first:
    the test bundle with `--no-sandbox`.
 5. **Protect the white-box oracle.** (`CODEOWNERS` required reviews aren't
    used: GitHub won't let you approve PRs opened under your own account.) A CI
-   check fails any PR that changes both product code
-   (`src/`, `ui/`) and the oracle (`tests/golden/`, existing test
-   assertions), unless the PR has the `oracle-change` label, which only the
-   maintainer applies. This is the cheap version of "agents can't rewrite the
-   tests to match the bug".
+   check fails any PR that changes product code (`src/`, `ui/`) **and also
+   modifies or deletes existing oracle files**: existing files under
+   `tests/golden/`, or existing test assertions. The only override is the
+   `oracle-change` label, which only the maintainer applies. *Adding* new
+   golden files and new tests is allowed, so a PR can add coverage for new
+   behavior without your help (including the PR that first creates the
+   goldens). This is the cheap version of "agents can't rewrite the tests to
+   match the bug".
 6. **Black-box agent testing (StrongDM's holdouts, scaled down).** Everything
    above is written against the code, so it can share the implementer's
    misunderstanding. This layer tests Lantern the way a user meets it, with
@@ -506,19 +530,31 @@ CI misses today. Cheapest first:
      footer is at the bottom". Each scenario lists the fixture pages it needs
      and what a user would observe. Implementing sessions never have this
      repo attached, so agents can't code to the scenarios.
-   - **Clean room.** A dedicated GitHub Actions job (`blackbox.yml`, in
-     this repo) never checks out this repo's code. It downloads only the
-     built Linux bundle artifact from the PR's CI run (`actions: read` on
-     `GITHUB_TOKEN` is enough), checks out the private scenarios repo with a
-     read-only deploy key, and serves the fixture pages from that repo
-     locally. There's no source, no `CLAUDE.md`, no diff and no test code on
-     the runner.
+   - **Clean room, run from `main`.** A dedicated workflow, `blackbox.yml`,
+     is started by **you** with **Run workflow** and a PR number
+     (`workflow_dispatch`), and also runs weekly on `main`. Both ways, GitHub
+     uses the workflow file and helper scripts from `main`, never from the
+     PR, so a PR can't change the job that holds your token. The job:
+     - downloads only the built Linux bundle artifact from the PR's CI run;
+     - sparse-checks-out `tools/blackbox/` (the `bb` helper, the judge
+       prompt and the broken-build patches) **from `main`**;
+     - checks out the private scenarios repo with a read-only deploy key,
+       and serves its fixture pages locally.
+
+     The runner has no Lantern source, no `CLAUDE.md`, no diff and no test
+     code. Any PR that changes `tools/blackbox/` is tier 2.
+   - **The build under test can't reach the token.** The bundle is the PR's
+     own code, and it runs on the same machine as your token. So `bb start`
+     runs Lantern as a separate unprivileged user, through `env -i` with
+     only `DISPLAY` and a scratch `HOME`. Firewall rules (`iptables`) block
+     that user from reaching anything except localhost. The PR's code can't
+     read the token from the environment or send anything out.
    - **UI-only tester [Pro: alternative].** The API's computer-use tool needs
      paid API billing, so the job runs **Claude Code** through the Claude
      Code GitHub Action, authenticated with your Pro `CLAUDE_CODE_OAUTH_TOKEN`.
      Lantern runs under Xvfb (`--no-sandbox`, since CI already isolates it),
-     and the agent works through a small `bb` helper script kept in the
-     scenarios repo:
+     and the agent works through a small `bb` helper script (in
+     `tools/blackbox/` on `main`):
      - `bb start [--url=…] [--retro=…]` starts Lantern;
      - `bb shot` saves a screenshot and prints its path;
      - `bb click X Y`, `bb type TEXT` and `bb key KEYS` send input
@@ -545,18 +581,18 @@ CI misses today. Cheapest first:
      patches the maintainer keeps in the scenarios repo. If the judge passes
      a broken build, the scenario or the judge prompt gets fixed before the
      check is trusted again.
-   - **When it runs.** When you add the `blackbox` label, which you do for
-     tier-2 PRs and for tier-1 PRs that change what users see. It also runs
-     weekly on `main`, not nightly, to stay within Pro usage. Never on every
-     push or on tier-0 PRs. Start with 5–10 scenarios, the ones that matter
-     most.
+   - **When it runs.** When you start it for tier-2 PRs and for tier-1 PRs
+     that change what users see, plus weekly on `main` (not nightly, to stay
+     within Pro usage). Never on every push or on tier-0 PRs. Start with 5–10
+     scenarios, the ones that matter most.
    - **Security.** The job holds your Pro subscription token, so anyone who
-     can trigger it spends your usage. It runs only on PRs from this repo's
-     own branches (forks never get secrets) and only after you add the label.
-     It also runs in a GitHub Environment named `blackbox` that requires your
-     approval (free on public repos). It gets a `GITHUB_TOKEN` limited to
-     reading artifacts and posting its comment, and a deploy key that can
-     only read the scenarios repo.
+     can trigger it spends your usage. Only people with write access can
+     dispatch a workflow, and it runs in a GitHub Environment named
+     `blackbox` that requires your approval (free on public repos). The
+     workflow declares its `GITHUB_TOKEN` permissions explicitly and gets no
+     more than `contents: read` (for the sparse checkout), `actions: read`
+     (for the artifact) and `pull-requests: write` (for its comment). The
+     deploy key can only read the scenarios repo.
 
    **Screenshots while implementing [Pro: alternative].** Desktop computer
    use isn't available, so the implementing cloud session uses the same
@@ -603,7 +639,7 @@ Implement):
    a progress note in the PR description so another session can take over.
 4. **Verify.** CI runs the Phase 1 oracle. The implementing session has
    already run `/code-review` before pushing. Tier-2 PRs also get the
-   labelled `claude-review.yml` review and the black-box agent test (Phase
+   `claude-review.yml` review you start and the black-box agent test (Phase
    1.6). Tier-1 PRs that change what users see get the black-box test too. A failing black-box verdict sends the agent only the
    scenario's *title* and the judge's screenshots, never the scenario text,
    so the holdout stays hidden. The
@@ -620,13 +656,28 @@ side tasks. Revisit this only if the plan changes.
 
 | Tier | Examples | Gate |
 |---|---|---|
-| **0: dark lane** | Typo/docs fixes, README screenshots, CI action version bumps, clippy fixes for new lints, pixel-art tweaks, new fixture pages | Auto-merge when CI and the oracle are green and the session's pre-push `/code-review` found nothing left open. The maintainer reads the weekly digest, not each diff. |
-| **1: skim** | Retro look changes, internal page styling, new toolbar commands, settings additions, dial-up profiles | Maintainer looks at the plan, the screenshot diff and the test changes, then skims the code. |
-| **2: full review** | `client.rs` request, popup and download handling; `commands.rs` `lantern.invalid` router; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin; `release.yml`, `bump-version.sh`, CI config | Maintainer reads the whole diff. The labelled `claude-review.yml` review, `/security-review` in the session, and the black-box test. Never auto-merged. |
+| **0: dark lane** | Typo/docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Auto-merge when CI and the oracle are green and the session's pre-push `/code-review` found nothing left open. The maintainer reads the weekly digest, not each diff. |
+| **1: skim** | Retro look changes, internal page styling, new toolbar commands, settings additions, dial-up profiles. Dependabot bumps whose diff changes only `uses:` lines in workflows. | Maintainer looks at the plan, the screenshot diff and the test changes, then skims the code. |
+| **2: full review** | `client.rs` request, popup and download handling; `commands.rs` `lantern.invalid` router; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml` and `Cargo.lock`; `release.yml`, `bump-version.sh`; any other change under `.github/` (workflows, `tiers.yml`, the tier script); `tools/blackbox/` | Maintainer reads the whole diff. The `claude-review.yml` review (you start it), `/security-review` in the session, and the black-box test. Never auto-merged. |
 
-The tier is mechanical: a CI step maps changed paths to the highest tier
-touched and labels the PR, so an agent can't downgrade its own work. A PR
-starts in tier 0 only if every path is on the tier-0 allowlist.
+The tier is mechanical, and it can't be steered from inside the PR:
+
+- **The labeller runs from `main`.** A workflow on `pull_request_target`
+  (which always uses the base branch's workflow file) checks out **only the
+  base branch**. It reads `.github/tiers.yml` and the tier script from
+  there, gets the PR's changed files from the GitHub API, and never runs PR
+  code. Its token may only label PRs and enable auto-merge. A PR that edits
+  `tiers.yml` or the script is itself tier 2.
+- **The highest tier touched wins**, and a PR is tier 0 only if every path
+  is on the tier-0 allowlist.
+- **The same job turns on auto-merge.** Labels and merges made with
+  `GITHUB_TOKEN` don't trigger other workflows. So the labelling job enables
+  auto-merge itself for tier-0 PRs (`gh pr merge --auto --squash`), instead
+  of a second workflow waiting for a label event that would never fire.
+- **`main` gets a scheduled CI run.** A merge made through `GITHUB_TOKEN`
+  auto-merge doesn't start push workflows on `main` either, so `ci.yml` also
+  runs daily on `main`. That run needs no model. Tier 0 can never touch
+  `Cargo.toml`, so these merges can't trigger or miss a release.
 
 ### Phase 3: Background loops (ongoing, after Phase 2 is stable)
 
@@ -645,7 +696,7 @@ download check).
 | **Lint ratchet** | Weekly (Pro: not nightly) | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
 | **Docs drift** | Monthly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
 | **Black-box explorer** | **[Pro: disabled at first]**, then weekly with a time cap | Turn it on only once Phase 2 runs within your usage. Then run it weekly (not nightly), on the same clean-room job and `bb` helper, capped at about 30 minutes per run. An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
-| **Release smoke** | On release | A plain GitHub Action (no model): downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
+| **Release smoke** | When the Release workflow succeeds (`workflow_run`; a release published with `GITHUB_TOKEN` doesn't fire `release` events) | A plain GitHub Action (no model): downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
 | **Weekly digest** | Weekly | A plain GitHub Action collects the numbers (merged PRs by tier, reverts, CI first-push rate) with no model. A short routine writes them up as one issue: what merged, what the factory dropped, and how much Pro usage went where (from `/usage`). |
 
 ### Phase 4: Widen the dark lanes, carefully
@@ -667,9 +718,18 @@ hostile input.
   can read public issues but runs with no secrets and a read-only token.
 - **Protect your Pro token.** `CLAUDE_CODE_OAUTH_TOKEN` is tied to your
   personal subscription, so any workflow that holds it can spend your usage.
-  Only label-triggered jobs on this repo's own branches get it, inside the
-  `blackbox` / `review` GitHub Environments that require your approval. If it
-  leaks, revoke it and run `claude setup-token` again.
+  Only workflows you start yourself from `main` (`workflow_dispatch`, or the
+  weekly schedule) get it, inside the `blackbox` / `review` GitHub
+  Environments that require your approval. If it leaks, revoke it and run
+  `claude setup-token` again.
+- **Privileged workflows never run PR-controlled workflow code.** On
+  `pull_request`, GitHub runs the PR's own version of the workflow, so
+  nothing that holds a secret or write access runs on that event.
+  - Jobs that need secrets run from `main` through `workflow_dispatch`.
+  - The tier labeller runs on `pull_request_target` and checks out only the
+    base branch.
+  - When a job does execute PR code (the black-box bundle), it runs as a
+    separate user with no environment and no outbound network.
 - **Never interpolate issue or PR text into a shell command or workflow
   expression.** Pass it as a file or environment variable the agent reads as
   data.
@@ -680,6 +740,9 @@ hostile input.
   handling, navigation interception, the sandbox and CI/release config always
   get a human read.
 - **Pin third-party Actions to a commit SHA** in agent workflows.
+- **Declare `permissions:` explicitly in every workflow**, starting from
+  `contents: read`, so nothing inherits the repository's default token
+  permissions.
 
 ### Metrics
 
