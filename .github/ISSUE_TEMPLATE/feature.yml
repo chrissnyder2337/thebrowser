@@ -38,8 +38,9 @@ body:
     attributes:
       label: Proposed risk tier
       description: >
-        See "Risk tiers" in CLAUDE.md. The highest tier any changed path
-        reaches wins; the maintainer has the final say.
+        See the "Risk tiers" table in .claude/skills/steward/SKILL.md. The
+        highest tier any changed path reaches wins; the maintainer has the
+        final say.
       options:
         - "0: dark lane (docs, typos, pixel art, fixture pages; nothing under .github/)"
         - "1: skim (retro looks, internal page styling, toolbar commands, settings)"

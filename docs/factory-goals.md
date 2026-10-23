@@ -24,6 +24,11 @@ Keep in mind:
 
 ## Goal 1: Foundations (Phase 0)
 
+*Done in PR #14. A later fix (the prompt-audit PR) moved the risk-tier list
+out of `CLAUDE.md` into the steward skill only, and broadened steward's
+branch rule, so the repo no longer matches items (1) and (4) word for word.
+That's intended; don't re-run this goal to "restore" them.*
+
 ```text
 /goal These Phase 0 items from docs/software-factory.md are implemented on this session's branch and open as a draft PR titled "Factory phase 0: foundations". Show in this session, as command output:
 (1) The existing CLAUDE.md is extended, not replaced: its no-attribution rule stays first and unchanged, it stays under 120 lines, links to README and skills instead of copying them, and adds: a pointer to the steward skill's "Before every push" checks, the invariants listed in Phase 0, the risk tiers, "run /code-review on your branch before every push", and the CEF sandbox note.
@@ -54,7 +59,7 @@ Claude Security scan and `claude plugin eval` can wait until after Goal 2.
 (4) Rust table tests for the lantern.invalid router and title-channel parser with hostile input, plus proptest properties for escaping and URL normalization. proptest is a dev-dependency only.
 (5) A --self-test=<file> flag that writes the final URL, title and load status and quits, and tests/smoke.sh that runs the release bundle under xvfb-run against a local fixture server, once per retro look, with CEF --no-sandbox.
 (6) CI jobs, with explicit permissions: contents: read, for Playwright (in the pinned container), smoke.sh, and an oracle-guard step. The guard fails a PR that changes src/ or ui/ AND modifies or deletes existing files under tests/golden/ or existing assertions; its only override is a job in GitHub Environment "oracle" (maintainer approval), never a label. Added goldens and tests pass. Show the guard's script passing on this branch and failing on a local test branch that edits an existing golden.
-(7) .claude/skills/retro-look/SKILL.md, and README Tests section updated. The steward skill's "Before every push" section adds the Playwright suite (in the pinned container) and tests/smoke.sh, and its oracle rules name the CI guard and the "oracle" environment override. Nothing else there changes.
+(7) .claude/skills/retro-look/SKILL.md, and README Tests section updated. The steward skill's "Before every push" section adds the Playwright suite (in the pinned container) and tests/smoke.sh, and its oracle rules name the CI guard and the "oracle" environment override. Nothing else in the steward skill changes. Separately, the cef-upgrade skill's "once it exists" smoke-test placeholder becomes the real tests/smoke.sh step.
 (8) All exit 0 in this session: every check in the steward skill's "Before every push" section; the Playwright suite in the pinned container; tests/smoke.sh.
 (9) Each new test was shown failing once against a deliberate break (then reverted), so none passes vacuously.
 (10) /code-review run and findings addressed.

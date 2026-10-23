@@ -16,10 +16,11 @@ description: Lantern's conventions for getting a pull request merged — the che
 - **Start work from the latest `origin/main`.** Once a branch's PR has merged,
   restart the branch from `origin/main` for new work. Don't stack on merged
   history.
-- **Never rewrite someone else's branch.** Other Claude sessions push
-  `ccr-*` branches. To build on one, start your branch from it and add your
-  commits on top, keeping its commits unchanged. Before merging, check that
-  the source branch hasn't gained commits you'd leave behind:
+- **Never rewrite a branch you didn't create**: other sessions' branches
+  (`ccr-*`, `claude/*`), the maintainer's, or Dependabot's. To build on one,
+  start your branch from it and add your commits on top, keeping its commits
+  unchanged. Before merging, check that the source branch hasn't gained
+  commits you'd leave behind:
   `git merge-base --is-ancestor origin/<their-branch> HEAD`.
 - **Releases go through the `release` skill** (`/release`). Never tag by hand,
   and don't change the version in a feature PR.
@@ -46,7 +47,7 @@ description.
 
 | Tier | Examples | Gate |
 |---|---|---|
-| **0** | Typo and docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Merges automatically once CI is green, through the tier labeller (Phase 2), not by hand. |
+| **0** | Typo and docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Auto-merge through the tier labeller once it exists (Phase 2); see "Merging". |
 | **1** | Retro looks, internal page styling, new toolbar commands, settings additions, dial-up profiles; Dependabot bumps that only change `uses:` lines. | The maintainer looks at the plan, screenshots and test changes, and skims the code. |
 | **2** | `client.rs` request, popup and download handling; the `lantern.invalid` router in `commands.rs`; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml`, `Cargo.lock`; `release.yml`, `bump-version.sh`; anything else under `.github/`; `tools/blackbox/`. | The maintainer reads the whole diff; also run `/security-review` in the session. Never auto-merged. |
 

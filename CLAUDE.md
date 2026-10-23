@@ -48,18 +48,13 @@ don't repeat them here.
 
 ## Risk tiers
 
-The highest tier touched wins; details and gates are in the steward skill.
+Every PR has a risk tier, 0, 1 or 2, and the highest tier any changed path
+reaches wins. Which paths are in which tier, and what each tier's gate is,
+lives only in the [steward skill's table](.claude/skills/steward/SKILL.md#risk-tiers);
+don't copy or summarise it here.
 
-- **Tier 0**: typo and docs fixes, README screenshots, clippy fixes for new
-  lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`.
-- **Tier 1**: retro looks, internal page styling, new toolbar commands,
-  settings additions, dial-up profiles.
-- **Tier 2**: `client.rs` request/popup/download handling, the
-  `lantern.invalid` router, `util.rs` escaping and URL normalization,
-  sandbox and helper setup, the CEF pin, `Cargo.toml`/`Cargo.lock`,
-  `release.yml`, `bump-version.sh`, anything else under `.github/`.
-
-Never merge tier 1–2 PRs; they wait for the maintainer.
+Don't merge PRs yourself unless the maintainer explicitly asks: the
+maintainer merges them (steward skill → "Merging").
 
 ## CEF sandbox
 
