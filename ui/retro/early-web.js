@@ -59,7 +59,10 @@
     ].join("\n"),
     css: css,
     decorate: function () {
-      if (foot && foot.host.isConnected) return;
+      if (foot && foot.host.isConnected) {
+        R.keepLast(foot.host);
+        return;
+      }
       foot = R.overlay("lantern-early-web-footer", footSheet);
       var badge = R.el("div", "badge");
       badge.appendChild(document.createTextNode("Lit by "));
@@ -75,7 +78,7 @@
       foot.root.appendChild(para(["You are visitor number ", R.el("span", "count", R.visitors()), " since 1996."]));
       foot.root.appendChild(para(["[ ", top, " | ", mail, " ]"]));
       foot.root.appendChild(para([R.el("small", "", "Last updated: " + lastUpdated())]));
-      document.body.appendChild(foot.host);
+      R.keepLast(foot.host);
     },
     undecorate: function () {
       if (foot) foot.host.remove();

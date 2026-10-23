@@ -130,10 +130,8 @@
         document.body.insertBefore(head.host, document.body.firstChild);
         if (atTop) window.scrollTo(0, 0);
       }
-      if (!foot || !foot.host.isConnected) {
-        foot = footer();
-        document.body.appendChild(foot.host);
-      }
+      if (!foot || !foot.host.isConnected) foot = footer();
+      R.keepLast(foot.host);
     },
     undecorate: function () {
       [head, foot].forEach(function (d) { if (d) d.host.remove(); });

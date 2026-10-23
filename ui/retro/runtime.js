@@ -89,6 +89,14 @@
     return { host: host, root: root };
   }
 
+  // Footers belong at the very end of the body. While the page is still
+  // loading, the parser keeps adding content after anything appended to it,
+  // so decorate() calls this on every scan to move the footer back down.
+  function keepLast(host) {
+    var body = document.body;
+    if (body && body.lastElementChild !== host) body.appendChild(host);
+  }
+
   var helpers = {
     SOLID: SOLID,
     DECOR: DECOR,
@@ -96,6 +104,7 @@
     el: el,
     visitors: visitors,
     overlay: overlay,
+    keepLast: keepLast,
     top: window === window.top
   };
 
