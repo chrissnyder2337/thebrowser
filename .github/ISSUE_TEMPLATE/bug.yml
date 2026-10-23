@@ -1,0 +1,49 @@
+name: Bug
+description: Something in Lantern doesn't work as it should.
+title: "Bug: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The maintainer adds `factory:ready` once this spec is approved. Only then
+        does an agent start work on it.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happens, and what did you expect? Include the Lantern version, OS, and steps to reproduce (command-line flags such as --retro= and --url= help).
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: >
+        Observable behaviour a user (or a test) can check, one per line. For
+        example: "with `--retro=portal`, the bookmarks page shows the footer at
+        the bottom of the window".
+      placeholder: |
+        - Starting Lantern with --url=example.com opens https://example.com/ and the URL bar shows it.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this issue deliberately doesn't cover.
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Proposed risk tier
+      description: >
+        See "Risk tiers" in CLAUDE.md. The highest tier any changed path
+        reaches wins; the maintainer has the final say.
+      options:
+        - "0: dark lane (docs, typos, pixel art, fixture pages; nothing under .github/)"
+        - "1: skim (retro looks, internal page styling, toolbar commands, settings)"
+        - "2: full review (escaping, URL handling, lantern.invalid, client.rs, sandbox, CEF pin, Cargo, .github/)"
+        - "Not sure"
+    validations:
+      required: true

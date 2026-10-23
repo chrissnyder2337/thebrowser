@@ -1,0 +1,49 @@
+name: Chore
+description: "Maintenance: dependencies, CI, tooling, docs or cleanup."
+title: "Chore: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The maintainer adds `factory:ready` once this spec is approved. Only then
+        does an agent start work on it.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What needs doing and why now?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: >
+        Observable behaviour a user (or a test) can check, one per line. For
+        example: "with `--retro=portal`, the bookmarks page shows the footer at
+        the bottom of the window".
+      placeholder: |
+        - cargo clippy --all-targets -- -D warnings passes on the new toolchain.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this issue deliberately doesn't cover.
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Proposed risk tier
+      description: >
+        See "Risk tiers" in CLAUDE.md. The highest tier any changed path
+        reaches wins; the maintainer has the final say.
+      options:
+        - "0: dark lane (docs, typos, pixel art, fixture pages; nothing under .github/)"
+        - "1: skim (retro looks, internal page styling, toolbar commands, settings)"
+        - "2: full review (escaping, URL handling, lantern.invalid, client.rs, sandbox, CEF pin, Cargo, .github/)"
+        - "Not sure"
+    validations:
+      required: true

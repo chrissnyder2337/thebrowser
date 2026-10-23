@@ -1,0 +1,20 @@
+# Labels the factory uses (docs/software-factory.md, Phase 0). Create them
+# once, e.g. with `gh label create <name> --color <color> --description <text>`.
+- name: factory:ready
+  color: "0e8a16"
+  description: The maintainer approved the spec; an agent may start.
+- name: factory:in-progress
+  color: "fbca04"
+  description: An agent session is working on this.
+- name: factory:needs-human
+  color: "d93f0b"
+  description: Blocked on a decision or action from the maintainer.
+- name: tier:0
+  color: "c2e0c6"
+  description: "Dark lane: low-risk paths, auto-merge once CI is green."
+- name: tier:1
+  color: "fef2c0"
+  description: "Skim: the maintainer checks plan, screenshots and tests."
+- name: tier:2
+  color: "f9d0c4"
+  description: "Full review: security-sensitive or CI/release paths."

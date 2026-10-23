@@ -336,6 +336,8 @@ tools/bump-version.sh           bumps the version and opens the release pull req
 .claude/skills/steward/         Claude Code skill: conventions for getting PRs merged
 ```
 
+Notes for Claude Code sessions are in [CLAUDE.md](CLAUDE.md).
+
 ### Pixel art
 
 All artwork is original and drawn as text grids in `ui/lantern.txt` and
