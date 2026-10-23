@@ -274,7 +274,7 @@ features for the loop and puts our own effort into the oracle.
 
 ## Part 2: Where Lantern stands today
 
-Lantern was built in two days, and 33 of its 42 commits were written by Claude.
+Lantern was built in two days, and 35 of the 46 commits on `main` (as of October 23, 2026) were written by Claude.
 It already sits around **level 3–4**: the maintainer specifies and merges,
 agents build. Some factory parts already exist:
 
@@ -333,7 +333,7 @@ we skip it for now.
 | Parallel sessions, agent view, cross-session messaging, Desktop features | **Disabled** | One implementing session at a time. |
 | Dynamic workflows | **Disabled** (too usage-heavy) | One exception: a single Claude Security scan limited to the tier-2 files. |
 | Merge queue | **Disabled** | Not needed with one agent. It would also need the repo moved to an organization. |
-| `CODEOWNERS` required reviews | **Disabled** | GitHub won't let you approve your own PRs, so the CI `oracle-change` label check does this job. |
+| `CODEOWNERS` required reviews | **Disabled** | GitHub won't let you approve your own PRs, so the CI oracle check, overridden only by your approval on the `oracle` GitHub Environment, does this job. |
 | Opus for everything; fast mode | **Alternative** | Sonnet 5.5 by default, Haiku 5.5 for subagents and triage, and Opus only for tier-2 plans where your plan allows it. No fast mode. |
 | OpenTelemetry dashboards | **Disabled** | `/usage` and `/cost`. |
 
@@ -461,8 +461,7 @@ Give every agent session the same starting context and a working toolchain.
   observable behavior ("with `--retro=portal`, the bookmarks page shows…"),
   out of scope, and a proposed risk tier.
 - **Labels:** `factory:ready` (the maintainer approved the spec), `tier:0`,
-  `tier:1`, `tier:2`, `factory:in-progress`, `factory:needs-human`,
-  `oracle-change`.
+  `tier:1`, `tier:2`, `factory:in-progress`, `factory:needs-human`.
 
 ### Phase 1: Build the oracle (about one to two weeks)
 
@@ -513,8 +512,17 @@ CI misses today. Cheapest first:
    used: GitHub won't let you approve PRs opened under your own account.) A CI
    check fails any PR that changes product code (`src/`, `ui/`) **and also
    modifies or deletes existing oracle files**: existing files under
-   `tests/golden/`, or existing test assertions. The only override is the
-   `oracle-change` label, which only the maintainer applies. *Adding* new
+   `tests/golden/`, or existing test assertions. The override is an
+   approval, not a label. The implementing agent acts through your GitHub
+   identity, so it could add a label, and GitHub can't tell its label from
+   yours. Instead, when the check finds an oracle change, it waits on a
+   GitHub Environment named `oracle` with you as the required reviewer, and
+   you approve it in the GitHub UI. Two things back this up:
+   - **To verify once:** that the Claude GitHub app's permissions can't
+     approve deployments. If they can, there's no mechanical override, and
+     oracle changes must land as a separate PR you push yourself.
+   - The edit hook also asks before any command or GitHub tool call that
+     approves deployments. *Adding* new
    golden files and new tests is allowed, so a PR can add coverage for new
    behavior without your help (including the PR that first creates the
    goldens). This is the cheap version of "agents can't rewrite the tests to
@@ -577,8 +585,13 @@ CI misses today. Cheapest first:
    - **Checking the checker.** Monthly, and whenever scenarios change, the
      job also runs against **deliberately broken builds**: a blank toolbar,
      a retro look that never applies, dial-up mode that doesn't throttle, a
-     status bar that never updates. These are produced from a small set of
-     patches the maintainer keeps in the scenarios repo. If the judge passes
+     status bar that never updates. The patches live in
+     `tools/blackbox/mutants/`. They're public, which only reveals what the
+     *judge* is calibrated against, not the scenarios. The clean room has no
+     source to patch, so a separate `mutants.yml` workflow (no Claude, no
+     token; dispatched from `main`) applies each patch, builds the bundle and
+     uploads it as a `mutant-<name>` artifact. `blackbox.yml` takes an input
+     choosing either the PR's bundle or one of these. If the judge passes
      a broken build, the scenario or the judge prompt gets fixed before the
      check is trusted again.
    - **When it runs.** When you start it for tier-2 PRs and for tier-1 PRs
@@ -656,7 +669,7 @@ side tasks. Revisit this only if the plan changes.
 
 | Tier | Examples | Gate |
 |---|---|---|
-| **0: dark lane** | Typo/docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Auto-merge when CI and the oracle are green and the session's pre-push `/code-review` found nothing left open. The maintainer reads the weekly digest, not each diff. |
+| **0: dark lane** | Typo/docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Auto-merge when CI and the oracle are green. The pre-push `/code-review` is required practice in `CLAUDE.md` but isn't checked mechanically, which is why tier 0 is limited to low-risk paths. The maintainer reads the weekly digest, not each diff. |
 | **1: skim** | Retro look changes, internal page styling, new toolbar commands, settings additions, dial-up profiles. Dependabot bumps whose diff changes only `uses:` lines in workflows. | Maintainer looks at the plan, the screenshot diff and the test changes, then skims the code. |
 | **2: full review** | `client.rs` request, popup and download handling; `commands.rs` `lantern.invalid` router; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml` and `Cargo.lock`; `release.yml`, `bump-version.sh`; any other change under `.github/` (workflows, `tiers.yml`, the tier script); `tools/blackbox/` | Maintainer reads the whole diff. The `claude-review.yml` review (you start it), `/security-review` in the session, and the black-box test. Never auto-merged. |
 
@@ -670,10 +683,21 @@ The tier is mechanical, and it can't be steered from inside the PR:
   `tiers.yml` or the script is itself tier 2.
 - **The highest tier touched wins**, and a PR is tier 0 only if every path
   is on the tier-0 allowlist.
-- **The same job turns on auto-merge.** Labels and merges made with
-  `GITHUB_TOKEN` don't trigger other workflows. So the labelling job enables
-  auto-merge itself for tier-0 PRs (`gh pr merge --auto --squash`), instead
+- **The same job turns auto-merge on and off.** Labels and merges made with
+  `GITHUB_TOKEN` don't trigger other workflows. So the labelling job itself
+  enables auto-merge for tier-0 PRs (`gh pr merge --auto --squash`), instead
   of a second workflow waiting for a label event that would never fire.
+  - It runs on every `opened`, `synchronize` and `reopened` event, so it
+    re-tiers the PR after each push.
+  - If a push makes the PR tier 1 or 2, it removes the old tier label and
+    **turns auto-merge off** (`gh pr merge --disable-auto`).
+  - Turning auto-merge on needs `contents: write` and
+    `pull-requests: write`. That's acceptable only because this job never
+    runs PR code and holds no Claude token.
+  - Branch protection on `main` must require the CI checks, **not an
+    approving review**. You can't approve PRs opened under your own account,
+    so a review requirement would block every auto-merge. PR #8 merged with
+    no review, so this already looks like the current setup.
 - **`main` gets a scheduled CI run.** A merge made through `GITHUB_TOKEN`
   auto-merge doesn't start push workflows on `main` either, so `ci.yml` also
   runs daily on `main`. That run needs no model. Tier 0 can never touch
@@ -696,7 +720,7 @@ download check).
 | **Lint ratchet** | Weekly (Pro: not nightly) | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
 | **Docs drift** | Monthly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
 | **Black-box explorer** | **[Pro: disabled at first]**, then weekly with a time cap | Turn it on only once Phase 2 runs within your usage. Then run it weekly (not nightly), on the same clean-room job and `bb` helper, capped at about 30 minutes per run. An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
-| **Release smoke** | When the Release workflow succeeds (`workflow_run`; a release published with `GITHUB_TOKEN` doesn't fire `release` events) | A plain GitHub Action (no model): downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
+| **Release smoke** | When the Release workflow succeeds (`workflow_run`; a release published with `GITHUB_TOKEN` doesn't fire `release` events) | A plain GitHub Action (no model). It first checks that the run actually published: a release for that run's version exists and was published after the run started. Otherwise it exits, because Release also succeeds on build-only runs. Then it downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
 | **Weekly digest** | Weekly | A plain GitHub Action collects the numbers (merged PRs by tier, reverts, CI first-push rate) with no model. A short routine writes them up as one issue: what merged, what the factory dropped, and how much Pro usage went where (from `/usage`). |
 
 ### Phase 4: Widen the dark lanes, carefully
@@ -714,8 +738,11 @@ hostile input.
 
 - **No agent runs on untrusted triggers with secrets.** Agents start on
   maintainer actions (a label, a comment from the maintainer, a schedule),
-  never on `issues: opened`, `pull_request_target` or outside comments. Triage
-  can read public issues but runs with no secrets and a read-only token.
+  never on `issues: opened` or outside comments, and never on
+  `pull_request_target` with PR code checked out. The one allowed
+  `pull_request_target` use is the tier labeller, which checks out only the
+  base branch and holds no Claude token. Triage can read public issues but
+  runs with no secrets and a read-only token.
 - **Protect your Pro token.** `CLAUDE_CODE_OAUTH_TOKEN` is tied to your
   personal subscription, so any workflow that holds it can spend your usage.
   Only workflows you start yourself from `main` (`workflow_dispatch`, or the

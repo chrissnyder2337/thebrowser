@@ -41,32 +41,32 @@ section has the details:
 
 | Feature | Shipped | Why it matters for Lantern | How |
 |---|---|---|---|
-| **Code Review** on PRs, with review levels | GA earlier; levels 2.1.304 (Oct 19); `@claude review always` / `stop` (2.1.307) | No PR has had an automated review. Levels map onto our risk tiers. | Install the Claude GitHub app's Code Review for this repo. Default **Standard**, **Deep** for tier-2 paths. `@claude review always` on agent PRs. |
+| **Code Review** on PRs, with review levels | GA earlier; levels 2.1.304 (Oct 19); `@claude review always` / `stop` (2.1.307) | No PR has had an automated review. Levels map onto our risk tiers. | **[Pro: not available]** Team/Enterprise only. On Pro, use the plan's replacement: pre-push `/code-review` plus a `claude-review.yml` run you start from `main` for tier-2 PRs. |
 | **`CLAUDE.md`** plus **`/doctor` trimming** and **`/doctor prompt-audit`** | 2.1.206 (Jul 9); 2.1.283 (Sep 25) | No project instructions exist yet. `prompt-audit` flags instructions written for older models, so run it on `.claude/skills/release` too. | Write `CLAUDE.md` (plan Phase 0), then run `/doctor` and `/doctor prompt-audit`. |
 | **SessionStart hook**, with `reloadSkills: true` and **`onFailure: "block"`** | May 27; 2.1.295 (Oct 8) | Cloud agents can't reliably run clippy or tests without CEF installed. `onFailure: "block"` makes a required check fail closed instead of being silently skipped. | Install CEF and warm cargo in a SessionStart hook. Use `onFailure: "block"` on guard hooks. |
 | **`/goal` + auto mode** (auto mode default since Aug 14) | May 12; check-ins and retries Aug–Sep | The built-in loop with a separate evaluator for the implementation step. | Already in the plan. In headless runs, add `--permission-prompts none` (2.1.259) so anything that would prompt is denied rather than hanging. |
 | **`/auto-mode-setup`** | 2.1.304 (Oct 19) | Teaches auto mode what's normal here: CEF downloads, cargo and apt hosts, `bundle-cef-app`. That means fewer false blocks during unattended runs. | Run it once in a session that has done a full build. |
 | **Sandbox: `allowNestedUserNamespaces`** | 2.1.305 (Oct 20) | The changelog names **Chromium** as the case for this. The bundle smoke test (Phase 1.4) starts CEF, and CEF's sandbox needs user namespaces inside Claude's Linux sandbox. | Turn it on only in settings used for smoke-test runs (it weakens the sandbox's file protections), or launch the test bundle with CEF's `--no-sandbox`. Note the tradeoff in `CLAUDE.md`. |
-| **PreToolUse hook guarding the oracle** | Hooks long-standing; `onFailure: "block"` new | Blocks Edit/Write to `tests/golden/` unless the maintainer sets a flag (the black-box scenarios live in a separate private repo). This enforces the plan's "agents don't rewrite the tests" rule at edit time, before CI ever sees it. | A command hook in `.claude/settings.json` that runs in every session, cloud included. |
+| **PreToolUse hook guarding the oracle** | Hooks long-standing; `onFailure: "block"` new | Returns an *ask* decision for edits to existing files under `tests/golden/`, Bash snapshot updates, and deployment approvals. New golden files are allowed. It catches the obvious cases at edit time, but it's a speed bump: the CI oracle check (approved only through the `oracle` environment) is the real lock. The black-box scenarios live in a separate private repo. | A command hook in `.claude/settings.json` that runs in every session, cloud included. |
 | **Security-guidance plugin** | May 28 | Checks each edit for vulnerability patterns, reviews each turn, and does a deeper review on push. Lantern's escaping, URL handling and `lantern.invalid` routing are exactly the patterns it's for. | `/plugin install security-guidance@claude-plugins-official`, plus Lantern rules in `.claude/claude-security-guidance.md`. |
-| **Cheaper current models** | Opus 5.5 (Sep 22, $4/$20, ~40% cheaper to run than Opus 5); Sonnet 5.5 (Sep 28); Haiku 5.5 (Oct 7, $0.10/$0.50) | Makes the factory much cheaper than the early-2026 cost figures suggest. | Opus 5.5 for planning and tier-2 work. Sonnet 5.5 for routine loops. Haiku 5.5 for triage subagents and the `/goal` evaluator. The Agent tool's `effort` parameter (2.1.292) sets effort per subagent. |
+| **Cheaper current models** | Opus 5.5 (Sep 22, $4/$20, ~40% cheaper to run than Opus 5); Sonnet 5.5 (Sep 28); Haiku 5.5 (Oct 7, $0.10/$0.50) | Makes the factory much cheaper than the early-2026 cost figures suggest. | On Pro: Sonnet 5.5 by default, Haiku 5.5 for triage, subagents and the `/goal` evaluator, and Opus 5.5 only for tier-2 plans where your plan allows it. The Agent tool's `effort` parameter (2.1.292) sets effort per subagent. |
 
 ## Adopt in Phase 1–2
 
 | Feature | Shipped | Use |
 |---|---|---|
-| **Computer use** (CLI preview Mar; Desktop background on macOS Sep); **in-app browser** (Jul); platform `computer_toolset` GA (Aug 19) | — | Lantern is a GUI app, and computer use lets an agent open it and look. Use it for evidence on visual PRs (screenshots of the retro looks in the real window), with Playwright and the Xvfb smoke test as the deterministic gate. It needs a display, so use the Desktop app locally; cloud containers don't have one. |
-| **Computer use via the API** (`computer_toolset`, GA Aug 19) and the Agent SDK | Aug | Powers the plan's black-box tester (Phase 1.6): a clean-room CI job runs Lantern under Xvfb, and an agent that has never seen the code drives it only through screenshots, mouse and keyboard against hidden scenarios. |
+| **Computer use** (CLI preview Mar; Desktop background on macOS Sep); **in-app browser** (Jul); platform `computer_toolset` GA (Aug 19) | — | **[Pro: replaced]** These need a real desktop (Desktop app or CLI on macOS) or paid API billing. The plan instead runs Lantern on a virtual display (Xvfb) in a cloud container and drives it with `xdotool` and screenshots Claude reads back. That approach has been checked in a cloud session (plan, Constraints). |
+| **Computer use via the API** (`computer_toolset`, GA Aug 19) and the Agent SDK | Aug | **[Pro: replaced]** Needs paid API billing. The plan's black-box tester (Phase 1.6) is instead Claude Code in a GitHub Action on your Pro token, driving Lantern through the `bb` helper (Xvfb, `xdotool`, screenshots). |
 | **`claude plugin eval`** (2.1.269, Sep 11) with `--disallow-tools` (2.1.299) | Sep–Oct | Score each project skill (`release`, `steward`, `retro-look`, …) against a run without it, and keep only the skills that help. Skills in `.claude/skills` already load as a plugin (May). |
 | **`/skill-doctor`** (2.1.261) | Sep 4 | Shows each skill's context cost and how often it's used, to prune with. |
 | **Routines** (Apr), plus the "why the last run didn't start" banner (2.1.302) | — | The plan's triage, CEF watcher, lint ratchet, docs drift and digest loops. |
 | **Ultraplan** (Apr) | — | The plan gate: comment on the agent's plan in a web editor, then run it. |
-| **`claude ultrareview`** in CI (Apr; needs `--trust-workspace` since 2.1.309) | — | A deeper multi-agent bug hunt on tier-2 PRs, run from a workflow on maintainer request. Not on every push, since it's expensive. |
-| **Claude Security plugin** (Jul 20) | — | A one-off multi-agent vulnerability scan of the whole codebase, before the factory starts running unattended. Findings turn into patches you choose to apply. |
-| **Dynamic workflows** (May 28; size settings Jul; per-workflow model 2.1.296) | — | For one-off fan-out jobs, not the main loop. Examples: "audit every CEF callback for off-UI-thread access", "migrate to the next `cef` crate across all handlers", "add golden tests for every look × fixture". |
+| **`claude ultrareview`** in CI (Apr; needs `--trust-workspace` since 2.1.309) | — | **[Pro: 3 free runs only]** Then $5–25 each in usage credits. Save the free runs for the largest tier-2 changes, such as a CEF upgrade. |
+| **Claude Security plugin** (Jul 20) | — | A one-off multi-agent vulnerability scan before the factory starts running unattended. **On Pro, limit it to the tier-2 files** to save usage, with dynamic workflows turned on only for the scan. Findings turn into patches you choose to apply. |
+| **Dynamic workflows** (May 28; size settings Jul; per-workflow model 2.1.296) | — | **[Pro: disabled]** Too usage-heavy, except for the scoped security scan. On a bigger plan, they'd suit one-off fan-out jobs, not the main loop. Examples: "audit every CEF callback for off-UI-thread access", "migrate to the next `cef` crate across all handlers", "add golden tests for every look × fixture". |
 | **Artifacts** (Jun; MCP connectors Jul) | — | The weekly digest as a private page. Also "walk through this PR with the diff annotated" pages to speed up tier-1 skims. |
 
-## Useful when running more than one agent
+## Useful when running more than one agent (**[Pro: disabled]**: one session at a time)
 
 | Feature | Shipped | Use |
 |---|---|---|
@@ -82,7 +82,7 @@ section has the details:
 |---|---|---|
 | `/usage` breakdowns (by skill, subagent, plugin, MCP, loop, workflow) | May–Oct | Cost per loop for the weekly digest. |
 | `/cost` prompt-cache lines (2.1.251, 2.1.260) | Aug–Sep | Spot loops that keep missing the cache and paying for it. |
-| OpenTelemetry: repository attributes (2.1.269), `safety_event` (2.1.307), cache-write split (2.1.300) | Sep–Oct | Only worth it if you want dashboards. For one maintainer, `/usage` is enough. |
+| OpenTelemetry: repository attributes (2.1.269), `safety_event` (2.1.307), cache-write split (2.1.300) | Sep–Oct | **[Pro: disabled]** Only worth it for dashboards. `/usage` is enough. |
 
 ## Considered and not needed (for now)
 
@@ -124,8 +124,9 @@ section has the details:
   2,500 a day in May to over 30,000 in September, until version control itself
   became the bottleneck. At our scale the equivalent is **CI time and
   merging**. The Linux job builds CEF and bundles, and three runners must pass.
-  Once more than one agent is running, add GitHub's merge queue and keep CI
-  fast (cache CEF and `bundle-cef-app`, as CI already does).
+  Keep CI fast (cache CEF and `bundle-cef-app`, as CI already does). A merge
+  queue would only matter with several agents running at once, which is
+  disabled on Pro, and it would also need the repo moved to an organization.
 - **"Donating Agent Skills to the Agentic AI Foundation" (Oct 22).** Skills
   are now an open standard adopted by 70+ platforms, so effort put into
   Lantern's skills isn't tied to one tool.
