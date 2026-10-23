@@ -200,6 +200,9 @@ site, not on every page.
 The screenshots show the Wikipedia article on
 [GeoCities](https://en.wikipedia.org/wiki/GeoCities) (CC BY-SA 4.0).
 
+Research for new looks: [`docs/research/90s-browsers/`](docs/research/90s-browsers/)
+catalogs the browsers of the 1990s, version by version, with screenshots.
+
 The button stays pressed in while a look is on. Choices are saved in
 `settings.txt` and can also be changed on the settings page (**Retro
 settings...** in the menu, or `lantern:settings`). Lantern's own pages (start

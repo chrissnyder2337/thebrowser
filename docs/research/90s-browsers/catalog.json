@@ -1,0 +1,1118 @@
+{
+  "about": "A reference catalog of the web browsers people used in the 1990s, version by version, with screenshots, for planning Lantern's retro looks. Dates and facts come from English Wikipedia (October 2026); each browser links to its article.",
+  "rules": [
+    "**Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.",
+    "**Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.",
+    "**A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.",
+    "**Fair-use screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia. Fair use covers Wikipedia's use of them, not redistribution from this repository."
+  ],
+  "browsers": [
+    {
+      "id": "worldwideweb",
+      "name": "WorldWideWeb (later Nexus)",
+      "maker": "Tim Berners-Lee, CERN",
+      "platforms": [
+        "NeXTSTEP"
+      ],
+      "source": "https://en.wikipedia.org/wiki/WorldWideWeb",
+      "look": "A NeXTSTEP application: commands live in the vertical NeXT menu, every document opens in its own window, and pages can be edited as well as read.",
+      "versions": [
+        {
+          "version": "first version",
+          "date": "1990-12-25",
+          "notes": "The first web browser, which was also an editor."
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/worldwideweb-nextstep.png",
+          "version": "NeXTSTEP build",
+          "shows": "Browser windows and menu on NeXTSTEP.",
+          "commons_file": "WorldWideWeb.1.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:WorldWideWeb.1.png",
+          "author": "Ck_mpk",
+          "license": "Public domain",
+          "license_url": ""
+        }
+      ],
+      "linked": [],
+      "try": [
+        [
+          "CERN's 2019 rebuild, runs in a modern browser",
+          "https://worldwideweb.cern.ch/"
+        ]
+      ]
+    },
+    {
+      "id": "line-mode",
+      "name": "Line Mode Browser",
+      "maker": "CERN",
+      "platforms": [
+        "Any terminal (cross-platform via libwww)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Line_Mode_Browser",
+      "look": "Plain text for teletype-style terminals. Links are numbered in square brackets and you type the number (or a command) at a prompt below the page.",
+      "versions": [
+        {
+          "version": "0.7",
+          "date": "1991-05-14",
+          "notes": "First release listed in the change history."
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/line-mode-browser.png",
+          "version": "later build",
+          "shows": "A modern page rendered as numbered-link text.",
+          "commons_file": "Line Mode Browser Wikipedia.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Line_Mode_Browser_Wikipedia.png",
+          "author": "Raphael Kirchner",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "lynx",
+      "name": "Lynx",
+      "maker": "University of Kansas; later Thomas Dickey",
+      "platforms": [
+        "Unix-like",
+        "DOS",
+        "Windows",
+        "VMS"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Lynx_(web_browser)",
+      "look": "Full-screen text browser: links are highlighted and chosen with the arrow keys, with a status line and key hints at the bottom of the screen.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1992",
+          "notes": "Still maintained; the interface has barely changed since the 1990s."
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/lynx-2.8.8.png",
+          "version": "2.8.8 (2010s)",
+          "shows": "The full-screen text interface, unchanged in style from the 1990s releases.",
+          "commons_file": "Lynx-2.8.8dev.5.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Lynx-2.8.8dev.5.png",
+          "author": "Shah-al",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "violawww",
+      "name": "ViolaWWW",
+      "maker": "Pei-Yuan Wei",
+      "platforms": [
+        "Unix (X11)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/ViolaWWW",
+      "look": "X11 browser that had stylesheets, scripting and embedded applets years before the big browsers.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1992-03-09",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "ViolaWWW.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:ViolaWWW.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "ViolaWWW on X11."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "erwise",
+      "name": "Erwise",
+      "maker": "Helsinki University of Technology students",
+      "platforms": [
+        "Unix (X11)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Erwise",
+      "look": "One of the first graphical browsers for X11, written by four students at Helsinki University of Technology.",
+      "versions": [
+        {
+          "version": "0.1",
+          "date": "1992-04-15",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "Erwise5.jpg",
+          "source_url": "https://en.wikipedia.org/wiki/File:Erwise5.jpg",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Erwise on X11."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "tkwww",
+      "name": "tkWWW",
+      "maker": "Joseph Wang",
+      "platforms": [
+        "Unix (Tcl/Tk)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/TkWWW",
+      "look": "A Tcl/Tk browser-editor with plain Tk buttons and menus.",
+      "versions": [
+        {
+          "version": "0.1",
+          "date": "1992-07-25",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/tkwww-robot.gif",
+          "version": "with the Robot extension",
+          "shows": "The tkWWW window running its web-crawler extension.",
+          "commons_file": "TkWWW Robot.gif",
+          "source_url": "https://commons.wikimedia.org/wiki/File:TkWWW_Robot.gif",
+          "author": "Scott Spetka",
+          "license": "GPL",
+          "license_url": "http://www.gnu.org/licenses/gpl.html"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "macwww",
+      "name": "MacWWW (Samba)",
+      "maker": "Robert Cailliau, Nicola Pellow (CERN)",
+      "platforms": [
+        "Classic Mac OS"
+      ],
+      "source": "https://en.wikipedia.org/wiki/MacWWW",
+      "look": "Early Macintosh browser in classic System 6/7 windows.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1992-12",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "MacWWWscreenshot.gif",
+          "source_url": "https://en.wikipedia.org/wiki/File:MacWWWscreenshot.gif",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "MacWWW on classic Mac OS."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "ncsa-mosaic",
+      "name": "NCSA Mosaic",
+      "maker": "National Center for Supercomputing Applications (NCSA)",
+      "platforms": [
+        "Unix (X11/Motif)",
+        "Windows",
+        "Classic Mac OS"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Mosaic_(web_browser)",
+      "look": "Motif window with a row of text buttons (Back, Forward, Home, Reload, Open, Save, Clone, New Window, Close), Title and URL fields above the page, and an animated logo in the top-right corner. Images appear inline with the text.",
+      "versions": [
+        {
+          "version": "0.5 (X)",
+          "date": "1993-01-23",
+          "notes": "First release."
+        },
+        {
+          "version": "1.0 (X)",
+          "date": "1993-04-21",
+          "notes": ""
+        },
+        {
+          "version": "2.0 (X)",
+          "date": "1993-11-10",
+          "notes": ""
+        },
+        {
+          "version": "2.4 (X)",
+          "date": "1994-04-11",
+          "notes": ""
+        },
+        {
+          "version": "2.5 (X)",
+          "date": "1995-03-12",
+          "notes": ""
+        },
+        {
+          "version": "2.6 (X)",
+          "date": "1995-07-06",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/ncsa-mosaic-x.png",
+          "version": "Mosaic for X",
+          "shows": "Main window with its button row, URL field and page.",
+          "commons_file": "NCSA Mosaic Browser Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:NCSA_Mosaic_Browser_Screenshot.png",
+          "author": "Charles Severance",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        }
+      ],
+      "linked": [
+        {
+          "title": "NCSAMosaic1.0Mac.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:NCSAMosaic1.0Mac.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "NCSA Mosaic 1.0 for Macintosh."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "cello",
+      "name": "Cello",
+      "maker": "Legal Information Institute, Cornell Law School",
+      "platforms": [
+        "Windows 3.1",
+        "OS/2"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Cello_(web_browser)",
+      "look": "One of the first browsers for Windows 3.1, with a plain menu bar and toolbar over the page.",
+      "versions": [
+        {
+          "version": "0.1 beta",
+          "date": "1993-06-08",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "Cello 2.0 (screenshot).gif",
+          "source_url": "https://en.wikipedia.org/wiki/File:Cello_2.0_(screenshot).gif",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Cello 2.0."
+        },
+        {
+          "title": "Cello main page.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Cello_main_page.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Cello showing a page."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "ibm-webexplorer",
+      "name": "IBM WebExplorer",
+      "maker": "IBM",
+      "platforms": [
+        "OS/2"
+      ],
+      "source": "https://en.wikipedia.org/wiki/IBM_WebExplorer",
+      "look": "Native OS/2 browser that came with OS/2 Warp 3.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1994",
+          "notes": "Shipped with OS/2 Warp 3; Wikipedia's infobox lists 1995-11-27 and a last version 1.2 in 1998."
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "OS2 IBM WebExplorer.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:OS2_IBM_WebExplorer.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "WebExplorer on OS/2."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "netscape",
+      "name": "Netscape (Mosaic Netscape, Navigator, Communicator)",
+      "maker": "Netscape Communications",
+      "platforms": [
+        "Windows 3.1/95/NT",
+        "Classic Mac OS",
+        "Unix (many)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Netscape_(web_browser)",
+      "look": "1.x–3.x: grey toolbar of large icon-and-label buttons, a Location field, a row of shortcut buttons to the maker's own pages, an animated logo at the top right, and a status bar with a progress meter and a security icon. 4.x (Communicator) restyled the toolbars, added a Personal Toolbar and collapsible toolbar tabs, and put a small component bar for the suite's other apps in the status bar.",
+      "versions": [
+        {
+          "version": "0.9 (Mosaic Netscape)",
+          "date": "1994-10-13",
+          "notes": "First public beta."
+        },
+        {
+          "version": "1.0",
+          "date": "1994-12-15",
+          "notes": "First non-beta release."
+        },
+        {
+          "version": "1.1",
+          "date": "1995-03",
+          "notes": "Tables, background images and colours."
+        },
+        {
+          "version": "1.22",
+          "date": "1995-08",
+          "notes": ""
+        },
+        {
+          "version": "2.0",
+          "date": "1995-09-18",
+          "notes": "JavaScript, Java, plug-ins, frames; mail and news built in. (Date as listed by Wikipedia.)"
+        },
+        {
+          "version": "2.01",
+          "date": "1996-03-18",
+          "notes": ""
+        },
+        {
+          "version": "3.0",
+          "date": "1996-08-19",
+          "notes": "LiveAudio/LiveVideo, HTML 3.2. 'Gold' editions added an editor."
+        },
+        {
+          "version": "3.03",
+          "date": "1997-07-31",
+          "notes": ""
+        },
+        {
+          "version": "3.04",
+          "date": "1997-10-04",
+          "notes": ""
+        },
+        {
+          "version": "4.0 (Communicator)",
+          "date": "1997-06-11",
+          "notes": "Became a suite: browser, mail, editor, groups, push channels."
+        },
+        {
+          "version": "4.01–4.04",
+          "date": "1997-06-18 to 1997-11-14",
+          "notes": ""
+        },
+        {
+          "version": "4.05–4.08",
+          "date": "1998-04-02 to 1998-11-09",
+          "notes": "4.06 added the Flash plug-in and 'Smart Browsing'. 4.08 was the last for 16-bit Windows and 68k Macs."
+        },
+        {
+          "version": "4.5",
+          "date": "1998-10-19",
+          "notes": ""
+        },
+        {
+          "version": "4.51",
+          "date": "1999-03-08",
+          "notes": ""
+        },
+        {
+          "version": "4.6",
+          "date": "1999-05-18",
+          "notes": ""
+        },
+        {
+          "version": "4.61",
+          "date": "1999-06-14",
+          "notes": ""
+        },
+        {
+          "version": "4.7",
+          "date": "1999-09-30",
+          "notes": "Last release of the decade."
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/netscape-0.9x.png",
+          "version": "0.9x (Mosaic Netscape)",
+          "shows": "About page of an 0.9x pre-release.",
+          "commons_file": "Netscape 0.92 Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_0.92_Screenshot.png",
+          "author": "Indolering",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "file": "images/netscape-1.0n.png",
+          "version": "1.0N",
+          "shows": "The 1.0 \"network release\".",
+          "commons_file": "Netscape-1.0N.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape-1.0N.png",
+          "author": "Indolering",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "file": "images/netscape-1.22.png",
+          "version": "1.22",
+          "shows": "About page.",
+          "commons_file": "Netscape Navigator 1.22 Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Navigator_1.22_Screenshot.png",
+          "author": "Indolering",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "file": "images/netscape-2.01-irix.png",
+          "version": "2.01 (IRIX)",
+          "shows": "Unix (Motif) build on an SGI Indy.",
+          "commons_file": "Irix Netscape Welcome.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Irix_Netscape_Welcome.png",
+          "author": "Aeroid",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        },
+        {
+          "file": "images/netscape-2.02.png",
+          "version": "2.02",
+          "shows": "About page, Windows build.",
+          "commons_file": "Netscape Navigator 2 Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Navigator_2_Screenshot.png",
+          "author": "Indolering",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "file": "images/netscape-3.02-gold.png",
+          "version": "3.02 Gold",
+          "shows": "Windows build (run under Wine).",
+          "commons_file": "Netscape Navigator 3 Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Navigator_3_Screenshot.png",
+          "author": "Indolering",
+          "license": "CC0",
+          "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "file": "images/netscape-3.04-acid1.png",
+          "version": "3.04 Gold",
+          "shows": "Rendering the Acid1 CSS test.",
+          "commons_file": "Netscape 3 - Acid1.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_3_-_Acid1.png",
+          "author": "Alessandro Antonelli",
+          "license": "Public domain",
+          "license_url": ""
+        },
+        {
+          "file": "images/netscape-4.03-acid1.png",
+          "version": "4.03",
+          "shows": "Rendering the Acid1 CSS test.",
+          "commons_file": "Netscape 4 - Acid1.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_4_-_Acid1.png",
+          "author": "Alessandro Antonelli",
+          "license": "Public domain",
+          "license_url": ""
+        },
+        {
+          "file": "images/netscape-4.51-irix.png",
+          "version": "4.51 (IRIX)",
+          "shows": "Communicator-era Unix build on an SGI Indy.",
+          "commons_file": "Irix Netscape451.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Irix_Netscape451.png",
+          "author": "Aeroid",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        }
+      ],
+      "linked": [
+        {
+          "title": "Mosaic Netscape 0.9 on Windows XP.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Mosaic_Netscape_0.9_on_Windows_XP.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Mosaic Netscape 0.9 (run on Windows XP)."
+        },
+        {
+          "title": "Navigator 1-22.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Navigator_1-22.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Navigator 1.22."
+        },
+        {
+          "title": "Welcome to Netscape.gif",
+          "source_url": "https://en.wikipedia.org/wiki/File:Welcome_to_Netscape.gif",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "A Netscape window showing its welcome page."
+        },
+        {
+          "title": "Apple Unix with Netscape.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Apple_Unix_with_Netscape.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Apple Unix with Finder, CommandShell and Netscape 3.01."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "arena",
+      "name": "Arena",
+      "maker": "CERN / W3C; later Yggdrasil Computing",
+      "platforms": [
+        "Unix (X11)",
+        "Linux",
+        "NeXT"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Arena_(web_browser)",
+      "look": "W3C's testbed for HTML 3 and CSS: a simple X window with a button bar, used to show off tables, maths and stylesheets.",
+      "versions": [
+        {
+          "version": "0.91 (first public)",
+          "date": "1994-10-24",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/arena.png",
+          "version": "W3C era",
+          "shows": "The Arena window (image recovered from the Internet Archive).",
+          "commons_file": "Arena (web browser) screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Arena_(web_browser)_screenshot.png",
+          "author": "Remember the dot",
+          "license": "FAL",
+          "license_url": "http://artlibre.org/licence/lal/en"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "slipknot",
+      "name": "SlipKnot",
+      "maker": "MicroMind",
+      "platforms": [
+        "Windows 3.1"
+      ],
+      "source": "https://en.wikipedia.org/wiki/SlipKnot_(web_browser)",
+      "look": "Graphical browser for people with only a Unix shell account, fetching pages over a plain dial-up terminal session.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1994-11",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "Slipknot browser.gif",
+          "source_url": "https://en.wikipedia.org/wiki/File:Slipknot_browser.gif",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "SlipKnot on Windows 3.1."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "opera",
+      "name": "Opera (MultiTorg Opera)",
+      "maker": "Telenor research, then Opera Software",
+      "platforms": [
+        "Windows",
+        "later others"
+      ],
+      "source": "https://en.wikipedia.org/wiki/History_of_the_Opera_web_browser",
+      "look": "Several pages open as child windows inside one main window (MDI), with a 'hotlist' side panel, page zoom, and a download small enough for a floppy disk.",
+      "versions": [
+        {
+          "version": "1.0 (MultiTorg Opera)",
+          "date": "1995",
+          "notes": "Internal release, shown in public in April 1995."
+        },
+        {
+          "version": "2.0",
+          "date": "1996",
+          "notes": "First public release (shareware)."
+        },
+        {
+          "version": "3.0",
+          "date": "1997-12-31",
+          "notes": "First with JavaScript."
+        },
+        {
+          "version": "3.5",
+          "date": "1998",
+          "notes": "CSS support."
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "MultiTorg Opera.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:MultiTorg_Opera.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "MultiTorg Opera, before version 2.0."
+        },
+        {
+          "title": "Opera 3.62.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Opera_3.62.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Opera 3.62 on Windows 9x."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "internet-explorer",
+      "name": "Internet Explorer",
+      "maker": "Microsoft",
+      "platforms": [
+        "Windows 3.1/95/98/NT",
+        "Classic Mac OS",
+        "Solaris and HP-UX"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Internet_Explorer_version_history",
+      "look": "1–2: a small Windows 95-style toolbar over the page. 3: large buttons in a rebar with Address and Links bands. 4: flat buttons that highlight on hover, a side Explorer Bar for search, favourites and history, Active Desktop and push channels. 5: address-bar autocomplete.",
+      "versions": [
+        {
+          "version": "1.0 (Windows)",
+          "date": "1995-08-24",
+          "notes": "Part of the Plus! pack for Windows 95."
+        },
+        {
+          "version": "1.5",
+          "date": "1995–96",
+          "notes": "Basic table display. Sources differ on the date."
+        },
+        {
+          "version": "2.0 (Windows)",
+          "date": "1995-11-27",
+          "notes": "Cookies, SSL, frames."
+        },
+        {
+          "version": "2.0 (Mac)",
+          "date": "1996-04-23",
+          "notes": ""
+        },
+        {
+          "version": "2.1 (Mac)",
+          "date": "1996-08",
+          "notes": ""
+        },
+        {
+          "version": "3.0 (Windows)",
+          "date": "1996-08-13",
+          "notes": "CSS, ActiveX, JScript; came with Windows 95 OSR2."
+        },
+        {
+          "version": "3.0 (Mac)",
+          "date": "1997-01-08",
+          "notes": ""
+        },
+        {
+          "version": "3.01 (Mac)",
+          "date": "1997-05-14",
+          "notes": ""
+        },
+        {
+          "version": "4.0 (Windows)",
+          "date": "1997-09-22",
+          "notes": "Shell integration, Active Desktop, channels."
+        },
+        {
+          "version": "4.0 (Mac)",
+          "date": "1998-01-06",
+          "notes": ""
+        },
+        {
+          "version": "4.0 (Unix)",
+          "date": "1998-03-04",
+          "notes": "Solaris and HP-UX."
+        },
+        {
+          "version": "4.5 (Mac)",
+          "date": "1999-01-05",
+          "notes": ""
+        },
+        {
+          "version": "5.0 (Windows)",
+          "date": "1999-03-18",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "Internet Explorer 1.0.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_1.0.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 1.0."
+        },
+        {
+          "title": "Internet Explorer 2.PNG",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_2.PNG",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 2.0."
+        },
+        {
+          "title": "Internet Explorer 3 on Windows 95.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_3_on_Windows_95.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 3 on Windows 95."
+        },
+        {
+          "title": "Internet Explorer 4.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_4.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 4.01 showing the Wikipedia main page."
+        },
+        {
+          "title": "Internet Explorer 4 for Solaris screenshot.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_4_for_Solaris_screenshot.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 4 for Solaris."
+        },
+        {
+          "title": "Internet Explorer 5 on Windows 98.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Internet_Explorer_5_on_Windows_98.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 5 on Windows 98."
+        },
+        {
+          "title": "Oe-Ie5-unix.jpg",
+          "source_url": "https://en.wikipedia.org/wiki/File:Oe-Ie5-unix.jpg",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Internet Explorer 5 and Outlook Express for UNIX."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "grail",
+      "name": "Grail",
+      "maker": "Corporation for National Research Initiatives (CNRI)",
+      "platforms": [
+        "Unix",
+        "Windows",
+        "Mac (Python/Tk)"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Grail_(web_browser)",
+      "look": "Written in Python with Tk widgets; could run Python applets inside pages.",
+      "versions": [
+        {
+          "version": "first public release",
+          "date": "1995-11",
+          "notes": "Project started 1995-08."
+        },
+        {
+          "version": "0.6",
+          "date": "1999-04-01",
+          "notes": "Last release."
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "Grail browser on Linux.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:Grail_browser_on_Linux.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "Grail on Linux."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "oracle-powerbrowser",
+      "name": "Oracle PowerBrowser",
+      "maker": "Oracle",
+      "platforms": [
+        "Windows"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Oracle_PowerBrowser",
+      "look": "Windows browser bundled with a small personal web server and database tools.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1996",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/oracle-powerbrowser.png",
+          "version": "1996",
+          "shows": "Main window.",
+          "commons_file": "Oracle PowerBrowser.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Oracle_PowerBrowser.png",
+          "author": "Jihei",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "ibrowse",
+      "name": "IBrowse",
+      "maker": "Stefan Burström and others",
+      "platforms": [
+        "AmigaOS"
+      ],
+      "source": "https://en.wikipedia.org/wiki/IBrowse",
+      "look": "Amiga browser built with the MUI toolkit.",
+      "versions": [
+        {
+          "version": "1.0",
+          "date": "1996-07-28",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [
+        {
+          "title": "IBrowse Amiga.png",
+          "source_url": "https://en.wikipedia.org/wiki/File:IBrowse_Amiga.png",
+          "license": "Non-free (fair use on English Wikipedia)",
+          "shows": "IBrowse on AmigaOS."
+        }
+      ],
+      "try": []
+    },
+    {
+      "id": "webtv",
+      "name": "WebTV",
+      "maker": "WebTV Networks (Microsoft from 1997)",
+      "platforms": [
+        "Set-top box on a TV"
+      ],
+      "source": "https://en.wikipedia.org/wiki/MSN_TV",
+      "look": "Browsing on a television with a remote control or a wireless keyboard.",
+      "versions": [
+        {
+          "version": "launch",
+          "date": "1996-09-18",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/webtv-launch-units.jpg",
+          "version": "1996 hardware",
+          "shows": "Photo of the two launch set-top boxes (hardware, not the screen).",
+          "commons_file": "WebTV Launch Units.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:WebTV_Launch_Units.jpg",
+          "author": "Halen Martini",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "arachne",
+      "name": "Arachne",
+      "maker": "Michael Polák and contributors",
+      "platforms": [
+        "DOS",
+        "later Linux"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Arachne_(web_browser)",
+      "look": "Graphical browser for DOS that ran in display modes from CGA to VESA.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1996-12-22",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/arachne-vesa.png",
+          "version": "later GPL build",
+          "shows": "800×600 VESA mode.",
+          "commons_file": "Arachne VESA Mode.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Arachne_VESA_Mode.png",
+          "author": "Arachne contributors",
+          "license": "GPL",
+          "license_url": "http://www.gnu.org/licenses/gpl.html"
+        },
+        {
+          "file": "images/arachne-cga.png",
+          "version": "later GPL build",
+          "shows": "640×200 monochrome CGA mode.",
+          "commons_file": "Arachne CGA Mode.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Arachne_CGA_Mode.png",
+          "author": "Arachne contributors",
+          "license": "GPL",
+          "license_url": "http://www.gnu.org/licenses/gpl.html"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "hotjava",
+      "name": "HotJava",
+      "maker": "Sun Microsystems",
+      "platforms": [
+        "Solaris",
+        "Windows",
+        "any Java platform"
+      ],
+      "source": "https://en.wikipedia.org/wiki/HotJava",
+      "look": "Browser written in Java, and the first to run Java applets.",
+      "versions": [
+        {
+          "version": "1.0",
+          "date": "1997-03-24",
+          "notes": "Earlier alpha/beta versions from 1995."
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/hotjava-3.png",
+          "version": "3.0",
+          "shows": "Main window.",
+          "commons_file": "MainPage-HotJava3-Optim.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:MainPage-HotJava3-Optim.png",
+          "author": "User Optim on en.wikipedia",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "links",
+      "name": "Links",
+      "maker": "Mikuláš Patočka",
+      "platforms": [
+        "Unix-like",
+        "OS/2",
+        "DOS",
+        "Windows"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Links_(web_browser)",
+      "look": "Text browser with pull-down menus and real table and frame layout in the terminal.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1999",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/links.jpg",
+          "version": "2000s build",
+          "shows": "Text-mode interface.",
+          "commons_file": "Webbrowser Links.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Webbrowser_Links.jpg",
+          "author": "Gürkan Sengün",
+          "license": "Public domain",
+          "license_url": ""
+        }
+      ],
+      "linked": [],
+      "try": []
+    },
+    {
+      "id": "icab",
+      "name": "iCab",
+      "maker": "Alexander Clauss",
+      "platforms": [
+        "Classic Mac OS"
+      ],
+      "source": "https://en.wikipedia.org/wiki/ICab",
+      "look": "Mac browser that ran on old 68k Macs and showed a smiley face for valid HTML (a frown for errors).",
+      "versions": [
+        {
+          "version": "first preview",
+          "date": "1999-02-17",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [],
+      "try": []
+    }
+  ],
+  "gaps": [
+    {
+      "name": "MidasWWW",
+      "date": "1992-11-16",
+      "source": "https://en.wikipedia.org/wiki/MidasWWW"
+    },
+    {
+      "name": "MacWeb",
+      "date": "1994-05-31",
+      "source": "https://en.wikipedia.org/wiki/MacWeb"
+    },
+    {
+      "name": "OmniWeb",
+      "date": "1995-03-17",
+      "source": "https://en.wikipedia.org/wiki/OmniWeb"
+    },
+    {
+      "name": "w3m",
+      "date": "1995",
+      "source": "https://en.wikipedia.org/wiki/W3m"
+    },
+    {
+      "name": "Cyberdog",
+      "date": "1996-02 (beta)",
+      "source": "https://en.wikipedia.org/wiki/Cyberdog"
+    },
+    {
+      "name": "Amaya",
+      "date": "1996-07",
+      "source": "https://en.wikipedia.org/wiki/Amaya_(web_editor)"
+    },
+    {
+      "name": "AWeb",
+      "date": "1996",
+      "source": "https://en.wikipedia.org/wiki/AWeb"
+    },
+    {
+      "name": "Voyager (Amiga)",
+      "date": "1990s",
+      "source": "https://en.wikipedia.org/wiki/Voyager_(web_browser)"
+    }
+  ],
+  "references": [
+    {
+      "label": "oldweb.today: old browsers running in emulation, in your own browser",
+      "url": "https://oldweb.today/"
+    },
+    {
+      "label": "CERN's rebuild of WorldWideWeb",
+      "url": "https://worldwideweb.cern.ch/"
+    },
+    {
+      "label": "Wikipedia: History of the web browser",
+      "url": "https://en.wikipedia.org/wiki/History_of_the_web_browser"
+    },
+    {
+      "label": "Wikipedia: List of web browsers",
+      "url": "https://en.wikipedia.org/wiki/List_of_web_browsers"
+    },
+    {
+      "label": "Wikimedia Commons: Screenshots of web browsers",
+      "url": "https://commons.wikimedia.org/wiki/Category:Screenshots_of_web_browsers"
+    }
+  ]
+}

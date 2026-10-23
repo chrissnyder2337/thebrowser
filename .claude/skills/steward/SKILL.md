@@ -35,6 +35,8 @@ Also avoid their logos, icons, throbber animations, and wording or layout
 signatures (a "<browser> Now!" button, an "N" or "e" logo).
 Describe the era instead: "Early web (1995)", "Web portal (1997)".
 Fonts named in CSS font stacks are fine.
+Research notes under `docs/research/` are the exception: they name real
+browsers in order to describe them, and they never ship in the app.
 
 ## Before every push
 
