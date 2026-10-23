@@ -31,7 +31,7 @@ automated review at all.
 | **`/goal` + auto mode** (auto mode default since Aug 14) | May 12; check-ins and retries Aug–Sep | The built-in loop with a separate evaluator for the implementation step. | Already in the plan. In headless runs, add `--permission-prompts none` (2.1.259) so anything that would prompt is denied rather than hanging. |
 | **`/auto-mode-setup`** | 2.1.304 (Oct 19) | Teaches auto mode what's normal here: CEF downloads, cargo and apt hosts, `bundle-cef-app`. That means fewer false blocks during unattended runs. | Run it once in a session that has done a full build. |
 | **Sandbox: `allowNestedUserNamespaces`** | 2.1.305 (Oct 20) | The changelog names **Chromium** as the case for this. The bundle smoke test (Phase 1.4) starts CEF, and CEF's sandbox needs user namespaces inside Claude's Linux sandbox. | Turn it on only in settings used for smoke-test runs (it weakens the sandbox's file protections), or launch the test bundle with CEF's `--no-sandbox`. Note the tradeoff in `CLAUDE.md`. |
-| **PreToolUse hook guarding the oracle** | Hooks long-standing; `onFailure: "block"` new | Blocks Edit/Write to `tests/golden/` and `scenarios/` unless the maintainer sets a flag. This enforces the plan's "agents don't rewrite the tests" rule at edit time, before CI ever sees it. | A command hook in `.claude/settings.json` that runs in every session, cloud included. |
+| **PreToolUse hook guarding the oracle** | Hooks long-standing; `onFailure: "block"` new | Blocks Edit/Write to `tests/golden/` unless the maintainer sets a flag (the black-box scenarios live in a separate private repo). This enforces the plan's "agents don't rewrite the tests" rule at edit time, before CI ever sees it. | A command hook in `.claude/settings.json` that runs in every session, cloud included. |
 | **Security-guidance plugin** | May 28 | Checks each edit for vulnerability patterns, reviews each turn, and does a deeper review on push. Lantern's escaping, URL handling and `lantern.invalid` routing are exactly the patterns it's for. | `/plugin install security-guidance@claude-plugins-official`, plus Lantern rules in `.claude/claude-security-guidance.md`. |
 | **Cheaper current models** | Opus 5.5 (Sep 22, $4/$20, ~40% cheaper to run than Opus 5); Sonnet 5.5 (Sep 28); Haiku 5.5 (Oct 7, $0.10/$0.50) | Makes the factory much cheaper than the early-2026 cost figures suggest. | Opus 5.5 for planning and tier-2 work. Sonnet 5.5 for routine loops. Haiku 5.5 for triage subagents and the `/goal` evaluator. The Agent tool's `effort` parameter (2.1.292) sets effort per subagent. |
 
@@ -40,7 +40,7 @@ automated review at all.
 | Feature | Shipped | Use |
 |---|---|---|
 | **Computer use** (CLI preview Mar; Desktop background on macOS Sep); **in-app browser** (Jul); platform `computer_toolset` GA (Aug 19) | — | Lantern is a GUI app, and computer use lets an agent open it and look. Use it for evidence on visual PRs (screenshots of the retro looks in the real window), with Playwright and the Xvfb smoke test as the deterministic gate. It needs a display, so use the Desktop app locally; cloud containers don't have one. |
-| **Scenario judge as an isolated subagent**: `omitClaudeMd` (2.1.271), `disallowed-tools` in frontmatter, `--restricted` (2.1.248) | Aug–Sep | The plan's holdout scenarios need a judge that doesn't share the implementer's context. Define a `scenario-judge` agent with `omitClaudeMd: true`, read-only tools, and Haiku or Sonnet. |
+| **Computer use via the API** (`computer_toolset`, GA Aug 19) and the Agent SDK | Aug | Powers the plan's black-box tester (Phase 1.6): a clean-room CI job runs Lantern under Xvfb, and an agent that has never seen the code drives it only through screenshots, mouse and keyboard against hidden scenarios. |
 | **`claude plugin eval`** (2.1.269, Sep 11) with `--disallow-tools` (2.1.299) | Sep–Oct | Score each project skill (`release`, `steward`, `retro-look`, …) against a run without it, and keep only the skills that help. Skills in `.claude/skills` already load as a plugin (May). |
 | **`/skill-doctor`** (2.1.261) | Sep 4 | Shows each skill's context cost and how often it's used, to prune with. |
 | **Routines** (Apr), plus the "why the last run didn't start" banner (2.1.302) | — | The plan's triage, CEF watcher, lint ratchet, docs drift and digest loops. |
@@ -93,7 +93,7 @@ automated review at all.
   Separate planner, generator and evaluator agents, with the evaluator testing
   the running app in a browser rather than reading code. This is the same
   shape as the plan (plan gate → `/goal` implementation → Playwright and
-  scenario judge), and it backs putting the most effort into the evaluator.
+  the black-box tester), and it backs putting the most effort into the evaluator.
 - **"How we contain Claude across products" (May 25).**
   - Deterministic boundaries over prompts: sandbox writes to the workspace,
     deny network by default, keep secrets out of the environment.

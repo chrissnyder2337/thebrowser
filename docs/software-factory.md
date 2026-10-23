@@ -370,8 +370,9 @@ Give every agent session the same starting context and a working toolchain.
   automated review.
 - **Guard the oracle at edit time:** a PreToolUse hook in
   `.claude/settings.json` (with `onFailure: "block"`) that refuses edits to
-  `tests/golden/` and `scenarios/` unless the maintainer sets a flag. CI's
-  check (Phase 1.5) stays as the backstop.
+  `tests/golden/` unless the maintainer sets a flag. CI's check (Phase 1.5)
+  stays as the backstop. The black-box scenarios (Phase 1.6) aren't in this
+  repo at all.
 - **Tune for unattended runs:** run `/auto-mode-setup` once after a full
   build; use `--permission-prompts none` in headless runs; run
   `/doctor prompt-audit` on `CLAUDE.md` and the skills.
@@ -421,25 +422,60 @@ CI misses today. Cheapest first:
    enable `sandbox.allowNestedUserNamespaces` (added Oct 2026 with Chromium
    as the named case; it weakens the sandbox's file protections) or launch
    the test bundle with `--no-sandbox`.
-5. **Scenario holdouts (StrongDM's idea, scaled down).** A `scenarios/`
-   directory of plain-language user journeys ("start Lantern, turn on dial-up
-   at 14.4k, open a page with images, see them paint top to bottom"). They're
-   run by a separate, read-only judge agent, which drives the smoke-test
-   bundle or the Playwright harness. Define it as a `scenario-judge`
-   subagent with `omitClaudeMd: true` and read-only tools, so it doesn't
-   share the implementer's instructions or assumptions. Two rules keep
-   them honest:
-   - `CODEOWNERS` makes `scenarios/` and `tests/golden/` maintainer-owned.
-   - A CI check fails any PR that changes both product code (`src/`, `ui/`)
-     and the oracle (`scenarios/`, `tests/golden/`, existing test
-     assertions), unless the PR has the `oracle-change` label, which only the
-     maintainer applies. This is the cheap version of "agents can't rewrite
-     the tests to match the bug".
+5. **Protect the white-box oracle.** `CODEOWNERS` makes `tests/golden/`
+   maintainer-owned. A CI check fails any PR that changes both product code
+   (`src/`, `ui/`) and the oracle (`tests/golden/`, existing test
+   assertions), unless the PR has the `oracle-change` label, which only the
+   maintainer applies. This is the cheap version of "agents can't rewrite the
+   tests to match the bug".
+6. **Black-box agent testing (StrongDM's holdouts, scaled down).** Everything
+   above is written against the code, so it can share the implementer's
+   misunderstanding. This layer tests Lantern the way a user meets it, with
+   an agent that has never seen the code.
+   - **Hidden scenarios.** Plain-language user journeys live in a separate
+     **private repo**, `thebrowser-scenarios`. For example: "start Lantern,
+     turn on dial-up at 14.4k, open the image fixture, see the images paint
+     top to bottom"; "pick the Portal look, open the bookmarks page, the
+     footer is at the bottom". Each scenario lists the fixture pages it needs
+     and what a user would observe. Implementing sessions never have this
+     repo attached, so agents can't code to the scenarios.
+   - **Clean room.** A dedicated CI job (`blackbox.yml`) downloads only the
+     built Linux bundle artifact from the PR's CI run, plus the scenarios and
+     fixture pages, into an empty directory. It has no checkout of this repo,
+     no `CLAUDE.md`, no diff and no test code. Network access is limited to
+     the local fixture server and the Claude API.
+   - **UI-only tester.** Lantern runs under Xvfb, and a computer-use agent
+     (the API's `computer_toolset`, GA since August 2026, driven by a small
+     Agent SDK script) sees screenshots and sends mouse and keyboard input.
+     It gets nothing else: no file reads, no shell, no Playwright hooks. It
+     may start Lantern with documented user-facing flags (`--url=`,
+     `--retro=`) because users can too.
+   - **Verdicts and gating.** Each scenario runs 3 times. A run returns
+     *satisfied / not satisfied / unclear*, with the screenshots that
+     support it. The PR check passes only when every scenario touched by the
+     PR's tier is satisfied in at least 2 of 3 runs. Any *unclear* result,
+     or a 2–1 split on a tier-2 PR, goes to the maintainer with the
+     screenshots attached. The job posts a summary comment on the PR.
+   - **Checking the checker.** Monthly, and whenever scenarios change, the
+     job also runs against **deliberately broken builds**: a blank toolbar,
+     a retro look that never applies, dial-up mode that doesn't throttle, a
+     status bar that never updates. These are produced from a small set of
+     patches the maintainer keeps in the scenarios repo. If the judge passes
+     a broken build, the scenario or the judge prompt gets fixed before the
+     check is trusted again.
+   - **When it runs.** On tier 1–2 PRs after ordinary CI is green, and
+     nightly on `main`. Not on every push or on tier-0 PRs, because
+     computer-use runs are slow and cost more than ordinary CI.
+   - **Security.** The job holds an Anthropic API key, so it runs only on PRs
+     from this repo's own branches (never forks) and after the maintainer's
+     `factory:ready` label. It gets a read-only `GITHUB_TOKEN` plus
+     permission to post its comment, and a deploy key that can only read the
+     scenarios repo.
 
-An extra check, not a gate: when a change is visual, the agent can also run
-the real app and look at it with computer use (where the session has a
-display). That's useful evidence to attach to a PR, but it isn't
-deterministic. CI keeps the deterministic checks above as the gate.
+   While the black-box job is being built, an agent can still run the real
+   app and look at it with computer use in the Desktop app (cloud containers
+   have no display). That's useful evidence to attach to a visual PR, but
+   it's not a gate.
 
 Once Phase 1 is done, an agent can show a change works without the maintainer
 running the app. That's what unlocks the next phases.
@@ -468,7 +504,7 @@ Implement):
    cargo clippy --all-targets -- -D warnings;
    LD_LIBRARY_PATH="$CEF_PATH" cargo test --bin lantern; npx playwright test.
    For a bug, a new test failed before the fix and passes after it.
-   No file under tests/golden/ or scenarios/ is changed and no existing
+   No file under tests/golden/ is changed and no existing
    assertion is removed or loosened. Or stop after 40 turns and report what
    is left.
    ```
@@ -478,7 +514,10 @@ Implement):
    oracle" constraint is enforced again by the CI check from Phase 1.5. Keep
    a progress note in the PR description so another session can take over.
 4. **Verify.** CI runs the Phase 1 oracle, plus Claude Code Review (Standard
-   for tiers 0–1, Deep for tier 2), plus the scenario judge for tiers 1–2. The
+   for tiers 0–1, Deep for tier 2), plus the black-box agent test (Phase 1.6)
+   for tiers 1–2. A failing black-box verdict sends the agent only the
+   scenario's *title* and the judge's screenshots, never the scenario text,
+   so the holdout stays hidden. The
    implementing agent stewards its own PR to green under the `steward` skill
    (PR auto-fix covers routine CI breakage).
 5. **Review by tier**, below.
@@ -518,6 +557,7 @@ download check).
 | **Dependency and Actions bumps** | Weekly | Tier-0 PRs (Dependabot plus an agent fixing any breakage). |
 | **Lint ratchet** | Nightly | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
 | **Docs drift** | Weekly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
+| **Black-box explorer** | Nightly | An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
 | **Release smoke** | On release | Downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
 | **Weekly digest** | Weekly | One issue or artifact: what merged by tier, what the factory attempted and dropped, cost, and the metrics below. |
 
@@ -563,6 +603,8 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
 | Maintainer minutes per merged PR | The real bottleneck |
 | Cost per merged PR | Sustainability; Simon Willison's $200/month is a more realistic anchor here than StrongDM's $1,000/day |
 | Oracle coverage (looks × fixtures with goldens, scenarios passing) | Whether autonomy has been earned |
+| Black-box satisfaction rate on `main`, and broken builds caught | Whether the black-box tester can be trusted. Any broken build it passes is a red flag. |
+| Explorer findings: confirmed vs. noise | Whether the nightly explorer is worth its cost |
 
 ### What we're deliberately not doing
 
@@ -588,10 +630,14 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
    chrome-page tests, and wire it into CI (Phase 1.1).
 3. Add golden screenshots and the oracle-protection CI check (Phase 1.2, 1.5).
 4. Add the `--self-test` flag and the Xvfb bundle smoke test (Phase 1.4).
-5. Add issue templates, labels, the path-to-tier CI step and the plan-gate
+5. Create the private `thebrowser-scenarios` repo with 5–10 scenarios and
+   the broken-build patches. Build the clean-room `blackbox.yml` job, and
+   check it catches every broken build before it gates anything (Phase 1.6).
+6. Add issue templates, labels, the path-to-tier CI step and the plan-gate
    workflow (Phase 2).
-6. Run the loop on a handful of real issues, adjust `CLAUDE.md` and the
-   skills from what went wrong, then turn on the first background loops.
+7. Run the loop on a handful of real issues, adjust `CLAUDE.md` and the
+   skills from what went wrong, then turn on the first background loops,
+   including the black-box explorer.
 
 ---
 
