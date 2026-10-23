@@ -38,6 +38,37 @@ Fonts named in CSS font stacks are fine.
 Research notes under `docs/research/` are the exception: they name real
 browsers in order to describe them, and they never ship in the app.
 
+## Risk tiers
+
+Every PR has a tier; **the highest tier any changed path reaches wins**, and
+a PR is tier 0 only if every path is low-risk. Say the tier in the PR
+description.
+
+| Tier | Examples | Gate |
+|---|---|---|
+| **0** | Typo and docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Merges automatically once CI is green, through the tier labeller (Phase 2), not by hand. |
+| **1** | Retro looks, internal page styling, new toolbar commands, settings additions, dial-up profiles; Dependabot bumps that only change `uses:` lines. | The maintainer looks at the plan, screenshots and test changes, and skims the code. |
+| **2** | `client.rs` request, popup and download handling; the `lantern.invalid` router in `commands.rs`; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml`, `Cargo.lock`; `release.yml`, `bump-version.sh`; anything else under `.github/`; `tools/blackbox/`. | The maintainer reads the whole diff; also run `/security-review` in the session. Never auto-merged. |
+
+## Oracle rules
+
+The tests, golden screenshots and (later) black-box scenarios are the
+oracle: they decide whether a change works, so a change doesn't get to
+rewrite them to pass.
+
+- **Existing goldens and existing assertions are not modified or deleted.**
+  That covers files under `tests/golden/`, snapshot updates
+  (`--update-snapshots`, `-u`) and weakening an existing test's assertions.
+  Adding new goldens and new tests is fine, including the first goldens for
+  new behaviour.
+- **Overrides go through the maintainer.** If an existing golden or
+  assertion really is wrong, say so in the PR and leave the change to the
+  maintainer: they approve it on the `oracle` GitHub Environment or push it
+  themselves. Never approve a deployment or environment yourself.
+- The PreToolUse hook in `.claude/settings.json` asks before such edits.
+  It's a speed bump, not permission: an approved prompt doesn't make the
+  change allowed.
+
 ## Before every push
 
 Run what CI runs; one validated push beats several speculative ones. Set up
@@ -60,6 +91,10 @@ Also run these when you touch the matching files:
 - `tools/*.sh` → `shellcheck` (`pip install shellcheck-py`);
 - `ui/**/*.js` → at least a syntax check (`node --check`, or
   `new Function(source)` for the look fragments in `ui/retro/`).
+
+Then **run `/code-review` on your branch** and fix what it finds (or answer
+it in the PR description) before pushing. For tier-2 changes also run
+`/security-review`.
 
 For UI changes, **run the app and look**. Unit tests don't cover the chrome
 pages or the retro looks. On Linux without a display:
@@ -98,6 +133,12 @@ and take screenshots with `import -window root`. Toolbar and status bar are
   not deferred.
 
 ## Merging
+
+**Never merge a tier 1 or tier 2 PR**: they wait for the maintainer, who
+merges them. Tier 0 PRs merge only through the tier labeller's auto-merge
+once it exists (Phase 2); until then, leave every PR for the maintainer.
+The steps below are for the maintainer, or for a merge they explicitly ask
+for.
 
 Merge only when all of these hold:
 1. CI is green on the PR's **current head** (check the run's head commit,
