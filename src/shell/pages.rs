@@ -246,7 +246,7 @@ fn retro_description(style: RetroStyle) -> &'static str {
             "Starry backgrounds, Comic Sans, rainbow headings, blinking links, \
              an UNDER CONSTRUCTION sign, a hit counter and sparkles behind the mouse."
         }
-        RetroStyle::Netscape => {
+        RetroStyle::EarlyWeb => {
             "Switches every site's style sheets off, so pages show as plain HTML: \
              gray background, Times, blue and purple links. With a hit counter, of course."
         }

@@ -107,7 +107,7 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
 - `--url=<address>`: open this instead of the start page. URL-bar rules apply,
   so `--url=example.com` works.
 - `--retro=<look>`: use a retro look for this run without saving it (see below):
-  `geocities`, `netscape`, `portal` or `off`. `--geocities` is short for
+  `geocities`, `early-web`, `portal` or `off`. `--geocities` is short for
   `--retro=geocities`.
 
 ### Tests
@@ -162,7 +162,7 @@ that Lantern gives every web page:
 | Look | What you get |
 |---|---|
 | GeoCities homepage (1998) | Starfield background, lime Comic Sans, rainbow headings, blinking links, ridged image borders, and a bottom bar with an UNDER CONSTRUCTION sign, a "Welcome!" marquee and a hit counter. A sparkle trail follows the mouse. |
-| Text-only web (1995) | The site's own style sheets are switched off, so the page shows as plain HTML: gray background, Times, blue and purple underlined links. A footer adds a "best viewed with" line, a hit counter and a last-updated date. |
+| Early web (1995) | The site's own style sheets are switched off, so the page shows as plain HTML: gray background, Times, blue and purple underlined links. A footer adds a "best viewed with" line, a hit counter and a last-updated date. |
 | Web portal (1997) | The page is squeezed into a 760px column (it has to fit 800x600) of small Arial on white, with headings on colored bars. A LanternNet header has a search box, a channel bar and a blinking 468x60 banner ad, and there's a copyright footer. Sticky headers go back into the page flow. |
 
 The menu also turns on a **Flash-style splash intro**: entering a site shows a
@@ -173,7 +173,7 @@ site, not on every page.
 <table>
   <tr>
     <td width="50%"><img src="docs/retro-geocities.png" alt="A Wikipedia article as a GeoCities homepage: starfield, lime text, rainbow heading, UNDER CONSTRUCTION bar and hit counter"><br><b>GeoCities homepage (1998)</b></td>
-    <td width="50%"><img src="docs/retro-netscape.png" alt="The same article as the text-only web: gray background, Times, blue underlined links, no styling"><br><b>Text-only web (1995)</b></td>
+    <td width="50%"><img src="docs/retro-early-web.png" alt="The same article as the early web: gray background, Times, blue underlined links, no styling"><br><b>Early web (1995)</b></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/retro-portal.png" alt="The same article as a 1997 web portal: LanternNet header with search box, channel bar and banner ad above a narrow column of small Arial"><br><b>Web portal (1997)</b></td>
@@ -304,7 +304,7 @@ src/shell/retro.rs              retro looks: the Retro menu and running ui/retro
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
-ui/retro/{geocities,netscape,portal}.js  the looks
+ui/retro/{geocities,early-web,portal}.js the looks
 ui/retro/splash.js              Flash-style splash intro
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
 ui/dialup-images.js             "slow images" pacer injected into content pages

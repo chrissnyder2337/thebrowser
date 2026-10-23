@@ -1,5 +1,5 @@
 //! Retro looks: restyle every page in the content view like a 1990s site (a
-//! GeoCities homepage, the text-only web, a '97 web portal), plus an optional
+//! GeoCities homepage, the early web of 1995, a '97 web portal), plus an optional
 //! Flash-style splash intro, by running `ui/retro/*.js` in its frames. The
 //! toolbar's Retro button opens a native menu to pick them.
 
@@ -18,8 +18,8 @@ const LOOKS: [(RetroStyle, &str); 3] = [
         include_str!("../../ui/retro/geocities.js"),
     ),
     (
-        RetroStyle::Netscape,
-        include_str!("../../ui/retro/netscape.js"),
+        RetroStyle::EarlyWeb,
+        include_str!("../../ui/retro/early-web.js"),
     ),
     (RetroStyle::Portal, include_str!("../../ui/retro/portal.js")),
 ];
@@ -154,7 +154,7 @@ pub fn set_style(style: RetroStyle) {
     set_notice(match style {
         RetroStyle::Off => "Back to the modern web.",
         RetroStyle::GeoCities => "GeoCities mode on. Welcome to the information superhighway!",
-        RetroStyle::Netscape => "Text-only web: it's 1995 and style sheets haven't been invented.",
+        RetroStyle::EarlyWeb => "Early web: it's 1995 and style sheets haven't been invented.",
         RetroStyle::Portal => "Welcome to LanternNet, your start page for the World Wide Web.",
     });
 }

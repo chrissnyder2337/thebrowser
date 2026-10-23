@@ -1,4 +1,4 @@
-// The text-only web of 1995: the page's own stylesheets are switched off, so
+// The early web of 1995: the page's own stylesheets are switched off, so
 // it renders the way an early browser showed plain HTML (gray page, Times,
 // blue and purple underlined links), with the homepage furniture of the day
 // at the bottom: a "best viewed with" line, a hit counter and a last-updated
@@ -60,10 +60,10 @@
     css: css,
     decorate: function () {
       if (foot && foot.host.isConnected) return;
-      foot = R.overlay("lantern-netscape-footer", footSheet);
+      foot = R.overlay("lantern-early-web-footer", footSheet);
       var badge = R.el("div", "badge");
-      badge.appendChild(document.createTextNode("Lantern "));
-      badge.appendChild(R.el("b", "", "NOW!"));
+      badge.appendChild(document.createTextNode("Lit by "));
+      badge.appendChild(R.el("b", "", "Lantern"));
       var top = R.el("a", "", "Back to top");
       top.href = "#";
       top.addEventListener("click", function (e) { e.preventDefault(); window.scrollTo(0, 0); });

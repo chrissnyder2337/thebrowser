@@ -100,20 +100,20 @@ pub enum RetroStyle {
     Off,
     /// A GeoCities homepage: starfield, Comic Sans, rainbows, a hit counter.
     GeoCities,
-    /// The text-only web of 1995: the page's own styles switched off.
-    Netscape,
+    /// The early web of 1995: the page's own styles switched off.
+    EarlyWeb,
     /// A 1997 web portal: a narrow column of small Arial, banner ad included.
     Portal,
 }
 
 impl RetroStyle {
-    pub const ALL: [Self; 4] = [Self::Off, Self::GeoCities, Self::Netscape, Self::Portal];
+    pub const ALL: [Self; 4] = [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
 
     pub fn key(self) -> &'static str {
         match self {
             Self::Off => "off",
             Self::GeoCities => "geocities",
-            Self::Netscape => "netscape",
+            Self::EarlyWeb => "early-web",
             Self::Portal => "portal",
         }
     }
@@ -127,7 +127,7 @@ impl RetroStyle {
         match self {
             Self::Off => "Off (modern web)",
             Self::GeoCities => "GeoCities homepage (1998)",
-            Self::Netscape => "Text-only web (1995)",
+            Self::EarlyWeb => "Early web (1995)",
             Self::Portal => "Web portal (1997)",
         }
     }
@@ -286,17 +286,17 @@ mod tests {
         assert_eq!(settings.modem_speed, ModemSpeed::K14_4);
         // The unchecked-checkbox default comes first, the checkbox after it.
         settings.apply_query(&[
-            ("retro".into(), "netscape".into()),
+            ("retro".into(), "early-web".into()),
             ("splash".into(), "0".into()),
             ("splash".into(), "1".into()),
         ]);
-        assert_eq!(settings.retro_style, RetroStyle::Netscape);
+        assert_eq!(settings.retro_style, RetroStyle::EarlyWeb);
         assert!(settings.splash_intro);
         settings.apply_query(&[
             ("retro".into(), "bbs".into()),
             ("splash".into(), "0".into()),
         ]);
-        assert_eq!(settings.retro_style, RetroStyle::Netscape);
+        assert_eq!(settings.retro_style, RetroStyle::EarlyWeb);
         assert!(!settings.splash_intro);
     }
 
