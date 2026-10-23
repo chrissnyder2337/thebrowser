@@ -2,7 +2,7 @@
 //! browser view it serves.
 
 use super::{
-    commands, dialup, geocities,
+    commands, dialup, retro,
     state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
 };
 use cef::*;
@@ -214,12 +214,16 @@ wrap_load_handler! {
             if self.role != Role::Content {
                 return;
             }
+            let Some(frame) = frame else {
+                return;
+            };
             // Dial-up "slow images" mode: install the image pacer in every frame.
             let settings = with_shell(|shell| shell.settings);
-            if let (Some(frame), Some(script)) = (frame, dialup::image_script(&settings)) {
+            if let Some(script) = dialup::image_script(&settings) {
                 let script = CefString::from(script.as_str());
                 frame.execute_java_script(Some(&script), Some(&CefString::from("")), 0);
             }
+            retro::on_load_start(frame);
         }
 
         fn on_loading_state_change(
@@ -259,7 +263,7 @@ wrap_load_handler! {
                 return;
             }
             if let Some(frame) = frame {
-                geocities::on_frame_loaded(frame);
+                retro::on_load_end(frame);
             }
         }
 

@@ -29,7 +29,8 @@ so the README's `releases/latest/download/<asset>` links always work.
 
 1. **Check the current state.**
    ```sh
-   git fetch origin main --tags
+   git fetch --force --tags origin    # --force: a deleted-and-recreated tag updates
+   git fetch origin main
    grep -m1 '^version' Cargo.toml                 # what main says now
    git describe --tags --abbrev=0 origin/main     # last tag reachable from main
    git log --oneline "$(git describe --tags --abbrev=0 origin/main)"..origin/main
@@ -82,6 +83,10 @@ so the README's `releases/latest/download/<asset>` links always work.
   Actions tab on `main` with **publish** ticked.
 - **A release exists with no assets**: rerun the Release workflow on the
   tagged commit with **publish** ticked. It uploads into the existing release.
+- **`git fetch` says "would clobber existing tag"**: the local clone still has
+  an old copy of a tag that was deleted and recreated on GitHub (a stale tag
+  also makes `git log vX..main` compare against the wrong commit). Run
+  `git fetch --force --tags origin`, which only updates local tags.
 - **`bump-version.sh` refuses**: it requires a clean tree, a plain `X.Y.Z`
   version greater than the current one, and a tag that doesn't exist yet on
   GitHub. Read its message; it names the fix.

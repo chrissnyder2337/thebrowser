@@ -154,7 +154,7 @@ mod tests {
             "bookmarks",
             "mark",
             "stop",
-            "geocities",
+            "retro",
         ] {
             assert_eq!(icons.size(name), (24, 24), "{name}");
         }

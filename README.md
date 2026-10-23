@@ -11,6 +11,7 @@ driven from Rust with the [`cef`](https://github.com/tauri-apps/cef-rs) crate.
 ![Lantern showing its start page](docs/screenshot.png)
 
 v1 is deliberately small: one window, one tab, and popups open in the same view.
+It can also make the modern web look like the '90s: see [Retro looks](#retro-looks).
 
 ## Download
 
@@ -105,7 +106,9 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
 
 - `--url=<address>`: open this instead of the start page. URL-bar rules apply,
   so `--url=example.com` works.
-- `--geocities`: start with GeoCities mode on for this run (see below).
+- `--retro=<look>`: use a retro look for this run without saving it (see below):
+  `geocities`, `early-web`, `portal` or `off`. `--geocities` is short for
+  `--retro=geocities`.
 
 ### Tests
 
@@ -119,7 +122,7 @@ Windows. It needs Rust 1.88 or newer.
 
 The unit tests cover URL normalization, percent and HTML/JS escaping, the title
 channel parser, template filling, bookmark and settings storage, the
-GeoCities script wrapper and the pixel-art sheets.
+retro script builder and the pixel-art sheets.
 
 ### Releasing
 
@@ -165,24 +168,57 @@ it under System Settings → Privacy & Security → Open Anyway.
 | Bookmark this page | Ctrl+D | Cmd+D |
 | Start page | Alt+Home | Alt+Home |
 
-### GeoCities mode
+### Retro looks
 
-The **GeoCities** button at the end of the toolbar restyles every page like a
-late-90s personal homepage: a starfield background, lime Comic Sans text,
-rainbow headings, blinking links, ridged image borders, a scrolling "Welcome!"
-marquee with an UNDER CONSTRUCTION sign and a visitor counter, and a sparkle
-trail behind the mouse. The button stays pressed in while the mode is on.
-Click it again to put the page back. The choice is saved in `settings.txt`, so
-it survives restarts.
+The **Retro ▾** button at the end of the toolbar opens a menu of 1990s looks
+that Lantern gives every web page:
 
-It works by running `ui/geocities.js` in each frame of the content view after
-every load (and in all frames right away when toggled). The styles are
-constructed stylesheets (`adoptedStyleSheets`), which page Content Security
-Policies don't block, and the banner lives in a closed shadow root so the page
-can't restyle it. The styles also go into the page's open shadow trees (custom
-elements), and menus, cookie banners and other floating boxes that had a solid
-background get a solid navy one so they stay readable. Both are rechecked as
-the page changes.
+![The Retro menu open over a Wikipedia article](docs/retro-menu.png)
+
+| Look | What you get |
+|---|---|
+| GeoCities homepage (1998) | Starfield background, lime Comic Sans, rainbow headings, blinking links, ridged image borders, and a bottom bar with an UNDER CONSTRUCTION sign, a "Welcome!" marquee and a hit counter. A sparkle trail follows the mouse. |
+| Early web (1995) | The site's own style sheets are switched off, so the page shows as plain HTML: gray background, Times, blue and purple underlined links. A footer adds a "best viewed with" line, a hit counter and a last-updated date. |
+| Web portal (1997) | The page is squeezed into a 760px column (it has to fit 800x600) of small Arial on white, with headings on colored bars. A LanternNet header has a search box, a channel bar and a blinking 468x60 banner ad, and there's a copyright footer. Sticky headers go back into the page flow. |
+
+The menu also turns on a **Flash-style splash intro**: entering a site shows a
+black screen with the site's name zooming in over a spinning ring, a
+"LOADING..." bar and an ENTER SITE button (or SKIP INTRO). It plays once per
+site, not on every page.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/retro-geocities.png" alt="A Wikipedia article as a GeoCities homepage: starfield, lime text, rainbow heading, UNDER CONSTRUCTION bar and hit counter"><br><b>GeoCities homepage (1998)</b></td>
+    <td width="50%"><img src="docs/retro-early-web.png" alt="The same article as the early web: gray background, Times, blue underlined links, no styling"><br><b>Early web (1995)</b></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/retro-portal.png" alt="The same article as a 1997 web portal: LanternNet header with search box, channel bar and banner ad above a narrow column of small Arial"><br><b>Web portal (1997)</b></td>
+    <td width="50%"><img src="docs/retro-splash.png" alt="The splash intro: the site's name over a spinning ring with a LOADING bar and a SKIP INTRO button"><br><b>Flash-style splash intro</b></td>
+  </tr>
+</table>
+
+The screenshots show the Wikipedia article on
+[GeoCities](https://en.wikipedia.org/wiki/GeoCities) (CC BY-SA 4.0).
+
+The button stays pressed in while a look is on. Choices are saved in
+`settings.txt` and can also be changed on the settings page (**Retro
+settings...** in the menu, or `lantern:settings`). Lantern's own pages (start
+page, bookmarks, settings) keep their look.
+
+How it works: `src/shell/retro.rs` runs `ui/retro/runtime.js`, together with
+the look definitions in `ui/retro/`, in every frame of the content view when a
+load starts and when it ends, and in all frames right away when the look
+changes. The styles are constructed stylesheets (`adoptedStyleSheets`), which
+page Content Security Policies don't block. They also go into the page's open
+shadow trees (custom elements). Floating boxes like menus and cookie banners
+that had a solid background keep a solid one, so they stay readable.
+Decorations live in closed shadow roots so the page can't restyle them.
+Everything is rechecked as the page changes, and switching back to Off takes
+it all out again without a reload. The splash intro is `ui/retro/splash.js`;
+it runs as the page starts loading, so it covers the load the way the
+originals did. The Retro menu is a native CEF menu (`Window::show_menu`)
+anchored under the button, because an HTML menu would be clipped to the
+toolbar view.
 
 The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `view-source`), bare host names (`example.com`, `localhost:8080`, which get
@@ -216,7 +252,7 @@ the page view, never the toolbar, and the setting is remembered between runs.
 | Windows | `%APPDATA%\Lantern\bookmarks.tsv` | `%APPDATA%\Lantern\cache` |
 | Linux | `$XDG_CONFIG_HOME/lantern/bookmarks.tsv` (default `~/.config/lantern`) | `…/lantern/cache` |
 
-Settings (the dial-up simulator and GeoCities mode) live in `settings.txt` next
+Settings (the dial-up simulator and the retro looks) live in `settings.txt` next
 to the bookmarks, as `key=value` lines.
 
 Bookmarks are plain text, one `title<TAB>url` per line, so you can edit the file
@@ -244,7 +280,7 @@ building browser UI with web tech on top of Chromium. They talk to Rust like thi
   `lantern|<seq>|<command>|<encodeURIComponent(arg)>`. The toolbar's display
   handler sees it in `on_title_change`, decodes it and acts on the content
   browser. Commands: `ready`, `back`, `forward`, `reload`, `stop`, `home`,
-  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`, `geocities`.
+  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`, `retro-menu`.
 - **Rust → chrome page.** `execute_java_script("lantern.update({...})")` pushes
   state (URL, nav buttons, loading, quick links; status text, progress, padlock).
 - **Internal page → Rust.** The bookmarks, about and error pages link to
@@ -278,12 +314,14 @@ src/shell/commands.rs           title-channel commands, lantern.invalid actions,
 src/shell/pages.rs              data: URIs for chrome and internal pages
 src/shell/art.rs                pixel-art text → inline SVG
 src/shell/bookmarks.rs          bookmark TSV + per-OS data directory
-src/shell/settings.rs           user settings (dial-up mode, modem speed profiles, GeoCities mode)
+src/shell/settings.rs           user settings (dial-up mode, modem speed profiles, retro look)
 src/shell/dialup.rs             dial-up simulator: network emulation and the image pacer
-src/shell/geocities.rs          GeoCities mode: toggling and running ui/geocities.js
+src/shell/retro.rs              retro looks: the Retro menu and running ui/retro/*.js
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
-ui/geocities.js                 GeoCities mode stylesheet and decorations, injected into pages
+ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
+ui/retro/{geocities,early-web,portal}.js the looks
+ui/retro/splash.js              Flash-style splash intro
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
 ui/dialup-images.js             "slow images" pacer injected into content pages
 ui/lantern.txt, icons.txt       pixel art: the lantern (5 frames) and the toolbar icons

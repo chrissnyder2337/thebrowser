@@ -61,6 +61,8 @@ pub struct Shell {
 
     pub bookmarks: Vec<Bookmark>,
     pub settings: Settings,
+    /// Host the splash intro was last shown for, so it plays once per site.
+    pub splash_host: Option<String>,
     pub toolbar_ready: bool,
     pub status_ready: bool,
 }
@@ -148,7 +150,8 @@ impl Shell {
             ("loading", Json::Bool(self.is_loading)),
             ("secure", Json::Bool(self.is_secure())),
             ("bookmarks", Json::Arr(quick)),
-            ("geocities", Json::Bool(self.settings.geocities)),
+            ("retro", Json::str(self.settings.retro_style.key())),
+            ("retroName", Json::str(self.settings.retro_style.name())),
         ])
         .render()
     }

@@ -1,4 +1,4 @@
-//! User settings (the dial-up simulator and GeoCities mode), stored as `key=value`
+//! User settings (the dial-up simulator and the retro looks), stored as `key=value`
 //! lines in `settings.txt` next to the bookmarks.
 
 use super::bookmarks::data_dir;
@@ -93,12 +93,57 @@ impl ModemSpeed {
     }
 }
 
+/// A 1990s look Lantern can give every page (see `ui/retro/`).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum RetroStyle {
+    #[default]
+    Off,
+    /// A GeoCities homepage: starfield, Comic Sans, rainbows, a hit counter.
+    GeoCities,
+    /// The early web of 1995: the page's own styles switched off.
+    EarlyWeb,
+    /// A 1997 web portal: a narrow column of small Arial, banner ad included.
+    Portal,
+}
+
+impl RetroStyle {
+    pub const ALL: [Self; 4] = [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Off => "off",
+            Self::GeoCities => "geocities",
+            Self::EarlyWeb => "early-web",
+            Self::Portal => "portal",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|style| style.key() == key)
+    }
+
+    /// Name for menus and the settings page.
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Off => "Off (modern web)",
+            Self::GeoCities => "GeoCities homepage (1998)",
+            Self::EarlyWeb => "Early web (1995)",
+            Self::Portal => "Web portal (1997)",
+        }
+    }
+}
+
+fn parse_bool(value: &str) -> bool {
+    matches!(value, "1" | "true" | "on" | "yes")
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Settings {
     pub dialup_mode: DialupMode,
     pub modem_speed: ModemSpeed,
-    /// Restyle every page like a 1990s GeoCities homepage.
-    pub geocities: bool,
+    pub retro_style: RetroStyle,
+    /// Show a Flash-style splash intro when entering a site.
+    pub splash_intro: bool,
 }
 
 impl Settings {
@@ -116,7 +161,12 @@ impl Settings {
                 "modem_speed" => {
                     settings.modem_speed = ModemSpeed::from_key(value).unwrap_or_default()
                 }
-                "geocities" => settings.geocities = matches!(value, "1" | "true" | "on" | "yes"),
+                "retro_style" => {
+                    settings.retro_style = RetroStyle::from_key(value).unwrap_or_default()
+                }
+                "splash_intro" => settings.splash_intro = parse_bool(value),
+                // Written by the first release of GeoCities mode.
+                "geocities" if parse_bool(value) => settings.retro_style = RetroStyle::GeoCities,
                 _ => {}
             }
         }
@@ -125,14 +175,17 @@ impl Settings {
 
     fn serialize(&self) -> String {
         format!(
-            "dialup_mode={}\nmodem_speed={}\ngeocities={}\n",
+            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\n",
             self.dialup_mode.key(),
             self.modem_speed.key(),
-            self.geocities
+            self.retro_style.key(),
+            self.splash_intro
         )
     }
 
-    /// Apply `dialup=<mode>&speed=<speed>` query pairs; unknown values are ignored.
+    /// Apply `dialup=<mode>&speed=<speed>&retro=<style>&splash=<0|1>` query
+    /// pairs; unknown values are ignored. The settings page sends `splash=0`
+    /// before its checkbox, so the last value wins.
     pub fn apply_query(&mut self, params: &[(String, String)]) {
         for (key, value) in params {
             match key.as_str() {
@@ -146,6 +199,12 @@ impl Settings {
                         self.modem_speed = speed;
                     }
                 }
+                "retro" => {
+                    if let Some(style) = RetroStyle::from_key(value) {
+                        self.retro_style = style;
+                    }
+                }
+                "splash" => self.splash_intro = parse_bool(value),
                 _ => {}
             }
         }
@@ -189,19 +248,29 @@ mod tests {
 
     #[test]
     fn parse_and_serialize() {
-        let settings =
-            Settings::parse("dialup_mode=network\nmodem_speed=28.8\njunk\n geocities = on \r\n");
+        let settings = Settings::parse(
+            "dialup_mode=network\nmodem_speed=28.8\njunk\n retro_style = portal \r\nsplash_intro=true\n",
+        );
         assert_eq!(
             settings,
             Settings {
                 dialup_mode: DialupMode::Network,
                 modem_speed: ModemSpeed::K28_8,
-                geocities: true,
+                retro_style: RetroStyle::Portal,
+                splash_intro: true,
             }
         );
         assert_eq!(Settings::parse(&settings.serialize()), settings);
         assert_eq!(Settings::parse("dialup_mode=warp\n"), Settings::default());
-        assert!(!Settings::parse("geocities=false\n").geocities);
+        assert_eq!(Settings::parse("retro_style=bbs\n"), Settings::default());
+    }
+
+    #[test]
+    fn reads_the_old_geocities_flag() {
+        let old = Settings::parse("geocities=true\n");
+        assert_eq!(old.retro_style, RetroStyle::GeoCities);
+        assert_eq!(Settings::parse("geocities=false\n"), Settings::default());
+        assert!(!old.serialize().contains("geocities=true"));
     }
 
     #[test]
@@ -215,6 +284,20 @@ mod tests {
         assert_eq!(settings.modem_speed, ModemSpeed::K14_4);
         settings.apply_query(&[("speed".into(), "9600".into())]);
         assert_eq!(settings.modem_speed, ModemSpeed::K14_4);
+        // The unchecked-checkbox default comes first, the checkbox after it.
+        settings.apply_query(&[
+            ("retro".into(), "early-web".into()),
+            ("splash".into(), "0".into()),
+            ("splash".into(), "1".into()),
+        ]);
+        assert_eq!(settings.retro_style, RetroStyle::EarlyWeb);
+        assert!(settings.splash_intro);
+        settings.apply_query(&[
+            ("retro".into(), "bbs".into()),
+            ("splash".into(), "0".into()),
+        ]);
+        assert_eq!(settings.retro_style, RetroStyle::EarlyWeb);
+        assert!(!settings.splash_intro);
     }
 
     #[test]
@@ -235,7 +318,8 @@ mod tests {
         let settings = Settings {
             dialup_mode: DialupMode::Images,
             modem_speed: ModemSpeed::K33_6,
-            geocities: true,
+            retro_style: RetroStyle::GeoCities,
+            splash_intro: true,
         };
         save_to(&path, &settings).unwrap();
         assert_eq!(load_from(&path), settings);
