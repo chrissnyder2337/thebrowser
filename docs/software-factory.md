@@ -311,6 +311,49 @@ sandbox and the release pipeline are security-sensitive. Those stay lit.
 
 ## Part 3: The plan
 
+### Constraints: Claude Pro, cloud sessions only
+
+This plan runs on a **Claude Pro** subscription, with no upgrade, no usage
+credits and no separate API billing. All agent work happens in **Anthropic's
+cloud sessions and in GitHub Actions**, never on a real desktop. Where a
+feature needs more than that, it's marked below and in the phases:
+**[Pro: alternative]** means we use something else; **[Pro: disabled]** means
+we skip it for now.
+
+| Plan item | Status | What we do instead |
+|---|---|---|
+| Cloud sessions, `/goal`, auto mode, hooks, skills, subagents, plugins, Ultraplan, artifacts | Enabled | Within Pro usage. |
+| Routines (background loops) | Enabled, reduced | Weekly or monthly rather than nightly (Phase 3). |
+| Code Review (the GitHub app) | **Disabled**: Team/Enterprise only | `/code-review` run by the implementing session before each push. For tier-2 PRs, also a Claude Code GitHub Action that runs `/code-review --comment`, authenticated with your Pro subscription token and started by your label. |
+| `claude ultrareview` | **Disabled** after the 3 free runs | Save the free runs for the largest tier-2 changes, such as a CEF upgrade. |
+| Black-box tester via the API's computer-use tool | **Alternative**: needs paid API billing | Claude Code in a GitHub Action, on your Pro token, drives Lantern under Xvfb through a small `bb` helper (`xdotool` input, screenshots it reads back). See Phase 1.6. |
+| Computer use in the Desktop app or CLI (macOS) | **Disabled**: no real desktop | The same `bb` helper inside the implementing cloud session, for screenshots of visual changes. |
+| Parallel sessions, agent view, cross-session messaging, Desktop features | **Disabled** | One implementing session at a time. |
+| Dynamic workflows | **Disabled** (too usage-heavy) | One exception: a single Claude Security scan limited to the tier-2 files. |
+| Merge queue | **Disabled** | Not needed with one agent. It would also need the repo moved to an organization. |
+| `CODEOWNERS` required reviews | **Disabled** | GitHub won't let you approve your own PRs, so the CI `oracle-change` label check does this job. |
+| Opus for everything; fast mode | **Alternative** | Sonnet 5.5 by default, Haiku 5.5 for subagents and triage, and Opus only for tier-2 plans where your plan allows it. No fast mode. |
+| OpenTelemetry dashboards | **Disabled** | `/usage` and `/cost`. |
+
+**Checked in a cloud session (2026-10-23).** Xvfb, `xdotool` and ImageMagick
+install with `apt` in an Anthropic cloud container. A browser runs on the
+virtual display, clicks land, and Claude can read the screenshots: the first
+click missed, and a second click aimed using the screenshot hit. This used
+the bundled Chromium. Running Lantern's own CEF bundle this way is still to
+be tried, and is the first step of Phase 1.6.
+
+**Usage budget.** Interactive work, cloud sessions, routines and Actions
+running on your Pro token all draw from the same Pro usage. When it runs
+out, everything stops until the window resets; there's no paid overflow.
+Spend it in this order:
+1. implementation sessions;
+2. the black-box test on tier 1–2 PRs;
+3. review;
+4. background loops.
+
+Check `/usage` weekly. If you hit the limit often, cut loops first, then
+black-box runs on tier 1.
+
 ### Design principles
 
 1. **Lit factory, with dark lanes earned one at a time.** Following Osmani and
@@ -342,9 +385,15 @@ Give every agent session the same starting context and a working toolchain.
     that reaches HTML or JS goes through `util.rs` escaping;
   - house style (match the surrounding code, comment density, commit message
     style) and the risk tiers below.
-- **SessionStart hook** (via the `session-start-hook` skill) that installs the
-  apt dependencies, restores or downloads CEF into a cached `CEF_PATH`, and
-  warms `cargo build`, so a cloud session can run the full local check suite.
+- **Cloud environment setup script**, with a **SessionStart hook** as a
+  fallback (via the `session-start-hook` skill). The script installs the apt
+  dependencies (`libglib2.0-dev`, `ninja-build`, plus `xvfb`, `xdotool` and
+  `imagemagick` for screenshots), downloads CEF into `CEF_PATH`, and warms
+  `cargo build`. That way a cloud session can run the full local check suite
+  and look at the app. Anthropic caches the environment after the setup script
+  runs, which saves usage-time on every session, but a script that takes more
+  than about five minutes isn't cached. If the CEF download pushes past that,
+  move CEF into the repo's SessionStart hook.
 - **Skills** in `.claude/skills/`, written from what past sessions had to work
   out:
   - `steward`: how to drive a PR to green in this repo (which checks matter,
@@ -360,14 +409,29 @@ Give every agent session the same starting context and a working toolchain.
 - **Check that the skills earn their place** with `claude plugin eval`: a few
   representative tasks per skill, scored against a run without the skill. Drop
   or rewrite skills that don't beat the baseline. `/skill-doctor` shows what
-  each one costs in context.
+  each one costs in context. On Pro, keep each eval suite to 3–5 cases and
+  run it only when a skill changes, since evals spend usage.
 - **Security-guidance plugin**, with Lantern rules in
   `.claude/claude-security-guidance.md`: escape everything that reaches HTML
   or JS, never widen `lantern.invalid` handling, keep chrome views locked
-  down.
-- **Turn on Code Review** for the repo: Standard by default, Deep for tier-2
-  paths, `@claude review always` on agent PRs. So far no PR has had an
-  automated review.
+  down. Its per-edit pattern check is cheap. Its model reviews each turn and
+  on push spend Pro usage, so if usage gets tight, turn the plugin off and
+  rely on the pre-push `/code-review`.
+- **One-off security scan [Pro: alternative].** Run the Claude Security
+  plugin once, limited to the tier-2 files (`util.rs`, `commands.rs`,
+  `client.rs`, the sandbox setup), rather than the whole repo. It uses
+  dynamic workflows, which need turning on in `/config` on Pro. Turn them
+  back off afterwards.
+- **Automated review [Pro: alternative].** The managed Code Review app needs
+  Team or Enterprise. Instead:
+  - `CLAUDE.md` tells the implementing session to run `/code-review` on its
+    own branch before every push, and fix what it finds.
+  - For tier-2 PRs, a `claude-review.yml` workflow runs the Claude Code
+    GitHub Action with `/code-review --comment`, authenticated with a
+    `CLAUDE_CODE_OAUTH_TOKEN` from `claude setup-token`. It starts only when
+    you add the `review` label, because it spends your Pro usage.
+
+  So far no PR has had an automated review.
 - **Guard the oracle at edit time:** a PreToolUse hook in
   `.claude/settings.json` (with `onFailure: "block"`) that refuses edits to
   `tests/golden/` unless the maintainer sets a flag. CI's check (Phase 1.5)
@@ -422,8 +486,9 @@ CI misses today. Cheapest first:
    enable `sandbox.allowNestedUserNamespaces` (added Oct 2026 with Chromium
    as the named case; it weakens the sandbox's file protections) or launch
    the test bundle with `--no-sandbox`.
-5. **Protect the white-box oracle.** `CODEOWNERS` makes `tests/golden/`
-   maintainer-owned. A CI check fails any PR that changes both product code
+5. **Protect the white-box oracle.** (`CODEOWNERS` required reviews aren't
+   used: GitHub won't let you approve PRs opened under your own account.) A CI
+   check fails any PR that changes both product code
    (`src/`, `ui/`) and the oracle (`tests/golden/`, existing test
    assertions), unless the PR has the `oracle-change` label, which only the
    maintainer applies. This is the cheap version of "agents can't rewrite the
@@ -439,23 +504,38 @@ CI misses today. Cheapest first:
      footer is at the bottom". Each scenario lists the fixture pages it needs
      and what a user would observe. Implementing sessions never have this
      repo attached, so agents can't code to the scenarios.
-   - **Clean room.** A dedicated CI job (`blackbox.yml`) downloads only the
-     built Linux bundle artifact from the PR's CI run, plus the scenarios and
-     fixture pages, into an empty directory. It has no checkout of this repo,
-     no `CLAUDE.md`, no diff and no test code. Network access is limited to
-     the local fixture server and the Claude API.
-   - **UI-only tester.** Lantern runs under Xvfb, and a computer-use agent
-     (the API's `computer_toolset`, GA since August 2026, driven by a small
-     Agent SDK script) sees screenshots and sends mouse and keyboard input.
-     It gets nothing else: no file reads, no shell, no Playwright hooks. It
-     may start Lantern with documented user-facing flags (`--url=`,
-     `--retro=`) because users can too.
-   - **Verdicts and gating.** Each scenario runs 3 times. A run returns
-     *satisfied / not satisfied / unclear*, with the screenshots that
-     support it. The PR check passes only when every scenario touched by the
-     PR's tier is satisfied in at least 2 of 3 runs. Any *unclear* result,
-     or a 2–1 split on a tier-2 PR, goes to the maintainer with the
-     screenshots attached. The job posts a summary comment on the PR.
+   - **Clean room.** A dedicated GitHub Actions job (`blackbox.yml`, in
+     this repo) never checks out this repo's code. It downloads only the
+     built Linux bundle artifact from the PR's CI run (`actions: read` on
+     `GITHUB_TOKEN` is enough), checks out the private scenarios repo with a
+     read-only deploy key, and serves the fixture pages from that repo
+     locally. There's no source, no `CLAUDE.md`, no diff and no test code on
+     the runner.
+   - **UI-only tester [Pro: alternative].** The API's computer-use tool needs
+     paid API billing, so the job runs **Claude Code** through the Claude
+     Code GitHub Action, authenticated with your Pro `CLAUDE_CODE_OAUTH_TOKEN`.
+     Lantern runs under Xvfb (`--no-sandbox`, since CI already isolates it),
+     and the agent works through a small `bb` helper script kept in the
+     scenarios repo:
+     - `bb start [--url=…] [--retro=…]` starts Lantern;
+     - `bb shot` saves a screenshot and prints its path;
+     - `bb click X Y`, `bb type TEXT` and `bb key KEYS` send input
+       (`xdotool`);
+     - `bb stop` closes it.
+
+     The action's allowed-tools setting limits the agent to running `./bb`
+     and reading files in `shots/`. Those restrictions are enforced, not
+     just asked for. The agent may start Lantern with the user-facing flags
+     `--url=` and `--retro=`, because users can too. This setup has been
+     checked in a cloud container with Chromium (see Constraints). Proving it
+     with the CEF bundle is the first task.
+   - **Verdicts and gating.** To save usage, each scenario runs **once**. A
+     run returns *satisfied / not satisfied / unclear*, with the screenshots
+     that support it. A *not satisfied* or *unclear* scenario is re-run twice
+     more, and passes only if both re-runs are satisfied (2 of 3). Still
+     *unclear*, or failing on a tier-2 PR, goes to you with the screenshots.
+     The job posts a summary comment on the PR, with screenshots uploaded as
+     a workflow artifact.
    - **Checking the checker.** Monthly, and whenever scenarios change, the
      job also runs against **deliberately broken builds**: a blank toolbar,
      a retro look that never applies, dial-up mode that doesn't throttle, a
@@ -463,19 +543,25 @@ CI misses today. Cheapest first:
      patches the maintainer keeps in the scenarios repo. If the judge passes
      a broken build, the scenario or the judge prompt gets fixed before the
      check is trusted again.
-   - **When it runs.** On tier 1–2 PRs after ordinary CI is green, and
-     nightly on `main`. Not on every push or on tier-0 PRs, because
-     computer-use runs are slow and cost more than ordinary CI.
-   - **Security.** The job holds an Anthropic API key, so it runs only on PRs
-     from this repo's own branches (never forks) and after the maintainer's
-     `factory:ready` label. It gets a read-only `GITHUB_TOKEN` plus
-     permission to post its comment, and a deploy key that can only read the
-     scenarios repo.
+   - **When it runs.** When you add the `blackbox` label, which you do for
+     tier-2 PRs and for tier-1 PRs that change what users see. It also runs
+     weekly on `main`, not nightly, to stay within Pro usage. Never on every
+     push or on tier-0 PRs. Start with 5–10 scenarios, the ones that matter
+     most.
+   - **Security.** The job holds your Pro subscription token, so anyone who
+     can trigger it spends your usage. It runs only on PRs from this repo's
+     own branches (forks never get secrets) and only after you add the label.
+     It also runs in a GitHub Environment named `blackbox` that requires your
+     approval (free on public repos). It gets a `GITHUB_TOKEN` limited to
+     reading artifacts and posting its comment, and a deploy key that can
+     only read the scenarios repo.
 
-   While the black-box job is being built, an agent can still run the real
-   app and look at it with computer use in the Desktop app (cloud containers
-   have no display). That's useful evidence to attach to a visual PR, but
-   it's not a gate.
+   **Screenshots while implementing [Pro: alternative].** Desktop computer
+   use isn't available, so the implementing cloud session uses the same
+   approach on its own build: Xvfb, `xdotool` and screenshots it reads back.
+   It can look at a visual change and describe or attach what it saw. This
+   is evidence, not a gate, and it isn't black-box, since this session has
+   the code.
 
 Once Phase 1 is done, an agent can show a change works without the maintainer
 running the app. That's what unlocks the next phases.
@@ -513,29 +599,28 @@ Implement):
    replace CI: it only reads what the agent printed, so the "don't touch the
    oracle" constraint is enforced again by the CI check from Phase 1.5. Keep
    a progress note in the PR description so another session can take over.
-4. **Verify.** CI runs the Phase 1 oracle, plus Claude Code Review (Standard
-   for tiers 0–1, Deep for tier 2), plus the black-box agent test (Phase 1.6)
-   for tiers 1–2. A failing black-box verdict sends the agent only the
+4. **Verify.** CI runs the Phase 1 oracle. The implementing session has
+   already run `/code-review` before pushing. Tier-2 PRs also get the
+   labelled `claude-review.yml` review and the black-box agent test (Phase
+   1.6). Tier-1 PRs that change what users see get the black-box test too. A failing black-box verdict sends the agent only the
    scenario's *title* and the judge's screenshots, never the scenario text,
    so the holdout stays hidden. The
    implementing agent stewards its own PR to green under the `steward` skill
    (PR auto-fix covers routine CI breakage).
 5. **Review by tier**, below.
 
-Start with **one** implementing session at a time. Add a second only once the
-plan-to-merge lead time is steady and the maintainer's review queue isn't
-growing. Scale with built-in tools before building any of our own: parallel
-cloud sessions or worktrees for separate issues, forked subagents within a
-session, and a dynamic workflow for one-off fan-out jobs such as a
-codebase-wide audit or a CEF API migration.
+Run **one** implementing session at a time. **[Pro: disabled]** Parallel
+sessions, agent view and dynamic workflows stay off: Pro usage is the limit,
+not your review time. Forked subagents within a session are fine for small
+side tasks. Revisit this only if the plan changes.
 
 #### Risk tiers
 
 | Tier | Examples | Gate |
 |---|---|---|
-| **0: dark lane** | Typo/docs fixes, README screenshots, CI action version bumps, clippy fixes for new lints, pixel-art tweaks, new fixture pages | Auto-merge when CI, the oracle and Claude Code Review are green. The maintainer reads the weekly digest, not each diff. |
+| **0: dark lane** | Typo/docs fixes, README screenshots, CI action version bumps, clippy fixes for new lints, pixel-art tweaks, new fixture pages | Auto-merge when CI and the oracle are green and the session's pre-push `/code-review` found nothing left open. The maintainer reads the weekly digest, not each diff. |
 | **1: skim** | Retro look changes, internal page styling, new toolbar commands, settings additions, dial-up profiles | Maintainer looks at the plan, the screenshot diff and the test changes, then skims the code. |
-| **2: full review** | `client.rs` request, popup and download handling; `commands.rs` `lantern.invalid` router; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin; `release.yml`, `bump-version.sh`, CI config | Maintainer reads the whole diff. Claude Code Review runs at high effort, plus `/security-review`. Never auto-merged. |
+| **2: full review** | `client.rs` request, popup and download handling; `commands.rs` `lantern.invalid` router; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin; `release.yml`, `bump-version.sh`, CI config | Maintainer reads the whole diff. The labelled `claude-review.yml` review, `/security-review` in the session, and the black-box test. Never auto-merged. |
 
 The tier is mechanical: a CI step maps changed paths to the highest tier
 touched and labels the PR, so an agent can't downgrade its own work. A PR
@@ -552,14 +637,14 @@ download check).
 
 | Loop | Cadence | Output |
 |---|---|---|
-| **Triage** | On issue open | Labels, duplicate check, a question if acceptance criteria are missing. Never starts work. |
-| **CEF watcher** | Weekly | When a new `cef` crate appears, opens a tier-2 draft PR that moves the pin and `CEF_CRATE_VERSION`, with smoke-test results. |
-| **Dependency and Actions bumps** | Weekly | Tier-0 PRs (Dependabot plus an agent fixing any breakage). |
-| **Lint ratchet** | Nightly | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
-| **Docs drift** | Weekly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
-| **Black-box explorer** | Nightly | An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
-| **Release smoke** | On release | Downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
-| **Weekly digest** | Weekly | One issue or artifact: what merged by tier, what the factory attempted and dropped, cost, and the metrics below. |
+| **Triage** | On issue open | Labels, duplicate check, a question if acceptance criteria are missing. Never starts work. Keep it short, on Haiku 5.5. |
+| **CEF watcher** | Weekly | First a plain GitHub Action (no model) checks crates.io for a new `cef` version. Only when one exists does a routine open a tier-2 draft PR that moves the pin and `CEF_CRATE_VERSION`, with smoke-test results. |
+| **Dependency and Actions bumps** | Weekly | Dependabot only (no model). Start an agent session by hand only when a bump breaks CI. |
+| **Lint ratchet** | Weekly (Pro: not nightly) | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
+| **Docs drift** | Monthly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
+| **Black-box explorer** | **[Pro: disabled at first]**, then weekly with a time cap | Turn it on only once Phase 2 runs within your usage. Then run it weekly (not nightly), on the same clean-room job and `bb` helper, capped at about 30 minutes per run. An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
+| **Release smoke** | On release | A plain GitHub Action (no model): downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
+| **Weekly digest** | Weekly | A plain GitHub Action collects the numbers (merged PRs by tier, reverts, CI first-push rate) with no model. A short routine writes them up as one issue: what merged, what the factory dropped, and how much Pro usage went where (from `/usage`). |
 
 ### Phase 4: Widen the dark lanes, carefully
 
@@ -578,6 +663,11 @@ hostile input.
   maintainer actions (a label, a comment from the maintainer, a schedule),
   never on `issues: opened`, `pull_request_target` or outside comments. Triage
   can read public issues but runs with no secrets and a read-only token.
+- **Protect your Pro token.** `CLAUDE_CODE_OAUTH_TOKEN` is tied to your
+  personal subscription, so any workflow that holds it can spend your usage.
+  Only label-triggered jobs on this repo's own branches get it, inside the
+  `blackbox` / `review` GitHub Environments that require your approval. If it
+  leaks, revoke it and run `claude setup-token` again.
 - **Never interpolate issue or PR text into a shell command or workflow
   expression.** Pass it as a file or environment variable the agent reads as
   data.
@@ -601,10 +691,10 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
 | Revert / follow-up-fix rate per tier | The safety signal for moving lanes darker |
 | Escaped defects (bugs found after merge, by area) | Whether the oracle has gaps |
 | Maintainer minutes per merged PR | The real bottleneck |
-| Cost per merged PR | Sustainability; Simon Willison's $200/month is a more realistic anchor here than StrongDM's $1,000/day |
+| Pro usage per merged PR, and how often you hit the limit | Sustainability on a fixed plan. If the limit is hit more than once or twice a week, cut background loops first. |
 | Oracle coverage (looks × fixtures with goldens, scenarios passing) | Whether autonomy has been earned |
 | Black-box satisfaction rate on `main`, and broken builds caught | Whether the black-box tester can be trusted. Any broken build it passes is a red flag. |
-| Explorer findings: confirmed vs. noise | Whether the nightly explorer is worth its cost |
+| Explorer findings: confirmed vs. noise (once enabled) | Whether the weekly explorer is worth its share of Pro usage |
 
 ### What we're deliberately not doing
 
@@ -617,27 +707,34 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
   `feature_list.json` initializer, no Gas Town. `/goal`, auto mode, routines,
   subagents and dynamic workflows cover these now. Our own engineering goes
   into the oracle, which no product feature replaces.
-- **No swarm on day one.** One loop, then two, then more only if metrics
-  justify it.
+- **No swarm.** One implementing session at a time on Pro.
+- **No paid add-ons.** No plan upgrade, no usage credits, no API billing, no
+  self-hosted runners. Everything here runs on Claude Pro, cloud sessions and
+  free GitHub Actions on a public repo.
 - **No digital twins.** Lantern has no third-party SaaS dependencies. The
   equivalent is local fixture pages and a local HTTP server (with throttling
   for the dial-up simulator).
 
 ### First steps, in order
 
-1. Add `CLAUDE.md` and the SessionStart hook (Phase 0).
+1. Add `CLAUDE.md`, the cloud environment setup script and the SessionStart
+   hook fallback (Phase 0).
 2. Add the Playwright harness with fixtures, retro-look behavior tests and
    chrome-page tests, and wire it into CI (Phase 1.1).
 3. Add golden screenshots and the oracle-protection CI check (Phase 1.2, 1.5).
 4. Add the `--self-test` flag and the Xvfb bundle smoke test (Phase 1.4).
-5. Create the private `thebrowser-scenarios` repo with 5–10 scenarios and
-   the broken-build patches. Build the clean-room `blackbox.yml` job, and
-   check it catches every broken build before it gates anything (Phase 1.6).
+5. Try the `bb` approach on the real CEF bundle in a cloud session (start
+   it, click a toolbar button, read the screenshot). If that works, create
+   the private `thebrowser-scenarios` repo with 5–10 scenarios, the `bb`
+   helper and the broken-build patches. Then build the clean-room
+   `blackbox.yml` job on your Pro token, and check it catches every broken
+   build before it gates anything (Phase 1.6). If CEF won't run that way,
+   keep the scripted smoke test and mark black-box testing disabled.
 6. Add issue templates, labels, the path-to-tier CI step and the plan-gate
    workflow (Phase 2).
 7. Run the loop on a handful of real issues, adjust `CLAUDE.md` and the
-   skills from what went wrong, then turn on the first background loops,
-   including the black-box explorer.
+   skills from what went wrong, then turn on the first background loops.
+   Turn on the black-box explorer only if `/usage` shows room.
 
 ---
 

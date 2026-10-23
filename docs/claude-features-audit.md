@@ -19,6 +19,22 @@ and Claude Code cloud sessions. There's no `CLAUDE.md`, no
 `.claude/settings.json`, no hooks, no plugins, no routines, and PR #8 had no
 automated review at all.
 
+**Plan constraint: Claude Pro, cloud sessions only.** Lantern runs on Claude
+Pro with no upgrade, usage credits or API billing, and without a real
+desktop. Under that constraint, these items below are **disabled or
+replaced**; the plan's
+[Constraints](software-factory.md#constraints-claude-pro-cloud-sessions-only)
+section has the details:
+- Code Review (Team/Enterprise only) → pre-push `/code-review`, plus a
+  labelled GitHub Action on your Pro token for tier-2 PRs;
+- `ultrareview` beyond the 3 free runs;
+- computer use in the Desktop app or CLI, and the API's computer-use tool
+  (paid API) → an Xvfb + `xdotool` + screenshot helper, run by Claude Code
+  on your Pro token;
+- parallel sessions, agent view, cross-session messaging;
+- dynamic workflows (except one scoped security scan);
+- OpenTelemetry dashboards.
+
 ---
 
 ## Adopt now: high value, low effort
