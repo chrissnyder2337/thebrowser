@@ -330,6 +330,7 @@ resources/mac, resources/win    bundle resources and generated .icns/.ico
 tools/make_icons.py             regenerates all app icons from ui/lantern.txt
 tools/bump-version.sh           bumps the version and opens the release pull request
 .claude/skills/release/         Claude Code skill for cutting and debugging releases
+.claude/skills/steward/         Claude Code skill: conventions for getting PRs merged
 ```
 
 ### Pixel art
