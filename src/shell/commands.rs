@@ -2,9 +2,9 @@
 //! the navigation helpers they share.
 
 use super::{
-    bookmarks, dialup, geocities,
+    bookmarks, dialup,
     pages::{self, ACTION_HOST},
-    settings,
+    retro, settings,
     state::{
         Role, content_browser, defer, exec_js, internal_url_key, push_all, push_status,
         push_toolbar, save_bookmarks, set_notice, with_shell,
@@ -70,7 +70,7 @@ fn run_toolbar_command(name: &str, arg: &str) {
         "bookmark-add" => add_bookmark(),
         "bookmarks" => show_bookmarks(),
         "about" => show_about(),
-        "geocities" => geocities::toggle(),
+        "retro-menu" => retro::show_menu(arg),
         _ => eprintln!("lantern: unknown toolbar command {name:?}"),
     }
 }
@@ -232,6 +232,7 @@ fn save_settings(params: &[(String, String)]) {
         dialup::apply_network(&content, &updated);
     }
     push_status();
+    retro::refresh();
     show_settings(true);
 }
 

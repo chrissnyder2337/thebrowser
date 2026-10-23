@@ -4,7 +4,7 @@
 use super::{
     art::{with_icons, with_lantern},
     bookmarks::Bookmark,
-    settings::{DialupMode, ModemSpeed, Settings},
+    settings::{DialupMode, ModemSpeed, RetroStyle, Settings},
     util::{encode_component, get_data_uri, html_escape, truncate},
 };
 use std::fmt::Write;
@@ -99,7 +99,7 @@ pub fn toolbar_uri() -> String {
             "bookmarks",
             "mark",
             "stop",
-            "geocities",
+            "retro",
         ] {
             let key = format!("ICON_{}", name.to_ascii_uppercase());
             let html = format!(
@@ -239,6 +239,24 @@ fn speed_description(speed: ModemSpeed) -> &'static str {
     }
 }
 
+fn retro_description(style: RetroStyle) -> &'static str {
+    match style {
+        RetroStyle::Off => "Pages look the way their designers made them.",
+        RetroStyle::GeoCities => {
+            "Starry backgrounds, Comic Sans, rainbow headings, blinking links, \
+             an UNDER CONSTRUCTION sign, a hit counter and sparkles behind the mouse."
+        }
+        RetroStyle::Netscape => {
+            "Switches every site's style sheets off, so pages show as plain HTML: \
+             gray background, Times, blue and purple links. With a hit counter, of course."
+        }
+        RetroStyle::Portal => {
+            "Squeezes pages into an 800x600-friendly column of small Arial with \
+             colored heading bars, a channel bar, a search box and a blinking banner ad."
+        }
+    }
+}
+
 fn checked(on: bool) -> &'static str {
     if on { " checked" } else { "" }
 }
@@ -273,6 +291,20 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
             description = html_escape(speed_description(speed)),
         );
     }
+    let mut retro = String::new();
+    for style in RetroStyle::ALL {
+        let _ = write!(
+            retro,
+            concat!(
+                r#"<label class="opt"><input type="radio" name="retro" value="{key}"{checked}>"#,
+                r#"<span><b>{name}</b><br><small>{description}</small></span></label>"#
+            ),
+            key = style.key(),
+            checked = checked(settings.retro_style == style),
+            name = html_escape(style.name()),
+            description = html_escape(retro_description(style)),
+        );
+    }
     let saved = if saved {
         r#"<p class="saved sunken">Settings saved.</p>"#.to_owned()
     } else {
@@ -281,6 +313,8 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
     let mut vars = common_vars();
     vars.push(("MODE_OPTIONS", modes));
     vars.push(("SPEED_OPTIONS", speeds));
+    vars.push(("RETRO_OPTIONS", retro));
+    vars.push(("SPLASH_CHECKED", checked(settings.splash_intro).to_owned()));
     vars.push(("SAVED", saved));
     vars.push((
         "ACTION_URL",
@@ -357,6 +391,8 @@ mod tests {
             "RETRY",
             "MODE_OPTIONS",
             "SPEED_OPTIONS",
+            "RETRO_OPTIONS",
+            "SPLASH_CHECKED",
             "SAVED",
             "ACTION_URL",
         ] {

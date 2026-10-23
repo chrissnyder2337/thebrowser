@@ -52,7 +52,7 @@
   .big.disabled svg.on { display: none; }
   .big.disabled svg.off { display: block; }
   .big.disabled span { color: #808080; text-shadow: 1px 1px #fff; }
-  /* Latched toggle (GeoCities mode): stays pressed in, on a dithered face. */
+  /* Latched (a retro look is on): stays pressed in, on a dithered face. */
   .big.latched, .big.latched:hover:not(.disabled) {
     box-shadow: var(--pressed);
     background: repeating-conic-gradient(#c0c0c0 0 25%, #fff 0 50%) 0 0 / 2px 2px;
@@ -134,7 +134,7 @@
       <div class="sep"></div>
       <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_STOP}}<span>Stop</span></button>
       <div class="sep"></div>
-      <button class="big" id="geocities" data-cmd="geocities" title="Make every page look like it's 1998" aria-pressed="false">{{ICON_GEOCITIES}}<span>GeoCities</span></button>
+      <button class="big" id="retro" data-cmd="retro-menu" title="Retro looks: make every page look like the '90s" aria-haspopup="menu" aria-pressed="false">{{ICON_RETRO}}<span>Retro &#9662;</span></button>
     </div>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       <div class="glow">
@@ -177,14 +177,17 @@
     back: document.getElementById("back"),
     forward: document.getElementById("forward"),
     stop: document.getElementById("stop"),
-    geocities: document.getElementById("geocities")
+    retro: document.getElementById("retro")
   };
   var state = { url: "" };
   var editing = false;
 
   Array.prototype.forEach.call(document.querySelectorAll(".big"), function (b) {
     b.addEventListener("click", function () {
-      if (!b.classList.contains("disabled")) send(b.dataset.cmd);
+      if (b.classList.contains("disabled")) return;
+      // The Retro menu opens under the button, so tell Rust where that is.
+      var r = b.getBoundingClientRect();
+      send(b.dataset.cmd, b.id === "retro" ? r.left + "," + r.bottom : "");
     });
   });
   throbber.addEventListener("click", function () { send("about"); });
@@ -253,9 +256,11 @@
         throbber.classList.toggle("loading", !!s.loading);
       }
       if ("secure" in s) field.classList.toggle("secure", !!s.secure);
-      if ("geocities" in s) {
-        buttons.geocities.classList.toggle("latched", !!s.geocities);
-        buttons.geocities.setAttribute("aria-pressed", s.geocities ? "true" : "false");
+      if ("retro" in s) {
+        var on = s.retro !== "off";
+        buttons.retro.classList.toggle("latched", on);
+        buttons.retro.setAttribute("aria-pressed", on ? "true" : "false");
+        buttons.retro.title = "Retro looks: " + s.retroName;
       }
       if (s.bookmarks) {
         var key = JSON.stringify(s.bookmarks);

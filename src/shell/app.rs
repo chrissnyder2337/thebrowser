@@ -1,7 +1,8 @@
 //! The CEF `App` and browser-process handler: builds the window and its three views.
 
 use super::{
-    bookmarks, client, commands, pages, settings,
+    bookmarks, client, commands, pages,
+    settings::{self, RetroStyle},
     state::{Role, with_shell},
     util::normalize_url_input,
     window::{FACE_GRAY, LanternBrowserViewDelegate, LanternWindowDelegate},
@@ -24,12 +25,17 @@ fn has_switch(command_line: &CommandLine, name: &str) -> bool {
     command_line.has_switch(Some(&CefString::from(name))) == 1
 }
 
+/// The value of a `--name=value` switch, if given and not blank.
+fn switch_value(command_line: &CommandLine, name: &str) -> Option<String> {
+    let value =
+        CefString::from(&command_line.switch_value(Some(&CefString::from(name)))).to_string();
+    let value = value.trim();
+    (!value.is_empty()).then(|| value.to_owned())
+}
+
 /// The `--url=` command-line value, if any.
 fn url_switch(command_line: &CommandLine) -> Option<String> {
-    let url =
-        CefString::from(&command_line.switch_value(Some(&CefString::from("url")))).to_string();
-    let url = url.trim();
-    (!url.is_empty()).then(|| url.to_owned())
+    switch_value(command_line, "url")
 }
 
 fn create_browser_view(role: Role, url: &str) -> Option<BrowserView> {
@@ -63,9 +69,15 @@ wrap_browser_process_handler! {
             let list = bookmarks::load();
             let mut user_settings = settings::load();
             let command_line = command_line_get_global();
-            // --geocities turns the mode on for this run without saving it.
-            if command_line.as_ref().is_some_and(|c| has_switch(c, "geocities")) {
-                user_settings.geocities = true;
+            // --retro=<style> (or --geocities) picks a look for this run without
+            // saving it; it's only saved if changed in the menu or settings page.
+            if let Some(command_line) = &command_line {
+                let style = switch_value(command_line, "retro")
+                    .and_then(|key| RetroStyle::from_key(&key))
+                    .or_else(|| has_switch(command_line, "geocities").then_some(RetroStyle::GeoCities));
+                if let Some(style) = style {
+                    user_settings.retro_style = style;
+                }
             }
             with_shell(|shell| {
                 shell.bookmarks = list.clone();

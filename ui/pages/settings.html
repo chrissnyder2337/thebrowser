@@ -31,14 +31,23 @@
           <legend>Modem speed</legend>
           <div class="speeds">{{SPEED_OPTIONS}}</div>
         </fieldset>
+        <fieldset>
+          <legend>Retro look</legend>
+          <p>Make every site look like it's the '90s. Also on the toolbar's Retro button.</p>
+          {{RETRO_OPTIONS}}
+          <input type="hidden" name="splash" value="0">
+          <label class="opt"><input type="checkbox" name="splash" value="1"{{SPLASH_CHECKED}}>
+            <span><b>Flash-style splash intro</b><br><small>A spinning, zooming
+            "LOADING..." intro with a SKIP INTRO button, once each time you enter a site.</small></span></label>
+        </fieldset>
         <div class="actions">
           <button type="submit">Save</button>
           <a class="btn" href="{{HOME_URL}}">Start Page</a>
         </div>
       </form>
       <hr>
-      <p>The status bar shows the modem speed while the simulator is on. Click it to come back here,
-        or type <b>lantern:settings</b> in the URL field.</p>
+      <p>The status bar shows the modem speed while the simulator is on. Click it, or Retro settings in
+        the toolbar's Retro menu, to come back here, or type <b>lantern:settings</b> in the URL field.</p>
     </div>
   </div>
   <div class="foot"><span>Lantern {{VERSION}}</span><span>Settings are saved in your Lantern profile.</span></div>
