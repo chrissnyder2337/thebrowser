@@ -126,16 +126,32 @@ retro script builder and the pixel-art sheets.
 
 ### Releasing
 
-1. Bump `version` in `Cargo.toml` and merge it to `main`.
-2. Tag that commit and push the tag: `git tag v0.2.0 && git push origin v0.2.0`.
+`Cargo.toml`'s version decides the release. There's no separate tagging step:
 
-`.github/workflows/release.yml` then builds bundles for Linux x86_64
-(`.tar.gz`), macOS arm64 (`.zip` of `Lantern.app`) and Windows x86_64 (`.zip`),
-and publishes them under fixed names (so the Download links above always point
-at the newest release) with a `SHA256SUMS.txt` as a GitHub Release with generated
-notes. The tag must match the `Cargo.toml` version or the run fails. Running the
-workflow by hand from the Actions tab builds the same bundles as downloadable
-artifacts without publishing a release.
+```sh
+tools/bump-version.sh minor --push     # or patch, major, or an exact 1.4.0
+```
+
+The script bumps `Cargo.toml` and `Cargo.lock` on a `release/vX.Y.Z` branch
+started from `origin/main`, commits it, pushes it, and opens a pull request
+(with the GitHub CLI `gh`, if installed; otherwise it prints the link). Add
+`--dry-run` to preview it, or leave out `--push` to push it yourself.
+
+Merging that pull request publishes the release: `.github/workflows/release.yml`
+sees that `vX.Y.Z` doesn't exist yet, builds Linux x86_64 (`.tar.gz`), macOS
+arm64 (`.zip` of `Lantern.app`) and Windows x86_64 (`.zip`), creates the tag,
+and publishes the bundles under fixed names (so the Download links above always
+reach the newest release) with a `SHA256SUMS.txt` and generated notes.
+
+- Pushing a tag by hand still works if it matches `Cargo.toml` at that commit.
+  If not, the run stops with a "Tag does not match Cargo.toml" error and
+  instructions.
+- Running the Release workflow from the Actions tab builds the bundles as
+  downloadable artifacts. Tick **publish** to release the version in
+  `Cargo.toml` from that branch: useful to fill a release left without files.
+- In Claude Code, `/release` (`.claude/skills/release/SKILL.md`) runs the whole
+  process: picking the version from the commits, the bump PR, CI, merging, and
+  checking the downloads.
 
 The macOS app is ad-hoc signed (`codesign --sign -`) but not notarized, so
 after downloading it, run `xattr -dr com.apple.quarantine Lantern.app` or allow
@@ -312,6 +328,8 @@ ui/lantern.txt, icons.txt       pixel art: the lantern (5 frames) and the toolba
 ui/appicon/                     generated window icons
 resources/mac, resources/win    bundle resources and generated .icns/.ico
 tools/make_icons.py             regenerates all app icons from ui/lantern.txt
+tools/bump-version.sh           bumps the version and opens the release pull request
+.claude/skills/release/         Claude Code skill for cutting and debugging releases
 ```
 
 ### Pixel art
