@@ -5,7 +5,9 @@ maintainer, Claude sessions doing most of the coding) into a deliberate
 "software factory".
 
 See also: [Claude feature audit (May–October 2026)](claude-features-audit.md),
-a list of recent Anthropic features this plan should use.
+a list of recent Anthropic features this plan should use, and
+[Factory goals](factory-goals.md), copy-paste `/goal` prompts that implement
+this plan one phase at a time.
 
 - [Part 1: What people mean by "software factory"](#part-1-what-people-mean-by-software-factory)
   - [How dated is this research?](#how-dated-is-this-research-checked-october-2026)
