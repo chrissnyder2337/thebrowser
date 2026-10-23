@@ -15,9 +15,10 @@ against what Lantern uses today. It feeds the
 - the Anthropic news page (Aug 27–Oct 22).
 
 **What Lantern uses today:** one project skill (`release`), GitHub Actions CI,
-and Claude Code cloud sessions. There's no `CLAUDE.md`, no
-`.claude/settings.json`, no hooks, no plugins, no routines, and PR #8 had no
-automated review at all.
+and Claude Code cloud sessions. As of the October 23 rebase, `main` also has
+a short `CLAUDE.md` (the no-attribution rule), a `.claude/settings.json` that
+turns attribution off, and a `steward` skill. There are still no hooks, no
+plugins and no routines, and PR #8 had no automated review at all.
 
 **Plan constraint: Claude Pro, cloud sessions only.** Lantern runs on Claude
 Pro with no upgrade, usage credits or API billing, and without a real

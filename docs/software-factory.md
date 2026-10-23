@@ -281,10 +281,10 @@ agents build. Some factory parts already exist:
 | Part | Today | Gap |
 |---|---|---|
 | Intake | Ad-hoc requests in Claude sessions | No issue templates, labels or queue; no spec format |
-| Repo knowledge | Excellent README (architecture, source layout, protocols); one skill (`release`) | No `CLAUDE.md`, no skills for common work, no steward/babysit guidance |
+| Repo knowledge | Excellent README (architecture, source layout, protocols); a short `CLAUDE.md` (no-attribution rule, pointers); skills `release` and `steward` (pre-push checks, CI failure history, review and merge conventions, branding rule, how to run the app under Xvfb) | `CLAUDE.md` has no invariants or risk tiers; no skills for common feature work |
 | Environment | CI installs CEF via `.github/actions/setup-cef` | Cloud sessions have no SessionStart hook, so agents can't reliably run `cargo clippy`/`cargo test` (CEF is a large download) |
 | Verification | rustfmt, clippy `-D warnings`, 24 unit tests on helpers, Linux bundle, macOS/Windows build | **Nothing checks the browser actually works.** No end-to-end test, no screenshots, no tests for `ui/retro/*.js` or the chrome pages, no smoke test of the bundle |
-| Review gate | Maintainer reviews every PR; `main` protected | Every change is reviewed the same way regardless of risk |
+| Review gate | Maintainer reviews every PR; `main` protected by three required CI checks, no required approvals; merges use merge commits | Every change is reviewed the same way regardless of risk |
 | Release | Fully automated from `Cargo.toml` + `/release` skill | Good already |
 | Feedback | None | No crash or usage signal; releases aren't smoke-tested |
 
@@ -341,8 +341,14 @@ we skip it for now.
 install with `apt` in an Anthropic cloud container. A browser runs on the
 virtual display, clicks land, and Claude can read the screenshots: the first
 click missed, and a second click aimed using the screenshot hit. This used
-the bundled Chromium. Running Lantern's own CEF bundle this way is still to
-be tried, and is the first step of Phase 1.6.
+the bundled Chromium. The steward skill (added to `main` since) documents
+running Lantern itself under Xvfb with `--no-sandbox --disable-gpu` and
+taking screenshots with `import`, which is good evidence the CEF bundle works
+too. Driving it with `xdotool` is still to be tried, and is the first step of
+Phase 1.6. The steward recipe also opens a DevTools port
+(`--remote-debugging-port`). That's fine for implementing sessions, but the
+black-box tester must never start Lantern with it, since DevTools exposes the
+page internals.
 
 **Usage budget.** Interactive work, cloud sessions, routines and Actions
 running on your Pro token all draw from the same Pro usage. When it runs
@@ -375,12 +381,14 @@ black-box runs on tier 1.
 
 Give every agent session the same starting context and a working toolchain.
 
-- **`CLAUDE.md`** at the repo root, short and linking to the README rather than
-  repeating it:
-  - the commands that must pass before a push (`cargo fmt --check`,
-    `cargo clippy --all-targets -- -D warnings`,
-    `LD_LIBRARY_PATH="$CEF_PATH" cargo test --bin lantern`, and the Phase 1
-    checks once they exist);
+- **Extend the existing `CLAUDE.md`.** It already states the
+  no-attribution rule and points to the `steward` and `release` skills. Keep
+  that rule first and keep the file short, linking to the README and skills
+  rather than repeating them. Add:
+  - a pointer to the steward skill's "Before every push" checks as the
+    required pre-push suite (they already include the macOS/Windows
+    `cef/dox` cross-checks, `actionlint`, `shellcheck` and `node --check`),
+    plus the Phase 1 checks once they exist;
   - invariants: the CEF pin moves only with its binaries; all CEF calls stay
     on the UI thread (thread-local `RefCell` state); chrome views stay locked
     down; internal actions only go through `lantern.invalid`; every string
@@ -398,9 +406,11 @@ Give every agent session the same starting context and a working toolchain.
   move CEF into the repo's SessionStart hook.
 - **Skills** in `.claude/skills/`, written from what past sessions had to work
   out:
-  - `steward`: how to drive a PR to green in this repo (which checks matter,
-    how to read CEF build failures, when macOS/Windows-only failures are
-    real);
+  - `steward` **already exists** (pre-push checks, CI failure history,
+    reviews, merging, PR descriptions, the branding rule). Extend it only
+    with the factory's additions: the risk tiers, the pre-push
+    `/code-review`, the oracle rules, and the Phase 1 checks once they
+    exist. Don't rewrite what's there;
   - `retro-look`: anatomy of a look in `ui/retro/`, how `runtime.js` handles
     shadow trees and floating boxes, how to add fixtures and golden shots
     (after Phase 1);
@@ -551,6 +561,9 @@ CI misses today. Cheapest first:
 
      The runner has no Lantern source, no `CLAUDE.md`, no diff and no test
      code. Any PR that changes `tools/blackbox/` is tier 2.
+   - **No DevTools for the tester.** `bb start` never passes
+     `--remote-debugging-port` or any other debugging flag, and refuses
+     flags other than `--url=` and `--retro=`.
    - **The build under test can't reach the token.** The bundle is the PR's
      own code, and it runs on the same machine as your token. So `bb start`
      runs Lantern as a separate unprivileged user, through `env -i` with
@@ -636,10 +649,9 @@ Implement):
    issue per PR, runs a `/goal` built from the approved plan. For example:
 
    ```text
-   /goal Every acceptance criterion in issue #N holds, shown by these all
-   exiting 0 in this session: cargo fmt --check;
-   cargo clippy --all-targets -- -D warnings;
-   LD_LIBRARY_PATH="$CEF_PATH" cargo test --bin lantern; npx playwright test.
+   /goal Every acceptance criterion in issue #N holds, shown by every check
+   in the steward skill's "Before every push" section exiting 0 in this
+   session, plus the Playwright suite and tests/smoke.sh.
    For a bug, a new test failed before the fix and passes after it.
    No file under tests/golden/ is changed and no existing
    assertion is removed or loosened. Or stop after 40 turns and report what
@@ -685,7 +697,8 @@ The tier is mechanical, and it can't be steered from inside the PR:
   is on the tier-0 allowlist.
 - **The same job turns auto-merge on and off.** Labels and merges made with
   `GITHUB_TOKEN` don't trigger other workflows. So the labelling job itself
-  enables auto-merge for tier-0 PRs (`gh pr merge --auto --squash`), instead
+  enables auto-merge for tier-0 PRs (`gh pr merge --auto --merge`, since the
+  steward skill requires merge commits), instead
   of a second workflow waiting for a label event that would never fire.
   - It runs on every `opened`, `synchronize` and `reopened` event, so it
     re-tiers the PR after each push.
@@ -696,8 +709,9 @@ The tier is mechanical, and it can't be steered from inside the PR:
     runs PR code and holds no Claude token.
   - Branch protection on `main` must require the CI checks, **not an
     approving review**. You can't approve PRs opened under your own account,
-    so a review requirement would block every auto-merge. PR #8 merged with
-    no review, so this already looks like the current setup.
+    so a review requirement would block every auto-merge. The steward skill
+    confirms this is the current setup: three required checks, no required
+    approvals.
 - **`main` gets a scheduled CI run.** A merge made through `GITHUB_TOKEN`
   auto-merge doesn't start push workflows on `main` either, so `ci.yml` also
   runs daily on `main`. That run needs no model. Tier 0 can never touch
