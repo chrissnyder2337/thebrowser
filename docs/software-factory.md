@@ -4,6 +4,9 @@ Research notes and a plan for turning Lantern's current way of working (one
 maintainer, Claude sessions doing most of the coding) into a deliberate
 "software factory".
 
+See also: [Claude feature audit (May–October 2026)](claude-features-audit.md),
+a list of recent Anthropic features this plan should use.
+
 - [Part 1: What people mean by "software factory"](#part-1-what-people-mean-by-software-factory)
   - [How dated is this research?](#how-dated-is-this-research-checked-october-2026)
 - [Part 2: Where Lantern stands today](#part-2-where-lantern-stands-today)
@@ -362,6 +365,16 @@ Give every agent session the same starting context and a working toolchain.
   `.claude/claude-security-guidance.md`: escape everything that reaches HTML
   or JS, never widen `lantern.invalid` handling, keep chrome views locked
   down.
+- **Turn on Code Review** for the repo: Standard by default, Deep for tier-2
+  paths, `@claude review always` on agent PRs. So far no PR has had an
+  automated review.
+- **Guard the oracle at edit time:** a PreToolUse hook in
+  `.claude/settings.json` (with `onFailure: "block"`) that refuses edits to
+  `tests/golden/` and `scenarios/` unless the maintainer sets a flag. CI's
+  check (Phase 1.5) stays as the backstop.
+- **Tune for unattended runs:** run `/auto-mode-setup` once after a full
+  build; use `--permission-prompts none` in headless runs; run
+  `/doctor prompt-audit` on `CLAUDE.md` and the skills.
 - **Issue templates** (`.github/ISSUE_TEMPLATE/`) for *feature*, *bug* and
   *chore*. Each asks for: the problem, acceptance criteria written as
   observable behavior ("with `--retro=portal`, the bookmarks page shows…"),
@@ -403,12 +416,19 @@ CI misses today. Cheapest first:
    cleanly. The simplest version needs a small debug flag, such as
    `--self-test=<file>`, which writes the final URL, title and load status to
    a file and quits. A screenshot of the X display can come later. The same
-   test runs once per retro look.
+   test runs once per retro look. When an agent runs this inside Claude
+   Code's Linux sandbox, CEF's own sandbox needs user namespaces. Either
+   enable `sandbox.allowNestedUserNamespaces` (added Oct 2026 with Chromium
+   as the named case; it weakens the sandbox's file protections) or launch
+   the test bundle with `--no-sandbox`.
 5. **Scenario holdouts (StrongDM's idea, scaled down).** A `scenarios/`
    directory of plain-language user journeys ("start Lantern, turn on dial-up
    at 14.4k, open a page with images, see them paint top to bottom"). They're
    run by a separate, read-only judge agent, which drives the smoke-test
-   bundle or the Playwright harness. Two rules keep them honest:
+   bundle or the Playwright harness. Define it as a `scenario-judge`
+   subagent with `omitClaudeMd: true` and read-only tools, so it doesn't
+   share the implementer's instructions or assumptions. Two rules keep
+   them honest:
    - `CODEOWNERS` makes `scenarios/` and `tests/golden/` maintainer-owned.
    - A CI check fails any PR that changes both product code (`src/`, `ui/`)
      and the oracle (`scenarios/`, `tests/golden/`, existing test
