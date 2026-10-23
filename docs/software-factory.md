@@ -408,9 +408,14 @@ Give every agent session the same starting context and a working toolchain.
   out:
   - `steward` **already exists** (pre-push checks, CI failure history,
     reviews, merging, PR descriptions, the branding rule). Extend it only
-    with the factory's additions: the risk tiers, the pre-push
-    `/code-review`, the oracle rules, and the Phase 1 checks once they
-    exist. Don't rewrite what's there;
+    with the factory's additions, **one phase at a time**, so it only ever
+    describes what exists. Phase 0 adds the risk tiers, a merge rule (never
+    merge tier 1–2; tier 0 merges only through the labeller), the pre-push
+    `/code-review` and the oracle rules. Phase 1 adds the Playwright suite,
+    the smoke test, the CI guard and when to dispatch the black-box job.
+    Phase 2 adds the tier labeller, auto-merge and the review workflow.
+    Each goal in `docs/factory-goals.md` makes its own steward update. Don't
+    rewrite what's there;
   - `retro-look`: anatomy of a look in `ui/retro/`, how `runtime.js` handles
     shadow trees and floating boxes, how to add fixtures and golden shots
     (after Phase 1);
