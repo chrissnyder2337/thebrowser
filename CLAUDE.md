@@ -20,7 +20,7 @@ don't repeat them here.
   Windows `cef/dox` cross-checks, and `actionlint`, `shellcheck` or
   `node --check` for the files you touched. In a cloud session,
   `tools/cloud-setup.sh` installs what they need (the SessionStart hook runs
-  it when CEF is missing).
+  it when CEF is missing or doesn't match the pin).
 - **Run `/code-review` on your branch before every push**, and fix what it
   finds or answer it in the PR description.
 - For UI changes, run the app and look (steward skill → Xvfb recipe).

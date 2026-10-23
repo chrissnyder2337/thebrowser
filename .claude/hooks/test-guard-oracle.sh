@@ -8,6 +8,7 @@ project="$(mktemp -d)"
 trap 'rm -rf "$project"' EXIT
 mkdir -p "$project/tests/golden"
 touch "$project/tests/golden/portal-home.png"
+ln -s "$project/tests" "$project/link"
 
 failures=0
 check() {
@@ -33,9 +34,20 @@ check ask   "Bash playwright -u"                "$(bash_ 'npx playwright test -u
 check ask   "Bash cp into tests/golden"         "$(bash_ 'cp /tmp/shot.png tests/golden/portal-home.png')"
 check ask   "Bash approve deployment (gh api)"  "$(bash_ 'gh api -X POST repos/o/r/actions/runs/1/pending_deployments -f state=approved')"
 check allow "Bash read of tests/golden"         "$(bash_ 'ls -l tests/golden && git diff --stat tests/golden')"
+check allow "Bash read with 2>/dev/null"         "$(bash_ 'ls tests/golden 2>/dev/null; git diff tests/golden 2>&1 | head')"
+check ask   "Bash redirect into tests/golden"   "$(bash_ 'echo x > tests/golden/portal-home.png')"
+check allow "Bash commit mentioning deployment" "$(bash_ "git commit -m 'CI: review deployment docs'")"
+check ask   "Edit golden via symlinked path"    "$(edit Edit "$project/link/golden/portal-home.png")"
 check allow "Bash unrelated command"            "$(bash_ 'cargo test --bin lantern')"
 check ask   "GitHub tool approving a deployment" \
   "$(jq -nc '{tool_name:"mcp__github__review_pending_deployments",tool_input:{run_id:1,state:"approved"}}')"
+check ask   "GitHub tool writing a golden"      \
+  "$(jq -nc '{tool_name:"mcp__github__create_or_update_file",tool_input:{path:"tests/golden/portal-home.png",content:"x"}}')"
+check ask   "GitHub push_files with a golden"   \
+  "$(jq -nc '{tool_name:"mcp__github__push_files",tool_input:{files:[{path:"README.md"},{path:"tests/golden/a.png"}]}}')"
+check allow "GitHub review mentioning deploys"  \
+  "$(jq -nc '{tool_name:"mcp__github__pull_request_review_write",tool_input:{body:"Reviewed: the deployment step now caches CEF"}}')"
+check ask   "Malformed input (fails closed)"    'not json'
 check allow "GitHub tool unrelated"             \
   "$(jq -nc '{tool_name:"mcp__github__list_pull_requests",tool_input:{owner:"o",repo:"r"}}')"
 

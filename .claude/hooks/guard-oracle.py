@@ -8,8 +8,9 @@ Answers "ask" for:
   would bypass the `oracle` GitHub Environment.
 
 Anything else, including a brand-new file under tests/golden/, gets no
-decision, so the normal permission rules apply. This is a speed bump; the CI
-oracle check is the lock.
+decision, so the normal permission rules apply. If the guard itself fails it
+answers "ask" too, so it fails closed. This is a speed bump; the CI oracle
+check is the lock.
 
 Reads the hook input JSON on stdin and prints a decision JSON, or nothing.
 """
@@ -31,19 +32,36 @@ SNAPSHOT_UPDATE = re.compile(
     r"|\bUPDATE_(GOLDEN|SNAPSHOTS?)=",
 )
 
-# Commands that can create, change or delete files.
+# Commands that can create, change or delete files. Redirections to
+# /dev/null or another descriptor (2>&1) don't count.
 WRITES = re.compile(
-    r">|\b(tee|cp|mv|rm|rmdir|ln|install|rsync|truncate|dd|touch|chmod|unzip|tar"
+    r"(^|[^0-9&>-])>>?(?!\s*(/dev/null|&))"
+    r"|\b(tee|cp|mv|rm|rmdir|ln|install|rsync|truncate|dd|touch|chmod|unzip|tar"
     r"|import|convert|magick|python3?|node|perl|ruby)\b"
     r"|\bsed\b[^|;&]*\s-i"
     r"|\bgit\s+(checkout|restore|mv|rm|apply|am|reset|stash|clean|cherry-pick|revert)\b",
 )
 
-DEPLOYMENT_APPROVAL = re.compile(
-    r"pending_deployments|review_?deployments?|approve_?deployments?"
-    r"|deployments?.{0,40}\b(approv|review)|\b(approv|review).{0,40}deployments?",
-    re.IGNORECASE,
+# The REST endpoint that approves or rejects a waiting environment.
+DEPLOYMENT_APPROVAL = re.compile(r"pending_deployments", re.IGNORECASE)
+# A tool whose name is about approving or reviewing deployments.
+DEPLOYMENT_TOOL = re.compile(
+    r"(approv|review).*deployment|deployment.*(approv|review)", re.IGNORECASE
 )
+
+
+def in_golden(path, root):
+    """Whether `path` (absolute, or relative to `root`) is under tests/golden/."""
+    full = os.path.realpath(os.path.join(root, path))
+    rel = os.path.relpath(full, os.path.realpath(root)).replace(os.sep, "/")
+    return (rel + "/").startswith(GOLDEN + "/"), full
+
+
+def github_paths(args):
+    """Repository paths a GitHub tool call would write (create, update, delete, push)."""
+    paths = [args.get("path")]
+    paths += [f.get("path") for f in args.get("files") or [] if isinstance(f, dict)]
+    return [p for p in paths if isinstance(p, str) and p]
 
 
 def decide(event):
@@ -56,10 +74,9 @@ def decide(event):
         path = args.get("file_path") or args.get("notebook_path") or ""
         if not path:
             return None
-        full = os.path.normpath(os.path.join(cwd, path))
-        rel = os.path.relpath(full, os.path.normpath(root))
-        if (rel + "/").startswith(GOLDEN + "/") and os.path.exists(full):
-            return f"{tool} would change an existing golden file ({rel})."
+        golden, full = in_golden(os.path.join(cwd, path), root)
+        if golden and os.path.exists(full):
+            return f"{tool} would change an existing golden file ({path})."
         return None
 
     if tool == "Bash":
@@ -73,14 +90,21 @@ def decide(event):
         return None
 
     if "github" in tool.lower():
-        text = tool + " " + json.dumps(args)
-        if DEPLOYMENT_APPROVAL.search(text):
+        if DEPLOYMENT_TOOL.search(tool) or DEPLOYMENT_APPROVAL.search(json.dumps(args)):
             return "This GitHub call may approve a deployment."
+        # Writes through the API land on the branch directly; the guard can't
+        # tell a new file from an existing one there, so it always asks.
+        for path in github_paths(args):
+            if path.lstrip("/").startswith(GOLDEN + "/"):
+                return f"This GitHub call writes {path}."
     return None
 
 
 def main():
-    reason = decide(json.load(sys.stdin))
+    try:
+        reason = decide(json.load(sys.stdin))
+    except Exception as err:  # fail closed: a broken guard asks
+        reason = f"The oracle guard failed ({err!r})."
     if reason:
         json.dump(
             {

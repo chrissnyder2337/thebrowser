@@ -56,7 +56,8 @@ fi
 # 3. Targets and linters for the steward skill's "Before every push" checks.
 rustup target add x86_64-apple-darwin x86_64-pc-windows-msvc
 if ! command -v actionlint >/dev/null || ! command -v shellcheck >/dev/null; then
-  pip install --quiet actionlint-py shellcheck-py
+  # Ubuntu 24.04's Python is externally managed (PEP 668).
+  PIP_BREAK_SYSTEM_PACKAGES=1 pip install --quiet actionlint-py shellcheck-py
 fi
 
 # 4. Warm the build (cef-dll-sys compiles its C++ wrapper against $CEF_PATH).
