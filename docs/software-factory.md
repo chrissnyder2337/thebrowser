@@ -5,6 +5,7 @@ maintainer, Claude sessions doing most of the coding) into a deliberate
 "software factory".
 
 - [Part 1: What people mean by "software factory"](#part-1-what-people-mean-by-software-factory)
+  - [How dated is this research?](#how-dated-is-this-research-checked-october-2026)
 - [Part 2: Where Lantern stands today](#part-2-where-lantern-stands-today)
 - [Part 3: The plan](#part-3-the-plan)
 - [Sources](#sources)
@@ -113,12 +114,40 @@ for agents that work across many sessions with no memory:
 - Agents marked features done after unit tests or `curl`. Telling them to test
   *as a user* with browser automation substantially improved results.
 
+*Dated (late 2025):* Claude Code now handles much of this harness itself.
+`/goal` keeps going until a separate model judges a condition met, Tasks
+track work across sessions, models have 1M-token context with automatic
+compaction, and sessions resume. The lessons that still hold are testing as a
+user and starting each session from written state. You no longer need to
+build the scaffolding (initializer agent, `feature_list.json`).
+
 **Geoffrey Huntley's Ralph loop (the minimal position).** A bash loop that
 feeds the same prompt file to an agent forever, with a fresh context each
 time. One repo, one process, one task per iteration. The skill is in watching
 the loop and fixing whatever made it fail so it can't recur. He argues against
 multi-agent complexity until it's needed. Anthropic now ships it as a Claude
 Code plugin.
+
+*Dated (mid-2025):* Ralph's core idea, "keep going until it's actually done",
+became a built-in feature in May 2026: **`/goal`**. The mechanics differ in
+ways that matter:
+
+- **A separate judge.** Ralph relies on the working agent to decide it's done
+  (or never stops). With `/goal`, a separate small model checks your
+  condition after every turn: "you can't trust a model to judge its own
+  homework." That judge doesn't run tools. It only reads what the worker
+  showed in the transcript, so it's a check on *stopping too early*, not an
+  independent oracle.
+- **Context.** Ralph throws the context away each iteration, which made sense
+  with 2025 context windows. `/goal` continues the same session, using 1M-token
+  context and auto-compaction, and restores the goal on resume.
+- **Built-in safety rails.** It stops when the condition is judged impossible,
+  clears on errors that need a human, stops if turns stop making progress, and
+  checks in on stuck background work. In headless runs it's one line:
+  `claude -p "/goal …"`. Paired with auto mode, it runs unattended.
+
+What still holds from Ralph: one task per run, state written to files and git,
+and the habit of watching the loop and fixing whatever caused a failure.
 
 **Steve Yegge's Gas Town (the orchestration position).** Runs 10+ agents with
 persistent worker identities, git worktrees per worker, a merge queue with
@@ -137,7 +166,11 @@ with 2–3 agents, and that the costs and fragility are real.
   20. "What we're really suffering from is a surplus of bad PRs." He recommends
   mostly deterministic workflows with LLM steps "sprinkled in at just the
   right points", and human review of *plans* before implementation (his
-  Research → Plan → Implement framework).
+  Research → Plan → Implement framework). *Dated in part:* his factory ran on
+  2025 models (it reportedly ended around November 2025), and the "3–10 steps"
+  figure doesn't describe 2026 models running long `/goal` sessions. His point
+  about verification and understanding is about the system, though, not the
+  model, and Osmani repeated it in July 2026.
 - **Comprehension debt.** Osmani: "the widening gap between how much code
   exists and how much any human still understands." Dark factories pile it up
   quietly, and the failure arrives late and gradually.
@@ -187,6 +220,50 @@ Despite the different positions, the same points come up again and again:
    a lint, a test or a CI check.
 7. **Measure outcomes, not volume.** Lead time, rework and reverts, escaped
    defects and cost per merged change beat "PRs opened" or "tokens burned".
+
+### How dated is this research? (checked October 2026)
+
+The sources cover about 15 months, and agent tooling changed a lot in that
+time. Some advice is a workaround for limits that no longer exist. Ordered by
+age:
+
+| Source | When | Built on | What still holds / what's dated |
+|---|---|---|---|
+| Huntley, Ralph loop | May–Jul 2025 | 2025 agents, small context | Watching and fixing the loop still holds. The bash loop itself is replaced by `/goal` (see above). |
+| METR productivity RCT | Jul 2025 (tools from early 2025) | Pre-agent IDE assistants | **Stale.** METR itself now calls it historical. Its follow-up couldn't get a clean number. |
+| DORA 2025 | Surveyed Jun–Jul 2025 | Mostly chat and autocomplete use | The "AI amplifies your system" thesis is about organizations and probably still holds, but the data predates agents doing the work. |
+| Böckeler on spec-driven tools | Oct 2025 | Kiro / spec-kit v1 | The tools have moved on. Her core point (heavy up-front specs are costly to review, so prefer small iterative steps) still holds. |
+| Anthropic long-running harness | Late 2025 | Pre-`/goal`, pre-Tasks | Scaffolding is now built in (see above). Testing as a user still holds. |
+| Shapiro's five levels | Jan 2026 | — | A vocabulary, not a technique. Still useful. |
+| StrongDM factory | Feb 2026 (running since Jul 2025) | Early-2026 models | Hidden scenarios and an independent judge still hold. The $1,000/day figure reflects their scale and early-2026 pricing, not a target. |
+| OpenAI harness engineering | Feb 2026 (work Aug 2025–Jan 2026) | GPT-5-era Codex | Docs in the repo and mechanical enforcement still hold. They're tool-agnostic. |
+| Gas Town | Jan 2026 onward | Custom orchestrator | Mostly **superseded for us** by built-in orchestration (dynamic workflows, forked and background subagents, agent view, cross-session messaging). |
+| "Comment and Control" injection research | Apr 2026 | Claude/Gemini/Copilot Actions | **Current.** Shapes the Security section. |
+| Osmani, Light and Dark; Horthy's talk | Jul 2026 | Mid-2026 | Most recent statement of the skeptics' case. Still holds. |
+| Vercel AI SDK factory | Aug 2026 | Current tooling | Most recent and closest to our situation (open source, untrusted input, human approves merges). |
+
+Claude Code features from 2026 that change how a small team should build a
+factory. Each one replaces something the earlier sources had to build
+themselves:
+
+| Feature (shipped) | What it replaces |
+|---|---|
+| Auto mode (Mar 2026; default since Aug) | `--dangerously-skip-permissions` / "YOLO mode" for unattended runs |
+| Computer use in the CLI (Mar 2026), in-app browser (Jul) | Agents can't check a GUI themselves |
+| Ultraplan (Apr 2026) | A hand-rolled "post a plan, wait for approval" step: draft a plan in the cloud, comment on it in a web editor, then run it |
+| Routines (Apr 2026) | GitHub Actions + `claude -p` cron jobs: scheduled, GitHub-event or API-triggered cloud agents |
+| `/ultrareview`, `/code-review`, Code Review levels (Apr–Oct 2026) | Custom review agents: Quick/Standard/Deep per repo, `@claude review always` |
+| `/goal` (May 2026) | Ralph loops and "the agent says it's done" |
+| Dynamic workflows (May 2026) | Custom multi-agent orchestrators for big fan-out jobs (audits, migrations) |
+| Security-guidance plugin (May 2026) | A separate security pass: checks each edit, reviews each turn, does a deeper review on push |
+| Forked and background subagents (Jun–Oct 2026) | Manually splitting work across sessions |
+| `claude plugin eval` (Sep 2026) | Guessing whether a skill or `CLAUDE.md` rule actually helps: scores it against a no-plugin baseline |
+
+**The takeaway.** Generating code, finishing a task and running unattended
+have mostly been productized. What hasn't changed, and is now even more clearly
+the bottleneck, is **an independent check that the result is correct**, plus
+human judgment on intent and risk. The plan below therefore uses the built-in
+features for the loop and puts our own effort into the oracle.
 
 ---
 
@@ -277,6 +354,14 @@ Give every agent session the same starting context and a working toolchain.
     title channel → `commands.rs` → `lantern.update`), with tests;
   - `cef-upgrade`: moving the `cef` pin and `CEF_CRATE_VERSION` together,
     regenerating, and running the smoke test.
+- **Check that the skills earn their place** with `claude plugin eval`: a few
+  representative tasks per skill, scored against a run without the skill. Drop
+  or rewrite skills that don't beat the baseline. `/skill-doctor` shows what
+  each one costs in context.
+- **Security-guidance plugin**, with Lantern rules in
+  `.claude/claude-security-guidance.md`: escape everything that reaches HTML
+  or JS, never widen `lantern.invalid` handling, keep chrome views locked
+  down.
 - **Issue templates** (`.github/ISSUE_TEMPLATE/`) for *feature*, *bug* and
   *chore*. Each asks for: the problem, acceptance criteria written as
   observable behavior ("with `--retro=portal`, the bookmarks page shows…"),
@@ -331,6 +416,11 @@ CI misses today. Cheapest first:
      maintainer applies. This is the cheap version of "agents can't rewrite
      the tests to match the bug".
 
+An extra check, not a gate: when a change is visual, the agent can also run
+the real app and look at it with computer use (where the session has a
+display). That's useful evidence to attach to a PR, but it isn't
+deterministic. CI keeps the deterministic checks above as the gate.
+
 Once Phase 1 is done, an agent can show a change works without the maintainer
 running the app. That's what unlocks the next phases.
 
@@ -342,24 +432,43 @@ Implement):
 1. The maintainer files or approves an issue and adds `factory:ready`. Only a
    maintainer-applied label starts work, never an outside comment or a newly
    opened issue (see Security).
-2. **Plan.** An agent (a Claude Code GitHub Action or a routine on the label
-   event) reads the issue, `CLAUDE.md` and the relevant code, then posts a
-   short plan: files to touch, approach, the tests that will prove it, and the
-   proposed tier. Five to fifteen lines, not a spec-kit document. The
-   maintainer replies "go" or corrects it. **This is the main human
+2. **Plan.** A routine triggered by the label event reads the issue,
+   `CLAUDE.md` and the relevant code, then drafts a short plan: files to
+   touch, approach, the tests that will prove it, and the proposed tier. Five
+   to fifteen lines, not a spec-kit document. Use Ultraplan, so the maintainer
+   can comment on the plan in the web editor, or post the plan as an issue
+   comment. The maintainer approves or corrects it. **This is the main human
    checkpoint.**
-3. **Implement.** An agent works on its own branch, one issue per PR, keeping
-   a progress note in the PR description, and runs the full local suite
-   before pushing (the system prompt for cloud sessions already requires
-   this). Tests come first for bugs: reproduce the failure, then fix it.
-4. **Verify.** CI runs the Phase 1 oracle, plus Claude Code Review, plus the
-   scenario judge for tier 1–2. The implementing agent stewards its own PR to
-   green under the `steward` skill.
+3. **Implement under a goal.** An agent in auto mode on its own branch, one
+   issue per PR, runs a `/goal` built from the approved plan. For example:
+
+   ```text
+   /goal Every acceptance criterion in issue #N holds, shown by these all
+   exiting 0 in this session: cargo fmt --check;
+   cargo clippy --all-targets -- -D warnings;
+   LD_LIBRARY_PATH="$CEF_PATH" cargo test --bin lantern; npx playwright test.
+   For a bug, a new test failed before the fix and passes after it.
+   No file under tests/golden/ or scenarios/ is changed and no existing
+   assertion is removed or loosened. Or stop after 40 turns and report what
+   is left.
+   ```
+
+   The goal's evaluator stops the agent quitting early. It **doesn't**
+   replace CI: it only reads what the agent printed, so the "don't touch the
+   oracle" constraint is enforced again by the CI check from Phase 1.5. Keep
+   a progress note in the PR description so another session can take over.
+4. **Verify.** CI runs the Phase 1 oracle, plus Claude Code Review (Standard
+   for tiers 0–1, Deep for tier 2), plus the scenario judge for tiers 1–2. The
+   implementing agent stewards its own PR to green under the `steward` skill
+   (PR auto-fix covers routine CI breakage).
 5. **Review by tier**, below.
 
-Start with **one** implementing agent at a time. Add a second, in a separate
-worktree or session, only once the plan-to-merge lead time is steady and the
-maintainer's review queue isn't growing.
+Start with **one** implementing session at a time. Add a second only once the
+plan-to-merge lead time is steady and the maintainer's review queue isn't
+growing. Scale with built-in tools before building any of our own: parallel
+cloud sessions or worktrees for separate issues, forked subagents within a
+session, and a dynamic workflow for one-off fan-out jobs such as a
+codebase-wide audit or a CEF API migration.
 
 #### Risk tiers
 
@@ -377,7 +486,10 @@ starts in tier 0 only if every path is on the tier-0 allowlist.
 
 Small, scheduled loops in Horthy's style: each opens at most one small PR,
 and stops with nothing if there's nothing to do. Run them as Claude Code
-routines or scheduled GitHub Actions.
+routines (schedule or GitHub-event triggers), each with its own prompt and the
+narrowest connectors and permissions it needs. Use plain scheduled GitHub
+Actions only for steps that don't need a model (Dependabot, the release
+download check).
 
 | Loop | Cadence | Output |
 |---|---|---|
@@ -439,6 +551,10 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
 - **No heavyweight spec-driven tooling** (spec-kit/Kiro-style document sets).
   A short issue with observable acceptance criteria plus a reviewed plan gets
   most of the value at a fraction of the review cost.
+- **No custom harness or orchestrator.** No Ralph script, no
+  `feature_list.json` initializer, no Gas Town. `/goal`, auto mode, routines,
+  subagents and dynamic workflows cover these now. Our own engineering goes
+  into the oracle, which no product feature replaces.
 - **No swarm on day one.** One loop, then two, then more only if metrics
   justify it.
 - **No digital twins.** Lantern has no third-party SaaS dependencies. The
@@ -483,6 +599,13 @@ Skepticism and evidence:
 - METR's 2025 developer-productivity RCT and 2026 redesign, via [scienceblog](https://scienceblog.com/?p=582102) and [Conffab](https://conffab.com/?p=10163)
 - Birgitta Böckeler, [Understanding Spec-Driven-Development: Kiro, spec-kit, and Tessl](https://www.martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)
 - SecurityWeek, [Claude Code, Gemini CLI, GitHub Copilot agents vulnerable to prompt injection via comments](https://www.securityweek.com/claude-code-gemini-cli-github-copilot-agents-vulnerable-to-prompt-injection-via-comments/)
+
+Current tooling (checked October 2026):
+
+- Claude Code docs, [Keep Claude working toward a goal (`/goal`)](https://code.claude.com/docs/en/goal)
+- Claude Code docs, [What's new](https://code.claude.com/docs/en/whats-new) (weekly digests: auto mode, routines, Ultraplan, `/ultrareview`, dynamic workflows, security-guidance plugin, `claude plugin eval`) and the [changelog](https://code.claude.com/docs/en/changelog) (Code Review levels, forked subagents by default)
+- VentureBeat, [Claude Code's /goals separates the agent that works from the one that decides it's done](https://venturebeat.com/orchestration/claude-codes-goals-separates-the-agent-that-works-from-the-one-that-decides-its-done)
+- Addy Osmani, [The Factory Model](https://addyosmani.com/blog/factory-model/) (Feb 2026)
 
 Figures from StrongDM, OpenAI and Vercel are self-reported. Some details
 (Vercel's percentages, Horthy's talk, Gas Town costs) come from secondary
