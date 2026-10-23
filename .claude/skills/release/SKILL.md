@@ -58,11 +58,17 @@ so the README's `releases/latest/download/<asset>` links always work.
    (`--branch NAME` only starts a *fresh* branch from `origin/main`, and
    refuses one that already has other commits). Run `--dry-run` first to preview.
 
-4. **Get the PR merged.** Wait for the three CI checks to go green, then merge
-   it (merge commit). Don't merge while CI is red: fix the cause.
+4. **Get CI green, then hand the PR to the maintainer.** The bump changes
+   `Cargo.toml` and `Cargo.lock`, so it's a tier-2 PR: wait for the three CI
+   checks to go green (fix the cause if one goes red), then leave the merge to
+   the maintainer, unless they explicitly ask you to merge it (steward skill →
+   "Merging"). The release starts when it's merged. If you're not merging it,
+   stop here: report the PR URL and the version, say the release starts once
+   it's merged, and offer to watch it then.
 
-5. **Watch the release.** The merge to `main` starts the **Release** workflow:
-   Plan → three Bundle jobs (about 5–10 minutes) → Publish vX.Y.Z. Then verify:
+5. **Watch the release** (after the merge). The merge to `main` starts the
+   **Release** workflow: Plan → three Bundle jobs (about 5–10 minutes) →
+   Publish vX.Y.Z. Then verify:
    - the release has all 4 assets;
    - each `https://github.com/<owner>/<repo>/releases/latest/download/<asset>`
      answers 200/206 after redirects, e.g.
@@ -75,8 +81,8 @@ so the README's `releases/latest/download/<asset>` links always work.
 - **"Tag does not match Cargo.toml"**: a tag was pushed without bumping the
   version. Ask the user to delete the bad tag and its empty release (Releases →
   the release → Delete; then the tag under Tags). Then bump to that version
-  with the script and merge. Tags can't be removed from a session that may only
-  push its own branch, so the user does the deletion.
+  with the script and get its PR merged (step 4). Tags can't be removed from
+  a session that may only push its own branch, so the user does the deletion.
 - **"vX.Y.Z already exists, nothing new to release"** in the Plan summary: the
   version wasn't bumped, or a stale tag holds that version. Bump again, or
   delete the stale tag and release, then run the Release workflow from the
