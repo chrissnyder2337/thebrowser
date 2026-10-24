@@ -1,0 +1,71 @@
+name: Mutants
+
+# Deliberately broken builds for checking the black-box tester
+# (docs/software-factory.md, Phase 1.6): each patch in tools/blackbox/mutants/
+# is applied to main and bundled as artifact mutant-<name>, which
+# blackbox.yml can test instead of a PR's bundle. No Claude, no secrets.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # Must match the `cef` pin in Cargo.toml.
+  CEF_CRATE_VERSION: "154.5.0"
+
+jobs:
+  mutant:
+    name: Mutant (${{ matrix.mutant }})
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # Keep in step with tools/blackbox/mutants/ and blackbox.yml's build input.
+      matrix:
+        mutant:
+          - blank-toolbar
+          - retro-never-applies
+          - dialup-no-throttle
+          - status-frozen
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Apply the patch
+        run: git apply --verbose "tools/blackbox/mutants/${{ matrix.mutant }}.patch"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq libglib2.0-dev ninja-build
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Set up CEF
+        uses: ./.github/actions/setup-cef
+        with:
+          version: ${{ env.CEF_CRATE_VERSION }}
+
+      - name: Cache bundle-cef-app
+        id: bundler
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin/bundle-cef-app
+          key: bundle-cef-app-${{ env.CEF_CRATE_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Install bundle-cef-app
+        if: steps.bundler.outputs.cache-hit != 'true'
+        run: cargo install cef --version "=$CEF_CRATE_VERSION" --bin bundle-cef-app --locked
+
+      - name: Bundle
+        run: bundle-cef-app lantern -o target/bundle --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutant-${{ matrix.mutant }}
+          path: target/bundle
+          retention-days: 30

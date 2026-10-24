@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+# bb: drive a Lantern bundle under Xvfb for the black-box tester
+# (docs/software-factory.md, Phase 1.6).
+#
+#   bb start [--url=URL] [--retro=LOOK]   start Lantern (stops a running one first)
+#   bb shot                               save a screenshot, print its path (shots/NNNN.png)
+#   bb click X Y                          left-click at screen pixel X,Y
+#   bb type TEXT                          type TEXT
+#   bb key KEYS                           press keys, xdotool names: ctrl+l Return BackSpace
+#   bb stop                               close Lantern
+#
+# The bundle under test is untrusted (a PR's code) and runs on the machine
+# that holds the tester's token, so `bb start`:
+#   - accepts only the user-facing flags --url= and --retro=, never a
+#     debugging flag such as --remote-debugging-port;
+#   - runs Lantern as the unprivileged user $BB_USER through `env -i`, with
+#     only DISPLAY and a scratch HOME;
+#   - firewalls that user (iptables owner match) to loopback only, minus DNS
+#     and any loopback egress proxy named in the caller's environment.
+# Root is needed for that; bb uses sudo when not run as root.
+#
+# Environment (set by the workflow, not by the tester):
+#   BB_BUNDLE   the Lantern bundle directory (default: ./bundle next to bb)
+#   BB_DISPLAY  the X display (default :99; bb starts Xvfb there if needed)
+#   BB_USER     the user Lantern runs as (default lantern-bb)
+set -euo pipefail
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+bundle="${BB_BUNDLE:-$here/bundle}"
+display="${BB_DISPLAY:-:99}"
+user="${BB_USER:-lantern-bb}"
+shots="$here/shots"
+state="/tmp/bb-state"
+run="/tmp/bb-run"
+
+die() { echo "bb: $*" >&2; exit 1; }
+as_root() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo -n "$@"; fi; }
+x() { DISPLAY="$display" "$@"; }
+
+usage() { sed -n '5,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+
+ensure_xvfb() {
+  if x xdotool getdisplaygeometry >/dev/null 2>&1; then return; fi
+  mkdir -p "$state"
+  Xvfb "$display" -screen 0 1280x800x24 -nolisten tcp >"$state/xvfb.log" 2>&1 &
+  echo $! >"$state/xvfb.pid"
+  for _ in $(seq 50); do
+    x xdotool getdisplaygeometry >/dev/null 2>&1 && return
+    sleep 0.1
+  done
+  die "Xvfb didn't start on $display"
+}
+
+# Ports of the proxies in the caller's environment: one listening locally
+# would let the build under test out through localhost.
+proxy_ports() {
+  local p
+  for p in "${HTTPS_PROXY:-}" "${https_proxy:-}" "${HTTP_PROXY:-}" "${http_proxy:-}" \
+    "${ALL_PROXY:-}" "${all_proxy:-}"; do
+    [[ "$p" =~ :([0-9]+)/*$ ]] && echo "${BASH_REMATCH[1]}"
+  done | sort -u
+}
+
+# The user, and its firewall: loopback only, rules rebuilt on every start.
+ensure_jail() {
+  id "$user" >/dev/null 2>&1 \
+    || as_root useradd --system --no-create-home --shell /usr/sbin/nologin "$user"
+  local uid port ipt
+  uid="$(id -u "$user")"
+  for ipt in iptables ip6tables; do
+    local loopback=127.0.0.0/8
+    [ "$ipt" = iptables ] || loopback=::1/128
+    as_root "$ipt" -N bb-jail 2>/dev/null || as_root "$ipt" -F bb-jail
+    for port in $(proxy_ports); do
+      as_root "$ipt" -A bb-jail -o lo -p tcp --dport "$port" -j REJECT
+    done
+    # A local resolver (systemd-resolved on 127.0.0.53) would forward lookups,
+    # and so data, to the outside.
+    as_root "$ipt" -A bb-jail -o lo -p udp --dport 53 -j REJECT
+    as_root "$ipt" -A bb-jail -o lo -p tcp --dport 53 -j REJECT
+    # Loopback addresses only: the host's other addresses also route via lo.
+    as_root "$ipt" -A bb-jail -o lo -d "$loopback" -j ACCEPT
+    as_root "$ipt" -A bb-jail -j REJECT
+    as_root "$ipt" -C OUTPUT -m owner --uid-owner "$uid" -j bb-jail 2>/dev/null \
+      || as_root "$ipt" -I OUTPUT 1 -m owner --uid-owner "$uid" -j bb-jail
+  done
+}
+
+cmd_stop() {
+  if id "$user" >/dev/null 2>&1; then
+    as_root pkill -TERM -u "$user" 2>/dev/null || true
+    for _ in $(seq 30); do
+      pgrep -u "$user" >/dev/null || break
+      sleep 0.1
+    done
+    as_root pkill -KILL -u "$user" 2>/dev/null || true
+  fi
+  as_root rm -rf "$run"
+}
+
+cmd_start() {
+  local url="" retro="" arg
+  for arg in "$@"; do
+    case "$arg" in
+      --url=?*) [ -z "$url" ] || die "--url= given twice"; url="${arg#--url=}" ;;
+      --retro=?*) [ -z "$retro" ] || die "--retro= given twice"; retro="${arg#--retro=}" ;;
+      *) die "bb start takes only --url= and --retro= (got: $arg)" ;;
+    esac
+  done
+  [ -z "$retro" ] || [[ "$retro" =~ ^[a-z0-9-]+$ ]] || die "bad --retro= value"
+  [ -x "$bundle/lantern" ] || die "no Lantern bundle at $bundle (set BB_BUNDLE)"
+  command -v xdotool >/dev/null || die "xdotool not found (apt install xdotool)"
+  command -v import >/dev/null || die "import not found (apt install imagemagick)"
+
+  cmd_stop
+  ensure_xvfb
+  ensure_jail
+
+  # A private copy of the bundle and a scratch HOME the user owns: the
+  # bundle's own directory may sit under a home the user can't read.
+  as_root mkdir -p "$run"
+  as_root cp -a "$bundle" "$run/bundle"
+  as_root mkdir "$run/home"
+  as_root chown -R "$user": "$run"
+  as_root chmod 700 "$run"
+
+  local args=(--no-sandbox --disable-gpu)
+  [ -z "$url" ] || args+=("--url=$url")
+  [ -z "$retro" ] || args+=("--retro=$retro")
+  as_root setsid runuser -u "$user" -- \
+    env -i DISPLAY="$display" HOME="$run/home" "$run/bundle/lantern" "${args[@]}" \
+    >"$state/lantern.log" 2>&1 </dev/null &
+  local launcher=$!
+
+  # Ready once a Lantern window is mapped, plus a moment to paint.
+  for _ in $(seq 150); do
+    if x xdotool search --onlyvisible --name . >/dev/null 2>&1; then
+      sleep 2
+      echo "bb: started"
+      return
+    fi
+    kill -0 "$launcher" 2>/dev/null || { tail -20 "$state/lantern.log" >&2; die "Lantern exited"; }
+    sleep 0.2
+  done
+  tail -20 "$state/lantern.log" >&2
+  die "no Lantern window after 30s"
+}
+
+cmd_shot() {
+  [ $# -eq 0 ] || usage
+  mkdir -p "$shots"
+  # Numbered after the highest existing shot, so names never repeat.
+  local last file
+  last="$(find "$shots" -maxdepth 1 -name '[0-9][0-9][0-9][0-9].png' -printf '%f\n' | sort | tail -1)"
+  last="${last%.png}"
+  file="shots/$(printf '%04d' $((10#${last:-0} + 1))).png"
+  x import -window root "$here/$file"
+  echo "$file"
+}
+
+num() { [[ "$1" =~ ^[0-9]{1,5}$ ]] || die "not a pixel coordinate: $1"; }
+
+case "${1:-}" in
+  start) shift; mkdir -p "$state"; cmd_start "$@" ;;
+  stop) shift; [ $# -eq 0 ] || usage; cmd_stop; echo "bb: stopped" ;;
+  shot) shift; cmd_shot "$@" ;;
+  click) shift; [ $# -eq 2 ] || usage; num "$1"; num "$2"
+    x xdotool mousemove --sync "$1" "$2" click 1; sleep 0.5 ;;
+  type) shift; [ $# -eq 1 ] || usage; x xdotool type --delay 40 -- "$1"; sleep 0.3 ;;
+  key) shift; [ $# -ge 1 ] || usage; x xdotool key --delay 60 -- "$@"; sleep 0.3 ;;
+  *) usage ;;
+esac

@@ -344,11 +344,23 @@ click missed, and a second click aimed using the screenshot hit. This used
 the bundled Chromium. The steward skill (added to `main` since) documents
 running Lantern itself under Xvfb with `--no-sandbox --disable-gpu` and
 taking screenshots with `import`, which is good evidence the CEF bundle works
-too. Driving it with `xdotool` is still to be tried, and is the first step of
-Phase 1.6. The steward recipe also opens a DevTools port
+too. The steward recipe also opens a DevTools port
 (`--remote-debugging-port`). That's fine for implementing sessions, but the
 black-box tester must never start Lantern with it, since DevTools exposes the
 page internals.
+
+**Driving the CEF bundle, checked (2026-10-24).** In a cloud session, the
+release bundle ran under Xvfb through `tools/blackbox/bb` as an unprivileged
+user (`env -i`, only `DISPLAY` and a scratch `HOME`, iptables limited to
+localhost). The steps that worked: a fixture page loaded, a click on Home
+opened the start page, and settings changed through the status bar. A
+variable set in `bb`'s caller wasn't in Lantern's `/proc/<pid>/environ`, and
+the user couldn't reach an outside host, directly or through the session's
+loopback proxy. Each of the four broken builds showed its fault in a
+screenshot. So Phase 1.6 is built (`blackbox.yml`, `mutants.yml`,
+`tools/blackbox/`, [docs/blackbox-scenarios.md](blackbox-scenarios.md)). It
+gates nothing until the private scenarios repo and its secrets exist and the
+judge has caught every broken build.
 
 **Usage budget.** Interactive work, cloud sessions, routines and Actions
 running on your Pro token all draw from the same Pro usage. When it runs

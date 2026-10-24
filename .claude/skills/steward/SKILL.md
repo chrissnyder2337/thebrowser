@@ -125,6 +125,27 @@ pages or the retro looks. On Linux without a display:
 (add `--retro=<look>` for the looks). Inspect pages over the DevTools port,
 and take screenshots with `import -window root`. Toolbar and status bar are
 `data:` pages. Test on a real, long page such as a Wikipedia article.
+The DevTools port is for implementing sessions only. The black-box tester
+never gets it: `tools/blackbox/bb start` takes only `--url=` and `--retro=`,
+and a change to `bb` must keep it that way.
+
+## Black-box test
+
+`blackbox.yml` runs the hidden scenarios against a PR's bundle
+([docs/blackbox-scenarios.md](../../../docs/blackbox-scenarios.md)). It
+holds the maintainer's Claude token and waits on the `blackbox` environment,
+so only the maintainer starts it (**Run workflow** on `main`, with the PR
+number). It is never triggered from a PR.
+
+- **When to ask for it:** on tier-2 PRs, and on tier-1 PRs that change what
+  users see (retro looks, chrome or internal pages, toolbar commands,
+  dial-up). Not on tier 0, and not on every push: say in the PR description
+  that it's due, once CI is green on the head you want tested.
+- **A failing verdict** comes back as the PR comment's ids and screenshots
+  only. Fix what the screenshots show; don't ask for the scenario text.
+- **Checking the checker:** whenever scenarios or `tools/blackbox/` change,
+  and monthly, dispatch `mutants.yml`, then `blackbox.yml` once per broken
+  build. Each one must fail a scenario.
 
 ## How CI is wired, and how it has failed
 
