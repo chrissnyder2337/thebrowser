@@ -9,8 +9,10 @@
 #   - a removed or changed line in a Rust test module (from the file's first
 #     `#[cfg(test)]` on);
 #   - an added line that skips tests (`#[ignore]`, `test.skip`, `.fixme`, ...);
-#   - any change to the suite's settings or to this guard: playwright.config.js,
-#     package.json, tools/oracle-guard.sh.
+#   - any change to the suite's settings, to this guard or to the workflows
+#     that run it: playwright.config.js, package.json, tools/oracle-guard.sh,
+#     .github/workflows/ (a pull_request run uses the PR's own workflow, so
+#     editing ci.yml could otherwise drop the guard job).
 # Adding goldens, fixtures, tests and assertions is always fine.
 #
 # Usage: tools/oracle-guard.sh [base]   (default origin/main; compares the
@@ -29,7 +31,7 @@ merge_base="$(git merge-base "$base" HEAD)" || {
 
 # Added lines that switch tests off.
 skips='#\[ignore|\.(skip|fixme|fail|only)\(|test\.describe\.(skip|fixme)|forbidOnly|updateSnapshots'
-config='^(playwright\.config\.js|package\.json|tools/oracle-guard\.sh)$'
+config='^(playwright\.config\.js|package\.json|tools/oracle-guard\.sh|\.github/workflows/.*)$'
 
 # Diffs are read into variables first, so a failing git command stops the
 # script (exit 2) instead of looking like an empty diff.
@@ -45,7 +47,7 @@ while IFS=$'\t' read -r status path; do
   kind="modified"
   [ "$status" = "D" ] && kind="deleted"
   if [[ "$path" =~ $config ]]; then
-    oracle+=("$path: test settings or guard $kind")
+    oracle+=("$path: test settings, guard or workflow $kind")
     continue
   fi
   case "$path" in
