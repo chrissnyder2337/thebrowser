@@ -149,8 +149,9 @@ release bundle on Linux (uploaded as a build artifact), the Playwright suite
 in the pinned container, the smoke test on that bundle, and builds on macOS
 and Windows. It needs Rust 1.88 or newer. On pull requests the **Oracle
 guard** fails a change that touches `src/` or `ui/` and also modifies or
-deletes existing goldens or assertions, or changes a workflow; only the maintainer's approval on the
-`oracle` GitHub Environment overrides it.
+deletes existing goldens or assertions, or changes the CI definition under
+`.github/workflows/` or `.github/actions/`; only the maintainer's approval on
+the `oracle` GitHub Environment overrides it.
 
 ### Releasing
 

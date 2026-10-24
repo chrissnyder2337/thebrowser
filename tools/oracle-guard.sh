@@ -9,10 +9,13 @@
 #   - a removed or changed line in a Rust test module (from the file's first
 #     `#[cfg(test)]` on);
 #   - an added line that skips tests (`#[ignore]`, `test.skip`, `.fixme`, ...);
-#   - any change to the suite's settings, to this guard or to the workflows
-#     that run it: playwright.config.js, package.json, tools/oracle-guard.sh,
-#     .github/workflows/ (a pull_request run uses the PR's own workflow, so
-#     editing ci.yml could otherwise drop the guard job).
+#   - any change to the suite's settings or to this guard:
+#     playwright.config.js, package.json, tools/oracle-guard.sh;
+#   - any change to the CI definition (.github/workflows/, .github/actions/),
+#     added files included: a pull_request run uses the PR's own copy, so
+#     editing it could drop the guard job. This catches an edited ci.yml that
+#     still runs the guard honestly; a ci.yml rewritten to pass needs a
+#     ruleset requiring the maintainer's review on .github/ to stop it.
 # Adding goldens, fixtures, tests and assertions is always fine.
 #
 # Usage: tools/oracle-guard.sh [base]   (default origin/main; compares the
@@ -31,7 +34,8 @@ merge_base="$(git merge-base "$base" HEAD)" || {
 
 # Added lines that switch tests off.
 skips='#\[ignore|\.(skip|fixme|fail|only)\(|test\.describe\.(skip|fixme)|forbidOnly|updateSnapshots'
-config='^(playwright\.config\.js|package\.json|tools/oracle-guard\.sh|\.github/workflows/.*)$'
+config='^(playwright\.config\.js|package\.json|tools/oracle-guard\.sh)$'
+ci_files='^\.github/(workflows|actions)/'
 
 # Diffs are read into variables first, so a failing git command stops the
 # script (exit 2) instead of looking like an empty diff.
@@ -43,11 +47,16 @@ rust_tests=()
 while IFS=$'\t' read -r status path; do
   [ -n "$path" ] || continue
   case "$path" in src/* | ui/*) product+=("$path") ;; esac
-  [ "$status" = "A" ] && continue
   kind="modified"
   [ "$status" = "D" ] && kind="deleted"
+  [ "$status" = "A" ] && kind="added"
+  if [[ "$path" =~ $ci_files ]]; then
+    oracle+=("$path: CI definition $kind")
+    continue
+  fi
+  [ "$status" = "A" ] && continue
   if [[ "$path" =~ $config ]]; then
-    oracle+=("$path: test settings, guard or workflow $kind")
+    oracle+=("$path: test settings or guard $kind")
     continue
   fi
   case "$path" in

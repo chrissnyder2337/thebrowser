@@ -72,8 +72,8 @@ rewrite them to pass.
 - **The lock is CI's `Oracle guard` check** (`tools/oracle-guard.sh`, run in
   `ci.yml`). It fails a PR that changes `src/` or `ui/` and also modifies or
   deletes an existing golden, deletes an existing test file, removes or
-  changes an existing assertion, or changes a workflow under
-  `.github/workflows/`. Its only override is the
+  changes an existing assertion, or changes the CI definition under
+  `.github/workflows/` or `.github/actions/`. Its only override is the
   `Oracle override (maintainer approval)` job, which waits on the `oracle`
   GitHub Environment until the maintainer approves it. A label or a
   workflow input never skips it, and the guard isn't edited to pass.

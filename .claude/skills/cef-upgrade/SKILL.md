@@ -69,5 +69,8 @@ unless the release requires it, and call out any change there in the PR.
 - Run the bundle smoke test, `tests/smoke.sh target/bundle`: it starts the
   release bundle under `xvfb-run` once per retro look and must print `ok`
   for each.
+- An upgrade that also fixes API drift in `src/` changes `ci.yml` and
+  `release.yml` too, so CI's `Oracle guard` waits for the maintainer's
+  approval on the `oracle` environment. Say so in the PR; that's expected.
 - In the PR's **Testing**, list what ran on Linux and say plainly that macOS
   and Windows were type-checked and built by CI, not run.
