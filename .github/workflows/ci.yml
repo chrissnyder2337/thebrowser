@@ -153,8 +153,9 @@ jobs:
           tests/smoke.sh target/bundle
 
   # The oracle guard (tools/oracle-guard.sh): a PR that changes src/ or ui/
-  # and also changes existing goldens or assertions needs the maintainer's
-  # approval on the "oracle" environment. No label or input skips it.
+  # and also changes existing goldens, assertions, the test settings or the CI
+  # definition needs the maintainer's approval on the "oracle" environment.
+  # No label or input skips it.
   oracle-check:
     name: Oracle check
     if: github.event_name == 'pull_request'
@@ -215,7 +216,7 @@ jobs:
           echo "check=$CHECK result=$RESULT approval=$APPROVAL"
           if [ "$CHECK" = "success" ] && [ "$RESULT" = "clean" ]; then exit 0; fi
           if [ "$CHECK" = "success" ] && [ "$RESULT" = "changed" ] && [ "$APPROVAL" = "success" ]; then exit 0; fi
-          echo "::error::Existing goldens or assertions changed together with src/ or ui/, without approval on the oracle environment."
+          echo "::error::Existing goldens, assertions, test settings or CI files changed together with src/ or ui/, without approval on the oracle environment (the Oracle check log lists them)."
           exit 1
 
   build:
