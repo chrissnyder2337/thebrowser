@@ -125,7 +125,14 @@ for (const look of LOOKS) {
       } else {
         // GeoCities pins its bar to the bottom of the window; the page is
         // padded so its own footer can still scroll clear of it.
-        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        // Without the page's own bottom margins, only the look's padding
+        // keeps the last line clear of the bar.
+        await page.evaluate(() => {
+          document.body.style.setProperty("padding-bottom", "0", "important");
+          document.body.style.setProperty("margin-bottom", "0", "important");
+          document.getElementById("late").style.setProperty("margin", "0", "important");
+          window.scrollTo(0, document.documentElement.scrollHeight);
+        });
         const { bottom, height } = await page.evaluate(() => ({
           bottom: document.getElementById("late").getBoundingClientRect().bottom,
           height: window.innerHeight,

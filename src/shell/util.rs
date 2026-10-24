@@ -434,7 +434,8 @@ mod tests {
             }
 
             #[test]
-            fn hosts_are_lowercase(s in any::<String>()) {
+            // URL-shaped input, or url_host would almost always see no "://".
+            fn hosts_are_lowercase(s in "[a-zA-Z]{1,6}://([^/?#@]{0,8}@)?[^/?#]{0,20}([/?#].{0,10})?") {
                 if let Some(host) = url_host(&s) {
                     prop_assert!(!host.is_empty());
                     prop_assert_eq!(host.to_ascii_lowercase(), host.clone());
