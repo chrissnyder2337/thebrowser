@@ -1,0 +1,245 @@
+name: Black-box test
+
+# The clean-room black-box tester (docs/software-factory.md, Phase 1.6).
+# Claude Code drives a Lantern bundle under Xvfb through tools/blackbox/bb and
+# judges the private scenarios in vars.SCENARIOS_REPO. Started by hand for a
+# PR (or a mutants.yml broken build), and weekly on main; never on
+# pull_request, so a PR can't change the job that holds the token. The
+# runner gets no Lantern source, no CLAUDE.md and no diff: only the built
+# bundle, tools/blackbox/ from main, and the scenarios.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number to test (empty tests main's latest CI bundle)
+        required: false
+        type: string
+      build:
+        description: Bundle to test (pr is the PR's, or main's; the rest are mutants.yml broken builds)
+        required: true
+        type: choice
+        default: pr
+        options:
+          - pr
+          - blank-toolbar
+          - retro-never-applies
+          - dialup-no-throttle
+          - status-frozen
+  schedule:
+    - cron: "23 7 * * 1"
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+concurrency:
+  group: blackbox
+  cancel-in-progress: false
+
+jobs:
+  blackbox:
+    name: Black-box scenarios
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: blackbox
+    timeout-minutes: 150
+    env:
+      PR: ${{ inputs.pr }}
+      BUILD: ${{ inputs.build || 'pr' }}
+      REPO: ${{ github.repository }}
+      FIXTURES_URL: http://127.0.0.1:8000/
+    steps:
+      - name: Check inputs
+        run: |
+          if [ -n "$PR" ] && ! [[ "$PR" =~ ^[0-9]+$ ]]; then
+            echo "::error::pr must be a pull request number"
+            exit 1
+          fi
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq xvfb xdotool imagemagick
+
+      # Only tools/blackbox/ (no-cone, so not even the root files), from main.
+      - name: Check out the tester from main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          sparse-checkout: /tools/blackbox/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Check out the scenarios
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.SCENARIOS_REPO }}
+          ssh-key: ${{ secrets.SCENARIOS_DEPLOY_KEY }}
+          path: scenarios-checkout
+          persist-credentials: false
+
+      # The workspace keeps only ./bb (and shots/ once it runs). The
+      # scenarios, the judge prompt and the bundle move to a private work
+      # directory, and the runner's home is closed to other users, since the
+      # bundle under test runs as one (bb start).
+      - name: Set up the clean room
+        run: |
+          bb_work="$RUNNER_TEMP/bb"
+          mkdir -p "$bb_work"
+          mv scenarios-checkout "$bb_work/scenarios"
+          cp tools/blackbox/judge-prompt.md tools/blackbox/verdicts.py "$bb_work/"
+          ln -s tools/blackbox/bb bb
+          chmod go-rwx "$HOME" "$RUNNER_TEMP"
+          {
+            echo "BB=$bb_work"
+            echo "BB_BUNDLE=$bb_work/bundle"
+          } >> "$GITHUB_ENV"
+
+      - name: Download the bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$BUILD" = pr ]; then
+            artifact=lantern-linux-x86_64
+            if [ -n "$PR" ]; then
+              # The PR's current head, so a stale green run isn't tested.
+              sha="$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)"
+              run="$(gh run list --repo "$REPO" --workflow ci.yml --commit "$sha" --status success \
+                --limit 1 --json databaseId -q '.[0].databaseId')"
+              where="PR #$PR's head $sha"
+            else
+              run="$(gh run list --repo "$REPO" --workflow ci.yml --branch main --event push --status success \
+                --limit 1 --json databaseId -q '.[0].databaseId')"
+              where="main"
+            fi
+          else
+            artifact="mutant-$BUILD"
+            run="$(gh run list --repo "$REPO" --workflow mutants.yml --branch main --status success \
+              --limit 1 --json databaseId -q '.[0].databaseId')"
+            where="mutants.yml on main"
+          fi
+          if [ -z "$run" ]; then
+            echo "::error::No successful run to take $artifact from ($where)."
+            exit 1
+          fi
+          echo "Testing $artifact from run $run ($where)"
+          gh run download "$run" --repo "$REPO" --name "$artifact" --dir "$BB_BUNDLE"
+          # Artifacts don't keep file modes.
+          chmod +x "$BB_BUNDLE/lantern" "$BB_BUNDLE"/*.so*
+
+      - name: Serve the fixtures
+        run: |
+          nohup python3 -m http.server 8000 --bind 127.0.0.1 --directory "$BB/scenarios/fixtures" \
+            > "$BB/fixtures.log" 2>&1 &
+          for _ in $(seq 50); do
+            curl -sf -o /dev/null "$FIXTURES_URL" && exit 0
+            sleep 0.1
+          done
+          echo "::error::The fixture server didn't start."
+          exit 1
+
+      # Three passes: every scenario once, then the failures twice more
+      # (verdicts.py decides who runs). The brief, with the scenario text, is
+      # written to shots/brief.md, the one place the judge can read, so it
+      # never appears in the prompt input or the log.
+      - name: Brief pass 1
+        id: brief1
+        run: echo "ids=$(python3 -I "$BB/verdicts.py" brief 1)" >> "$GITHUB_OUTPUT"
+
+      - name: Judge pass 1
+        id: judge1
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          show_full_output: false
+          prompt: Read shots/brief.md and follow it.
+          claude_args: >-
+            --max-turns 200
+            --allowedTools "Bash(./bb:*),Read(./shots/**)"
+            --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
+
+      - name: Record pass 1
+        if: always() && steps.brief1.outcome == 'success'
+        env:
+          EXEC_FILE: ${{ steps.judge1.outputs.execution_file }}
+        run: |
+          ./bb stop || true
+          python3 -I "$BB/verdicts.py" record 1 "$EXEC_FILE"
+
+      - name: Brief pass 2
+        id: brief2
+        run: echo "ids=$(python3 -I "$BB/verdicts.py" brief 2)" >> "$GITHUB_OUTPUT"
+
+      - name: Judge pass 2
+        id: judge2
+        if: steps.brief2.outputs.ids != ''
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          show_full_output: false
+          prompt: Read shots/brief.md and follow it.
+          claude_args: >-
+            --max-turns 200
+            --allowedTools "Bash(./bb:*),Read(./shots/**)"
+            --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
+
+      - name: Record pass 2
+        if: always() && steps.brief2.outputs.ids != ''
+        env:
+          EXEC_FILE: ${{ steps.judge2.outputs.execution_file }}
+        run: |
+          ./bb stop || true
+          python3 -I "$BB/verdicts.py" record 2 "$EXEC_FILE"
+
+      - name: Brief pass 3
+        id: brief3
+        run: echo "ids=$(python3 -I "$BB/verdicts.py" brief 3)" >> "$GITHUB_OUTPUT"
+
+      - name: Judge pass 3
+        id: judge3
+        if: steps.brief3.outputs.ids != ''
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          show_full_output: false
+          prompt: Read shots/brief.md and follow it.
+          claude_args: >-
+            --max-turns 200
+            --allowedTools "Bash(./bb:*),Read(./shots/**)"
+            --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
+
+      - name: Record pass 3
+        if: always() && steps.brief3.outputs.ids != ''
+        env:
+          EXEC_FILE: ${{ steps.judge3.outputs.execution_file }}
+        run: |
+          ./bb stop || true
+          python3 -I "$BB/verdicts.py" record 3 "$EXEC_FILE"
+
+      # verdicts.py removes each brief before moving a pass's shots here.
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blackbox-shots
+          path: ${{ runner.temp }}/bb/shots
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Ids and verdicts only: never scenario text.
+      - name: Summary
+        if: always() && steps.brief1.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result="$(python3 -I "$BB/verdicts.py" summary)"
+          cat "$BB/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$PR" ] && [ "$BUILD" = pr ]; then
+            gh pr comment "$PR" --repo "$REPO" --body-file "$BB/summary.md"
+          fi
+          [ "$result" = pass ]

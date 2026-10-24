@@ -1,6 +1,6 @@
 ---
 name: cef-upgrade
-description: Move Lantern to a new CEF / `cef` crate release — the Cargo.toml pin, Cargo.lock, CEF_CRATE_VERSION in both workflows, the README version line and the local CEF export — then rebuild, fix API drift on all three platforms and run the app. Use when asked to upgrade, bump or update CEF or Chromium, or when a new `cef` crate version is out.
+description: Move Lantern to a new CEF / `cef` crate release — the Cargo.toml pin, Cargo.lock, CEF_CRATE_VERSION in the workflows, the README version line and the local CEF export — then rebuild, fix API drift on all three platforms and run the app. Use when asked to upgrade, bump or update CEF or Chromium, or when a new `cef` crate version is out.
 ---
 
 # Upgrading CEF
@@ -27,6 +27,7 @@ version. Read the cef-rs release notes for API changes.
 | `Cargo.lock` | `cargo update -p cef --precise <new>`; `cef-dll-sys` follows |
 | `.github/workflows/ci.yml` | `env.CEF_CRATE_VERSION` |
 | `.github/workflows/release.yml` | `env.CEF_CRATE_VERSION` (the one release.yml change allowed, and it needs the maintainer's eye) |
+| `.github/workflows/mutants.yml` | `env.CEF_CRATE_VERSION` |
 | `README.md` | "Building and running": the pin, CEF and Chromium versions, and the `bundle-cef-app` install line |
 
 `CEF_CRATE_VERSION` keys the CEF and `bundle-cef-app` caches in

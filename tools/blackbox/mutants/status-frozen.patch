@@ -1,0 +1,12 @@
+diff --git a/ui/status.html b/ui/status.html
+index 1bf4b61..acdee5a 100644
+--- a/ui/status.html
++++ b/ui/status.html
+@@ -72,6 +72,7 @@
+ 
+   window.lantern = {
+     update: function (s) {
++      return;
+       if ("text" in s) { msg.textContent = s.text; msg.parentNode.title = s.text; }
+       if ("progress" in s) setBlocks(Math.round(Math.max(0, Math.min(1, s.progress)) * BLOCKS));
+       if ("loading" in s) meter.classList.toggle("on", !!s.loading);

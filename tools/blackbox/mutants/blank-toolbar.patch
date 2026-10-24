@@ -1,0 +1,14 @@
+diff --git a/src/shell/pages.rs b/src/shell/pages.rs
+index 47f0a97..a37896c 100644
+--- a/src/shell/pages.rs
++++ b/src/shell/pages.rs
+@@ -120,7 +120,8 @@ pub fn toolbar_uri() -> String {
+         ));
+     });
+     let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
+-    html_uri(&fill(TOOLBAR_HTML, &vars))
++    let _ = fill(TOOLBAR_HTML, &vars);
++    html_uri("<!doctype html><title>toolbar</title><body></body>")
+ }
+ 
+ pub fn status_uri() -> String {

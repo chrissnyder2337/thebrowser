@@ -363,6 +363,7 @@ resources/mac, resources/win    bundle resources and generated .icns/.ico
 tools/make_icons.py             regenerates all app icons from ui/lantern.txt
 tools/bump-version.sh           bumps the version and opens the release pull request
 tools/oracle-guard.sh           CI check: product changes may not rewrite existing goldens or assertions
+tools/blackbox/                 black-box tester: the bb driver, judge prompt and broken-build patches (docs/blackbox-scenarios.md)
 examples/dump-pages.rs          writes the chrome and internal pages to files for Playwright
 tests/web/, tests/fixtures/     Playwright tests and the fixture pages they style
 tests/golden/                   golden screenshots (new files only; see the steward skill)
