@@ -37,7 +37,7 @@ die() { echo "bb: $*" >&2; exit 1; }
 as_root() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo -n "$@"; fi; }
 x() { DISPLAY="$display" "$@"; }
 
-usage() { sed -n '4,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2; exit 2; }
+usage() { sed -n '5,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2; exit 2; }
 
 ensure_xvfb() {
   if x xdotool getdisplaygeometry >/dev/null 2>&1; then return; fi
@@ -51,12 +51,13 @@ ensure_xvfb() {
   die "Xvfb didn't start on $display"
 }
 
-# Loopback ports of HTTP(S) proxies in the caller's environment: a local
-# egress proxy would let the build under test out through localhost.
+# Ports of the proxies in the caller's environment: one listening locally
+# would let the build under test out through localhost.
 proxy_ports() {
   local p
-  for p in "${HTTPS_PROXY:-}" "${https_proxy:-}" "${HTTP_PROXY:-}" "${http_proxy:-}" "${ALL_PROXY:-}"; do
-    [[ "$p" =~ ^[a-z0-9]+://([^@/]*@)?(127\.[0-9.]+|localhost|\[::1\]):([0-9]+) ]] && echo "${BASH_REMATCH[3]}"
+  for p in "${HTTPS_PROXY:-}" "${https_proxy:-}" "${HTTP_PROXY:-}" "${http_proxy:-}" \
+    "${ALL_PROXY:-}" "${all_proxy:-}"; do
+    [[ "$p" =~ :([0-9]+)/*$ ]] && echo "${BASH_REMATCH[1]}"
   done | sort -u
 }
 
@@ -67,6 +68,8 @@ ensure_jail() {
   local uid port ipt
   uid="$(id -u "$user")"
   for ipt in iptables ip6tables; do
+    local loopback=127.0.0.0/8
+    [ "$ipt" = iptables ] || loopback=::1/128
     as_root "$ipt" -N bb-jail 2>/dev/null || as_root "$ipt" -F bb-jail
     for port in $(proxy_ports); do
       as_root "$ipt" -A bb-jail -o lo -p tcp --dport "$port" -j REJECT
@@ -75,7 +78,8 @@ ensure_jail() {
     # and so data, to the outside.
     as_root "$ipt" -A bb-jail -o lo -p udp --dport 53 -j REJECT
     as_root "$ipt" -A bb-jail -o lo -p tcp --dport 53 -j REJECT
-    as_root "$ipt" -A bb-jail -o lo -j ACCEPT
+    # Loopback addresses only: the host's other addresses also route via lo.
+    as_root "$ipt" -A bb-jail -o lo -d "$loopback" -j ACCEPT
     as_root "$ipt" -A bb-jail -j REJECT
     as_root "$ipt" -C OUTPUT -m owner --uid-owner "$uid" -j bb-jail 2>/dev/null \
       || as_root "$ipt" -I OUTPUT 1 -m owner --uid-owner "$uid" -j bb-jail

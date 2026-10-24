@@ -135,11 +135,11 @@ def summary():
         ok = passed
         head = "All scenarios passed." if passed else "Some scenarios didn't pass; the maintainer reviews the screenshots."
     else:
-        # A broken build should fail something; passing it means the judge or
-        # the scenarios need fixing before the tester is trusted again.
-        ok = not passed
+        # A broken build must fail a scenario; "unclear" (or a judge that
+        # never answered) doesn't count as catching it.
+        ok = "fail" in outcomes
         head = (f"Mutant `{build}` was caught." if ok
-                else f"**Mutant `{build}` passed every scenario: the judge or the scenarios need fixing.**")
+                else f"**Mutant `{build}` failed no scenario: the judge or the scenarios need fixing.**")
     lines = [
         "### Black-box test",
         "",

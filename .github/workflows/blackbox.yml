@@ -45,6 +45,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: blackbox
     timeout-minutes: 150
+    # The judge job holds the Claude token and runs PR code, so it can't
+    # write to the PR; the report job below posts the comment.
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      summary: ${{ steps.summary.outputs.summary }}
     env:
       PR: ${{ inputs.pr }}
       BUILD: ${{ inputs.build || 'pr' }}
@@ -115,8 +122,10 @@ jobs:
               where="main"
             fi
           else
+            # The newest run, even if another leg failed; this mutant's
+            # artifact exists only if its own leg built.
             artifact="mutant-$BUILD"
-            run="$(gh run list --repo "$REPO" --workflow mutants.yml --branch main --status success \
+            run="$(gh run list --repo "$REPO" --workflow mutants.yml --branch main --status completed \
               --limit 1 --json databaseId -q '.[0].databaseId')"
             where="mutants.yml on main"
           fi
@@ -162,7 +171,8 @@ jobs:
             --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
 
       - name: Record pass 1
-        if: always() && steps.brief1.outcome == 'success'
+        id: record1
+        if: ${{ !cancelled() && steps.brief1.outcome == 'success' }}
         env:
           EXEC_FILE: ${{ steps.judge1.outputs.execution_file }}
         run: |
@@ -171,11 +181,12 @@ jobs:
 
       - name: Brief pass 2
         id: brief2
+        if: ${{ !cancelled() && steps.record1.outcome == 'success' }}
         run: echo "ids=$(python3 -I "$BB/verdicts.py" brief 2)" >> "$GITHUB_OUTPUT"
 
       - name: Judge pass 2
         id: judge2
-        if: steps.brief2.outputs.ids != ''
+        if: ${{ !cancelled() && steps.brief2.outputs.ids != '' }}
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -188,7 +199,7 @@ jobs:
             --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
 
       - name: Record pass 2
-        if: always() && steps.brief2.outputs.ids != ''
+        if: ${{ !cancelled() && steps.brief2.outputs.ids != '' }}
         env:
           EXEC_FILE: ${{ steps.judge2.outputs.execution_file }}
         run: |
@@ -197,11 +208,12 @@ jobs:
 
       - name: Brief pass 3
         id: brief3
+        if: ${{ !cancelled() && steps.record1.outcome == 'success' }}
         run: echo "ids=$(python3 -I "$BB/verdicts.py" brief 3)" >> "$GITHUB_OUTPUT"
 
       - name: Judge pass 3
         id: judge3
-        if: steps.brief3.outputs.ids != ''
+        if: ${{ !cancelled() && steps.brief3.outputs.ids != '' }}
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -214,7 +226,7 @@ jobs:
             --disallowedTools "Read(./tools/**),Read(./.git/**),Glob,Grep,LS,Edit,MultiEdit,Write,NotebookEdit,WebFetch,WebSearch,Task,TodoWrite"
 
       - name: Record pass 3
-        if: always() && steps.brief3.outputs.ids != ''
+        if: ${{ !cancelled() && steps.brief3.outputs.ids != '' }}
         env:
           EXEC_FILE: ${{ steps.judge3.outputs.execution_file }}
         run: |
@@ -233,13 +245,32 @@ jobs:
 
       # Ids and verdicts only: never scenario text.
       - name: Summary
-        if: always() && steps.brief1.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
+        id: summary
+        if: ${{ !cancelled() && steps.record1.outcome == 'success' }}
         run: |
           result="$(python3 -I "$BB/verdicts.py" summary)"
           cat "$BB/summary.md" >> "$GITHUB_STEP_SUMMARY"
-          if [ -n "$PR" ] && [ "$BUILD" = pr ]; then
-            gh pr comment "$PR" --repo "$REPO" --body-file "$BB/summary.md"
-          fi
+          {
+            echo "summary<<BB_SUMMARY_EOF"
+            cat "$BB/summary.md"
+            echo "BB_SUMMARY_EOF"
+          } >> "$GITHUB_OUTPUT"
           [ "$result" = pass ]
+
+  report:
+    name: Post the verdict
+    needs: blackbox
+    if: ${{ !cancelled() && inputs.pr != '' && (inputs.build || 'pr') == 'pr' && needs.blackbox.outputs.summary != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment on the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ inputs.pr }}
+          SUMMARY: ${{ needs.blackbox.outputs.summary }}
+        run: |
+          printf '%s\n' "$SUMMARY" > summary.md
+          gh pr comment "$PR" --repo "$REPO" --body-file summary.md
