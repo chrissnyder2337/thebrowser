@@ -172,8 +172,13 @@ jobs:
         id: guard
         env:
           BASE_REF: ${{ github.base_ref }}
+        # The base branch's copy of the guard judges the PR, so a PR can't
+        # loosen the guard that checks it (the PR's copy runs only until the
+        # guard exists on the base branch).
         run: |
-          if tools/oracle-guard.sh "origin/$BASE_REF"; then
+          guard="$RUNNER_TEMP/oracle-guard.sh"
+          git show "origin/$BASE_REF:tools/oracle-guard.sh" > "$guard" 2>/dev/null || cp tools/oracle-guard.sh "$guard"
+          if bash "$guard" "origin/$BASE_REF"; then
             echo "result=clean" >> "$GITHUB_OUTPUT"
           else
             status=$?
