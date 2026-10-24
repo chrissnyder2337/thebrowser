@@ -430,3 +430,4 @@ mod tests {
         assert!(chromium.chars().next().unwrap().is_ascii_digit());
     }
 }
+// Oracle gate test: this line and the edited golden must not be merged.
