@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture: tables</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; color: #222; background: #fafafa; margin: 0; padding: 16px; }
+  table { border-collapse: collapse; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 4px 10px; }
+  thead th { background: #333; color: #fff; }
+  tbody tr:nth-child(even) { background: #eee; }
+  footer { margin-top: 24px; padding: 8px; border-top: 1px solid #ccc; color: #666; }
+</style>
+</head>
+<body>
+  <h1>Planets</h1>
+  <p>A data table with a header row, striped rows and a nested layout table.</p>
+  <table id="planets">
+    <thead><tr><th>Planet</th><th>Moons</th><th>Day length</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Mercury</td><td>0</td><td>176 days</td><td>Closest to the Sun</td></tr>
+      <tr><td>Venus</td><td>0</td><td>243 days</td><td><b>Hottest</b> surface</td></tr>
+      <tr><td>Earth</td><td>1</td><td>24 hours</td><td><a href="#earth">Home</a></td></tr>
+      <tr><td>Mars</td><td>2</td><td>24.6 hours</td><td><i>Red</i> dust</td></tr>
+      <tr><td>Jupiter</td><td>95</td><td>9.9 hours</td><td>Great Red Spot</td></tr>
+    </tbody>
+  </table>
+  <h2>Layout table</h2>
+  <table id="layout" style="width: 100%">
+    <tr>
+      <td style="width: 30%; background: #dde"><b>Sidebar</b><br><a href="#a">Link A</a><br><a href="#b">Link B</a></td>
+      <td><h3>Content cell</h3><p>Old sites laid pages out with tables like this one.</p></td>
+    </tr>
+  </table>
+  <footer id="page-footer">Page footer: tables fixture</footer>
+</body>
+</html>

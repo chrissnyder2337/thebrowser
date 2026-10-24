@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture: shadow DOM</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; color: #222; background: #fff; margin: 0; padding: 16px; }
+  footer { margin-top: 24px; padding: 8px; border-top: 1px solid #ccc; color: #666; }
+</style>
+<script>
+  // A card with an open shadow root, like many sites' custom elements.
+  customElements.define("x-card", class extends HTMLElement {
+    constructor() {
+      super();
+      var root = this.attachShadow({ mode: "open" });
+      root.innerHTML =
+        "<style>.card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin: 8px 0;" +
+        " font-family: Georgia, serif; color: #333; background: #f5f5ff; }" +
+        " button { background: #6200ee; color: #fff; border: 0; border-radius: 4px; padding: 4px 12px; }" +
+        " .pop { position: fixed; top: 10px; right: 10px; z-index: 9; background: #fff; border: 1px solid #333; padding: 4px; }</style>" +
+        "<div class='card'><h3 part='title'><slot name='title'>Untitled</slot></h3>" +
+        "<p class='body'>Text inside an open shadow root.</p><button type='button'>Shadow button</button></div>";
+    }
+  });
+  // A closed one, which a look can't reach (and must not break on).
+  customElements.define("x-closed", class extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: "closed" }).innerHTML = "<p>Closed shadow content</p>";
+    }
+  });
+  customElements.define("x-popup", class extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" }).innerHTML =
+        "<style>div { position: fixed; top: 70px; right: 16px; z-index: 9; background: #ffffff;" +
+        " border: 1px solid #333; padding: 6px; }</style><div data-test-float>Popup in a shadow root</div>";
+    }
+  });
+</script>
+</head>
+<body>
+  <h1>Custom elements</h1>
+  <x-card><span slot="title">First card</span></x-card>
+  <x-card><span slot="title">Second card</span></x-card>
+  <x-closed></x-closed>
+  <x-popup></x-popup>
+  <footer id="page-footer">Page footer: shadow DOM fixture</footer>
+</body>
+</html>

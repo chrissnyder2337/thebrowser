@@ -2,7 +2,7 @@
 //! browser view it serves.
 
 use super::{
-    commands, dialup, retro,
+    commands, dialup, retro, selftest,
     state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
 };
 use cef::*;
@@ -257,13 +257,16 @@ wrap_load_handler! {
             &self,
             _browser: Option<&mut Browser>,
             frame: Option<&mut Frame>,
-            _http_status_code: ::std::os::raw::c_int,
+            http_status_code: ::std::os::raw::c_int,
         ) {
             if self.role != Role::Content {
                 return;
             }
             if let Some(frame) = frame {
                 retro::on_load_end(frame);
+                if frame.is_main() != 0 {
+                    selftest::on_load_end(http_status_code);
+                }
             }
         }
 
@@ -287,6 +290,7 @@ wrap_load_handler! {
             let failed_url = cef_text(failed_url);
             let error_text = cef_text(error_text);
             let error_code = error_code as i32;
+            selftest::on_load_error(error_code, &error_text);
             super::state::defer(move || commands::show_error(&failed_url, error_code, &error_text));
         }
     }

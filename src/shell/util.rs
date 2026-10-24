@@ -319,4 +319,129 @@ mod tests {
             ]
         );
     }
+
+    mod props {
+        use super::super::*;
+        use proptest::prelude::*;
+
+        /// Undo [`html_escape`]; only its five entities are expected.
+        fn html_unescape(s: &str) -> String {
+            s.replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&#39;", "'")
+                .replace("&amp;", "&")
+        }
+
+        /// Read back a [`js_string`] literal the way a JSON parser would.
+        fn js_unquote(s: &str) -> Option<String> {
+            let inner = s.strip_prefix('"')?.strip_suffix('"')?;
+            let mut out = String::new();
+            let mut chars = inner.chars();
+            while let Some(c) = chars.next() {
+                if c != '\\' {
+                    out.push(c);
+                    continue;
+                }
+                match chars.next()? {
+                    '\\' => out.push('\\'),
+                    '"' => out.push('"'),
+                    'n' => out.push('\n'),
+                    'r' => out.push('\r'),
+                    't' => out.push('\t'),
+                    'u' => {
+                        let hex: String = chars.by_ref().take(4).collect();
+                        out.push(char::from_u32(u32::from_str_radix(&hex, 16).ok()?)?);
+                    }
+                    _ => return None,
+                }
+            }
+            Some(out)
+        }
+
+        proptest! {
+            #[test]
+            fn percent_coding_round_trips(s in any::<String>()) {
+                let encoded = encode_component(&s);
+                prop_assert!(encoded.bytes().all(|b| b.is_ascii_alphanumeric()
+                    || b"-_.!~*'()%".contains(&b)));
+                prop_assert_eq!(percent_decode(&encoded), s);
+            }
+
+            #[test]
+            fn query_pairs_round_trip(k in ".+", v in any::<String>()) {
+                let query = format!("{}={}", encode_component(&k), encode_component(&v));
+                prop_assert_eq!(parse_query(&query), vec![(k, v)]);
+            }
+
+            #[test]
+            fn html_escape_is_inert(s in any::<String>()) {
+                let escaped = html_escape(&s);
+                prop_assert!(!escaped.contains(['<', '>', '"', '\'']));
+                // Every & starts one of the entities html_escape writes.
+                for (i, _) in escaped.match_indices('&') {
+                    let rest = &escaped[i..];
+                    prop_assert!(["&amp;", "&lt;", "&gt;", "&quot;", "&#39;"]
+                        .iter()
+                        .any(|e| rest.starts_with(e)));
+                }
+                prop_assert_eq!(html_unescape(&escaped), s);
+            }
+
+            #[test]
+            fn js_string_is_inert(s in any::<String>()) {
+                let quoted = js_string(&s);
+                let inner = &quoted[1..quoted.len() - 1];
+                // Nothing can end the literal, the line or an inline <script>.
+                prop_assert!(
+                    !inner.contains(['<', '\n', '\r', '\u{2028}', '\u{2029}']),
+                    "raw terminator in {}",
+                    quoted
+                );
+                prop_assert!(
+                    !inner.chars().any(|c| (c as u32) < 0x20 || c == '\u{7f}'),
+                    "raw control character in {}",
+                    quoted
+                );
+                let mut escaped = false;
+                for c in inner.chars() {
+                    prop_assert!(escaped || c != '"', "unescaped quote in {}", quoted);
+                    escaped = !escaped && c == '\\';
+                }
+                prop_assert_eq!(js_unquote(&quoted), Some(s));
+            }
+
+            #[test]
+            fn url_bar_normalization(s in any::<String>()) {
+                let Some(url) = normalize_url_input(&s) else {
+                    prop_assert!(s.trim().is_empty());
+                    return Ok(());
+                };
+                let text = s.trim();
+                prop_assert!(!text.is_empty());
+                // Known schemes pass through; host-like text gets https://;
+                // everything else is a search for exactly what was typed.
+                if known_scheme(text).is_some() {
+                    prop_assert_eq!(&url, text);
+                } else if let Some(query) = url.strip_prefix("https://duckduckgo.com/?q=") {
+                    prop_assert_eq!(percent_decode(query), text);
+                } else {
+                    prop_assert_eq!(&url, &format!("https://{text}"));
+                    prop_assert!(!text.chars().any(char::is_whitespace));
+                }
+                // The result is final: normalizing it again changes nothing.
+                prop_assert_eq!(normalize_url_input(&url), Some(url.clone()));
+            }
+
+            #[test]
+            // URL-shaped input, or url_host would almost always see no "://".
+            fn hosts_are_lowercase(s in "[a-zA-Z]{1,6}://([^/?#@]{0,8}@)?[^/?#]{0,20}([/?#].{0,10})?") {
+                if let Some(host) = url_host(&s) {
+                    prop_assert!(!host.is_empty());
+                    prop_assert_eq!(host.to_ascii_lowercase(), host.clone());
+                    prop_assert!(!host.contains(['/', '?', '#', '@']));
+                }
+            }
+        }
+    }
 }

@@ -11,6 +11,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
   # Must match the `cef` pin in Cargo.toml.
@@ -66,6 +69,154 @@ jobs:
           name: lantern-linux-x86_64
           path: target/bundle
           retention-days: 7
+
+      # The chrome and internal pages, and the retro scripts, for the
+      # Playwright job (which has no CEF).
+      - name: Dump pages
+        run: LD_LIBRARY_PATH="$CEF_PATH" cargo run --example dump-pages -- target/pages
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lantern-pages
+          path: target/pages
+          retention-days: 7
+
+  playwright:
+    name: Playwright (web layer, goldens)
+    needs: linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Must match @playwright/test in package.json (checked below), so golden
+    # screenshots render as they do with tests/web/run.sh.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_IMAGE_VERSION: "1.64.0"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lantern-pages
+          path: target/pages
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Check the image matches package.json
+        run: |
+          pinned="$(node -p 'require("./package.json").devDependencies["@playwright/test"]')"
+          installed="$(node -p 'require("@playwright/test/package.json").version')"
+          if [ "$pinned" != "$PLAYWRIGHT_IMAGE_VERSION" ] || [ "$installed" != "$PLAYWRIGHT_IMAGE_VERSION" ]; then
+            echo "::error::package.json pins $pinned, installed $installed, image is $PLAYWRIGHT_IMAGE_VERSION"
+            exit 1
+          fi
+
+      # HOME=/root: Firefox and Chromium in the image expect it when run as root.
+      - name: Playwright tests
+        run: HOME=/root npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  smoke:
+    name: Bundle smoke test
+    needs: linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq xvfb
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: lantern-linux-x86_64
+          path: target/bundle
+
+      # Artifacts don't keep file modes.
+      - name: Smoke test
+        run: |
+          chmod +x target/bundle/lantern target/bundle/*.so*
+          tests/smoke.sh target/bundle
+
+  # The oracle guard (tools/oracle-guard.sh): a PR that changes src/ or ui/
+  # and also changes existing goldens or assertions needs the maintainer's
+  # approval on the "oracle" environment. No label or input skips it.
+  oracle-check:
+    name: Oracle check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      result: ${{ steps.guard.outputs.result }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Run the guard
+        id: guard
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        # The base branch's copy of the guard judges the PR, so a PR can't
+        # loosen the guard that checks it (the PR's copy runs only until the
+        # guard exists on the base branch).
+        run: |
+          guard="$RUNNER_TEMP/oracle-guard.sh"
+          git show "origin/$BASE_REF:tools/oracle-guard.sh" > "$guard" 2>/dev/null || cp tools/oracle-guard.sh "$guard"
+          if bash "$guard" "origin/$BASE_REF"; then
+            echo "result=clean" >> "$GITHUB_OUTPUT"
+          else
+            status=$?
+            if [ "$status" -ne 1 ]; then exit "$status"; fi
+            echo "::warning::Existing oracle files changed; waiting for approval on the oracle environment."
+            echo "result=changed" >> "$GITHUB_OUTPUT"
+          fi
+
+  oracle-approval:
+    name: Oracle override (maintainer approval)
+    needs: oracle-check
+    if: needs.oracle-check.outputs.result == 'changed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    environment: oracle
+    steps:
+      - run: echo "The maintainer approved the oracle change for ${{ github.sha }}."
+
+  oracle-guard:
+    name: Oracle guard
+    needs: [oracle-check, oracle-approval]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Decide
+        env:
+          CHECK: ${{ needs.oracle-check.result }}
+          RESULT: ${{ needs.oracle-check.outputs.result }}
+          APPROVAL: ${{ needs.oracle-approval.result }}
+        run: |
+          echo "check=$CHECK result=$RESULT approval=$APPROVAL"
+          if [ "$CHECK" = "success" ] && [ "$RESULT" = "clean" ]; then exit 0; fi
+          if [ "$CHECK" = "success" ] && [ "$RESULT" = "changed" ] && [ "$APPROVAL" = "success" ]; then exit 0; fi
+          echo "::error::Existing goldens or assertions changed together with src/ or ui/, without approval on the oracle environment."
+          exit 1
 
   build:
     name: Build (${{ matrix.os }})

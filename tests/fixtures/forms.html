@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture: forms</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; color: #222; background: #fff; margin: 0; padding: 16px; }
+  label { display: block; margin: 8px 0 2px; }
+  .primary { background: #0b57d0; color: #fff; border: 0; border-radius: 16px; padding: 6px 16px; }
+  .ghost { background: transparent; color: #0b57d0; border: 1px solid #0b57d0; border-radius: 16px; padding: 6px 16px; }
+  .dark { background: #111; color: #eee; border: 0; padding: 6px 16px; }
+  .icon-button svg { width: 16px; height: 16px; vertical-align: middle; }
+  footer { margin-top: 24px; padding: 8px; border-top: 1px solid #ccc; color: #666; }
+</style>
+</head>
+<body>
+  <h1>Sign the guestbook</h1>
+  <form id="guestbook" action="#" onsubmit="return false">
+    <label for="name">Name</label>
+    <input id="name" name="name" value="Webmaster">
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" placeholder="you@example.com">
+    <label for="mood">Mood</label>
+    <select id="mood"><option>Rad</option><option>Tubular</option></select>
+    <label for="msg">Message</label>
+    <textarea id="msg" rows="3">Cool page!</textarea>
+    <p><label><input type="checkbox" checked> Add me to the webring</label></p>
+    <p>
+      <button class="primary" type="submit">Sign it</button>
+      <button class="ghost" type="button">Preview</button>
+      <button class="dark" type="button"><span>Clear</span></button>
+      <button class="icon-button" type="button"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#c00"/></svg> <span>Help</span></button>
+      <input type="submit" class="primary" value="Submit input">
+      <input type="button" class="dark" value="Button input">
+    </p>
+  </form>
+  <footer id="page-footer">Page footer: forms fixture</footer>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture: floats</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; color: #222; background: #fff; margin: 0; }
+  #masthead { position: sticky; top: 0; z-index: 10; background: #1a73e8; color: #fff; padding: 10px 16px; }
+  main { padding: 16px; }
+  #menu { position: absolute; top: 60px; right: 16px; z-index: 5; width: 180px; background: #fff;
+          border: 1px solid #999; box-shadow: 0 2px 8px rgba(0,0,0,.3); padding: 8px; }
+  #cookies { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 100; background: rgb(40, 40, 40);
+             color: #fff; padding: 12px; }
+  #cookies button { background: #fbbc04; color: #000; border: 0; padding: 4px 12px; }
+  #tooltip { position: fixed; top: 120px; left: 40px; z-index: 50; background: rgba(255, 255, 224, 0.95);
+             border: 1px solid #aa8; padding: 4px 8px; }
+  #ghost { position: fixed; top: 200px; right: 30px; z-index: 50; background: rgba(0, 0, 0, 0.1); padding: 4px; }
+  footer { margin-top: 24px; padding: 8px 16px 90px; border-top: 1px solid #ccc; color: #666; }
+</style>
+</head>
+<body>
+  <header id="masthead" data-test-float>Sticky masthead</header>
+  <div id="menu" data-test-float><b>Menu</b><br><a href="#1">First item</a><br><a href="#2">Second item</a></div>
+  <div id="tooltip" data-test-float>A floating tooltip</div>
+  <div id="ghost">See-through overlay</div>
+  <main>
+    <h1>Floating boxes</h1>
+    <p>Menus, banners and sticky headers float over the page. With a retro look on, the ones that had a
+       solid background must stay solid, or the text underneath shows through.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+       dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+       Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</p>
+  </main>
+  <div id="cookies" data-test-float>We use cookies to remember your hit count. <button type="button">OK</button></div>
+  <footer id="page-footer">Page footer: floats fixture</footer>
+</body>
+</html>

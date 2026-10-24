@@ -1,0 +1,12 @@
+{
+  "name": "lantern-web-tests",
+  "private": true,
+  "description": "Playwright tests for Lantern's web layer (tests/web). Run them with tests/web/run.sh.",
+  "license": "Apache-2.0 OR MIT",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}

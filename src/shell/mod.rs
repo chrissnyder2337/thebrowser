@@ -12,6 +12,7 @@ pub mod dialup;
 pub mod pages;
 pub mod resources;
 pub mod retro;
+pub mod selftest;
 pub mod settings;
 pub mod state;
 pub mod util;

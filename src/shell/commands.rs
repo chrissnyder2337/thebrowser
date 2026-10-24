@@ -287,53 +287,69 @@ pub fn add_bookmark() {
     }
 }
 
-/// Handle a navigation to `https://lantern.invalid/...` from an internal page.
-/// Returns true if `url` was such an action link (the navigation must be cancelled).
-pub fn handle_action_url(url: &str) -> bool {
-    let Some(rest) = url
+/// What a `https://lantern.invalid/<action>?…` link asks for.
+#[derive(Debug, PartialEq, Eq)]
+pub enum Action {
+    /// Remove the bookmark with this URL (nothing, without a `url=`).
+    Delete(Option<String>),
+    Home,
+    Bookmarks,
+    About,
+    OpenSettings,
+    /// Apply the settings form's fields.
+    SaveSettings(Vec<(String, String)>),
+    /// An action Lantern doesn't know; the link is still swallowed.
+    Unknown(String),
+}
+
+/// Parse an action link. `None` means `url` isn't one and loads normally.
+pub fn parse_action_url(url: &str) -> Option<Action> {
+    let rest = url
         .strip_prefix("https://")
-        .or_else(|| url.strip_prefix("http://"))
-    else {
-        return false;
-    };
+        .or_else(|| url.strip_prefix("http://"))?;
     let (host, path) = rest.split_once('/').unwrap_or((rest, ""));
     if !host.eq_ignore_ascii_case(ACTION_HOST) {
-        return false;
+        return None;
     }
     let path = path.split('#').next().unwrap_or("");
     let (action, query) = path.split_once('?').unwrap_or((path, ""));
     let params = parse_query(query);
-    let param = |name: &str| {
-        params
-            .iter()
-            .find(|(k, _)| k == name)
-            .map(|(_, v)| v.clone())
-    };
+    Some(match action {
+        "delete" => Action::Delete(params.into_iter().find(|(k, _)| k == "url").map(|(_, v)| v)),
+        "home" => Action::Home,
+        "bookmarks" => Action::Bookmarks,
+        "about" => Action::About,
+        "open-settings" => Action::OpenSettings,
+        "settings" => Action::SaveSettings(params),
+        other => Action::Unknown(other.to_owned()),
+    })
+}
 
+/// Handle a navigation to `https://lantern.invalid/...` from an internal page.
+/// Returns true if `url` was such an action link (the navigation must be cancelled).
+pub fn handle_action_url(url: &str) -> bool {
+    let Some(action) = parse_action_url(url) else {
+        return false;
+    };
     // Navigating from inside on_before_browse is not safe; run actions later.
     match action {
-        "delete" => {
-            if let Some(target) = param("url") {
-                defer(move || {
-                    let removed =
-                        with_shell(|shell| bookmarks::remove(&mut shell.bookmarks, &target));
-                    if removed {
-                        save_bookmarks();
-                        push_all();
-                    }
-                    refresh_bookmark_pages();
-                });
-            }
+        Action::Delete(Some(target)) => {
+            defer(move || {
+                let removed = with_shell(|shell| bookmarks::remove(&mut shell.bookmarks, &target));
+                if removed {
+                    save_bookmarks();
+                    push_all();
+                }
+                refresh_bookmark_pages();
+            });
         }
-        "home" => defer(show_home),
-        "bookmarks" => defer(show_bookmarks),
-        "about" => defer(show_about),
-        "open-settings" => defer(|| show_settings(false)),
-        "settings" => {
-            let params = params.clone();
-            defer(move || save_settings(&params));
-        }
-        other => eprintln!("lantern: unknown action link {other:?}"),
+        Action::Delete(None) => {}
+        Action::Home => defer(show_home),
+        Action::Bookmarks => defer(show_bookmarks),
+        Action::About => defer(show_about),
+        Action::OpenSettings => defer(|| show_settings(false)),
+        Action::SaveSettings(params) => defer(move || save_settings(&params)),
+        Action::Unknown(other) => eprintln!("lantern: unknown action link {other:?}"),
     }
     true
 }
@@ -361,5 +377,147 @@ mod tests {
         assert_eq!(parse_title("Lantern Toolbar"), None);
         assert_eq!(parse_title("lantern|1|"), None);
         assert_eq!(parse_title("lanternX|1|go|x"), None);
+    }
+
+    #[test]
+    fn hostile_titles() {
+        let huge = "x".repeat(1 << 20);
+        let cmd = |name: &str, arg: &str| {
+            Some(Command {
+                name: name.into(),
+                arg: arg.into(),
+            })
+        };
+        let cases: Vec<(String, Option<Command>)> = vec![
+            // Only the exact prefix counts; titles a page might set don't.
+            ("".into(), None),
+            ("lantern".into(), None),
+            ("lantern|".into(), None),
+            ("LANTERN|1|go|x".into(), None),
+            (" lantern|1|go|x".into(), None),
+            ("<b>lantern</b>|1|go|x".into(), None),
+            ("lantern|1||x".into(), None),
+            // The argument keeps everything after the third bar, decoded once.
+            ("lantern|1|go|a|b|c".into(), cmd("go", "a|b|c")),
+            ("lantern|1|go|%2541".into(), cmd("go", "%41")),
+            ("lantern|1|go|%ZZ%4".into(), cmd("go", "%ZZ%4")),
+            ("lantern|1|go|%FF%FE".into(), cmd("go", "\u{FFFD}\u{FFFD}")),
+            ("lantern|1|go|%00".into(), cmd("go", "\0")),
+            (
+                "lantern|1|go|javascript%3Aalert(1)".into(),
+                cmd("go", "javascript:alert(1)"),
+            ),
+            (
+                "lantern|1|go|%3Cscript%3E%22%27".into(),
+                cmd("go", "<script>\"'"),
+            ),
+            // Names are passed on as given; unknown ones are ignored later.
+            ("lantern|x|<img src=x>|".into(), cmd("<img src=x>", "")),
+            ("lantern||ready".into(), cmd("ready", "")),
+            (format!("lantern|1|go|{huge}"), cmd("go", &huge)),
+        ];
+        for (title, want) in cases {
+            let shown: String = title.chars().take(40).collect();
+            assert_eq!(parse_title(&title), want, "title {shown:?}");
+        }
+    }
+
+    #[test]
+    fn action_router() {
+        let huge = "y".repeat(1 << 20);
+        let pairs = |list: &[(&str, &str)]| {
+            list.iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect::<Vec<_>>()
+        };
+        let cases: Vec<(String, Option<Action>)> = vec![
+            ("https://lantern.invalid/home".into(), Some(Action::Home)),
+            ("http://lantern.invalid/home".into(), Some(Action::Home)),
+            ("https://LANTERN.INVALID/about".into(), Some(Action::About)),
+            (
+                "https://lantern.invalid/home#top".into(),
+                Some(Action::Home),
+            ),
+            (
+                "https://lantern.invalid/bookmarks?x=1".into(),
+                Some(Action::Bookmarks),
+            ),
+            (
+                "https://lantern.invalid/open-settings".into(),
+                Some(Action::OpenSettings),
+            ),
+            (
+                "https://lantern.invalid/delete?url=https%3A%2F%2Fa%2F%3Fq%3D1%26r%3D2".into(),
+                Some(Action::Delete(Some("https://a/?q=1&r=2".into()))),
+            ),
+            (
+                "https://lantern.invalid/delete?url=a&url=b".into(),
+                Some(Action::Delete(Some("a".into()))),
+            ),
+            (
+                "https://lantern.invalid/delete".into(),
+                Some(Action::Delete(None)),
+            ),
+            (
+                "https://lantern.invalid/delete?url=javascript%3Aalert(1)".into(),
+                Some(Action::Delete(Some("javascript:alert(1)".into()))),
+            ),
+            (
+                format!("https://lantern.invalid/delete?url={huge}"),
+                Some(Action::Delete(Some(huge.clone()))),
+            ),
+            (
+                "https://lantern.invalid/settings?retro=%3Cscript%3E&dialup=off".into(),
+                Some(Action::SaveSettings(pairs(&[
+                    ("retro", "<script>"),
+                    ("dialup", "off"),
+                ]))),
+            ),
+            // Unknown or oddly spelled actions are swallowed, never loaded.
+            (
+                "https://lantern.invalid".into(),
+                Some(Action::Unknown(String::new())),
+            ),
+            (
+                "https://lantern.invalid/HOME".into(),
+                Some(Action::Unknown("HOME".into())),
+            ),
+            (
+                "https://lantern.invalid/home/../about".into(),
+                Some(Action::Unknown("home/../about".into())),
+            ),
+            (
+                "https://lantern.invalid/%68ome".into(),
+                Some(Action::Unknown("%68ome".into())),
+            ),
+            (
+                "https://lantern.invalid/<script>".into(),
+                Some(Action::Unknown("<script>".into())),
+            ),
+            // Anything that isn't exactly the action host loads normally.
+            ("https://lantern.invalid.example.com/home".into(), None),
+            ("https://example.com/lantern.invalid/home".into(), None),
+            (
+                "https://example.com/?u=https://lantern.invalid/home".into(),
+                None,
+            ),
+            ("https://user@lantern.invalid/home".into(), None),
+            ("https://lantern.invalid:443/home".into(), None),
+            ("https://lantern%2Einvalid/home".into(), None),
+            ("ftp://lantern.invalid/home".into(), None),
+            ("file://lantern.invalid/home".into(), None),
+            (
+                "javascript:location='https://lantern.invalid/home'".into(),
+                None,
+            ),
+            ("data:text/html,https://lantern.invalid/home".into(), None),
+            (" https://lantern.invalid/home".into(), None),
+            ("lantern:home".into(), None),
+            ("".into(), None),
+        ];
+        for (url, want) in cases {
+            let shown: String = url.chars().take(60).collect();
+            assert_eq!(parse_action_url(&url), want, "url {shown:?}");
+        }
     }
 }
