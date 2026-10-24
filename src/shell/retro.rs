@@ -27,7 +27,7 @@ const SPLASH: &str = include_str!("../../ui/retro/splash.js");
 
 /// Script that switches a frame to `style`, defining the runtime and the
 /// looks the first time it runs in a document. See `ui/retro/runtime.js`.
-fn style_script(style: RetroStyle) -> String {
+pub fn style_script(style: RetroStyle) -> String {
     if style == RetroStyle::Off {
         return r#"window.__lanternRetro&&window.__lanternRetro.apply("off");"#.to_owned();
     }

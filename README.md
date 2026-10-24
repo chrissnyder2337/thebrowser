@@ -109,20 +109,48 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
 - `--retro=<look>`: use a retro look for this run without saving it (see below):
   `geocities`, `early-web`, `portal` or `off`. `--geocities` is short for
   `--retro=geocities`.
+- `--self-test=<file>`: once the first page has loaded (or failed), write its
+  URL, title and load status to `<file>` as `key=value` lines and quit. For
+  `tests/smoke.sh`.
 
 ### Tests
 
 ```sh
-cargo test --bin lantern
+cargo test --bin lantern          # unit, table and property tests (needs LD_LIBRARY_PATH="$CEF_PATH")
+tests/web/run.sh                  # Playwright: retro looks, chrome and internal pages, goldens (Docker)
+tests/smoke.sh target/bundle      # the release bundle under xvfb-run, once per retro look
+tools/oracle-guard.sh origin/main # the CI check that protects existing goldens and assertions
 ```
 
-CI (`.github/workflows/ci.yml`) runs rustfmt, clippy, the unit tests and a
-release bundle on Linux (uploaded as a build artifact), and builds on macOS and
-Windows. It needs Rust 1.88 or newer.
+- **Rust tests** cover URL normalization, percent and HTML/JS escaping, the
+  title channel parser, the `lantern.invalid` action router (table tests with
+  hostile input), template filling, bookmark and settings storage, the retro
+  script builder and the pixel-art sheets. `proptest` properties check that
+  escaping round-trips and stays inert, and that URL-bar normalization is
+  stable.
+- **Playwright** (`package.json`, `tests/web/`) needs no CEF.
+  `cargo run --example dump-pages -- target/pages` writes the toolbar,
+  status bar and internal pages, plus the script Lantern injects for each
+  retro look. The tests inject each look into the fixture pages in
+  `tests/fixtures/` (tables, forms, floats, shadow DOM, an iframe, a long
+  page) and check for script errors, footers at the end of the page,
+  readable buttons, opaque floating boxes and restyled late nodes. They
+  drive the toolbar and status bar through `lantern.update` and check each
+  button's title-channel message. Golden screenshots are in `tests/golden/`.
+  `tests/web/run.sh` runs everything in the official Playwright Docker image
+  whose tag matches `@playwright/test`, as CI does, because the goldens only
+  match there.
+- **Smoke test**: `tests/smoke.sh` serves `tests/fixtures/` on 127.0.0.1 and
+  starts the bundle with `--no-sandbox --disable-gpu --self-test=<file>`,
+  which writes the final URL, title and load status to the file and quits.
 
-The unit tests cover URL normalization, percent and HTML/JS escaping, the title
-channel parser, template filling, bookmark and settings storage, the
-retro script builder and the pixel-art sheets.
+CI (`.github/workflows/ci.yml`) runs rustfmt, clippy, the unit tests and a
+release bundle on Linux (uploaded as a build artifact), the Playwright suite
+in the pinned container, the smoke test on that bundle, and builds on macOS
+and Windows. It needs Rust 1.88 or newer. On pull requests the **Oracle
+guard** fails a change that touches `src/` or `ui/` and also modifies or
+deletes existing goldens or assertions; only the maintainer's approval on the
+`oracle` GitHub Environment overrides it.
 
 ### Releasing
 
@@ -320,6 +348,7 @@ src/shell/bookmarks.rs          bookmark TSV + per-OS data directory
 src/shell/settings.rs           user settings (dial-up mode, modem speed profiles, retro look)
 src/shell/dialup.rs             dial-up simulator: network emulation and the image pacer
 src/shell/retro.rs              retro looks: the Retro menu and running ui/retro/*.js
+src/shell/selftest.rs           --self-test=<file>: report the first load and quit
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
@@ -332,8 +361,14 @@ ui/appicon/                     generated window icons
 resources/mac, resources/win    bundle resources and generated .icns/.ico
 tools/make_icons.py             regenerates all app icons from ui/lantern.txt
 tools/bump-version.sh           bumps the version and opens the release pull request
+tools/oracle-guard.sh           CI check: product changes may not rewrite existing goldens or assertions
+examples/dump-pages.rs          writes the chrome and internal pages to files for Playwright
+tests/web/, tests/fixtures/     Playwright tests and the fixture pages they style
+tests/golden/                   golden screenshots (new files only; see the steward skill)
+tests/smoke.sh                  bundle smoke test under xvfb-run
 .claude/skills/release/         Claude Code skill for cutting and debugging releases
 .claude/skills/steward/         Claude Code skill: conventions for getting PRs merged
+.claude/skills/retro-look/      Claude Code skill: changing or adding a retro look, with tests
 ```
 
 Notes for Claude Code sessions are in [CLAUDE.md](CLAUDE.md).

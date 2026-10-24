@@ -69,6 +69,13 @@ rewrite them to pass.
 - The PreToolUse hook in `.claude/settings.json` asks before such edits.
   It's a speed bump, not permission: an approved prompt doesn't make the
   change allowed.
+- **The lock is CI's `Oracle guard` check** (`tools/oracle-guard.sh`, run in
+  `ci.yml`). It fails a PR that changes `src/` or `ui/` and also modifies or
+  deletes an existing golden, deletes an existing test file, or removes or
+  changes an existing assertion. Its only override is the
+  `Oracle override (maintainer approval)` job, which waits on the `oracle`
+  GitHub Environment until the maintainer approves it. A label or a
+  workflow input never skips it, and the guard isn't edited to pass.
 
 ## Before every push
 
@@ -86,6 +93,19 @@ for t in x86_64-apple-darwin x86_64-pc-windows-msvc; do
   CARGO_TARGET_DIR=target/xcheck cargo check --target "$t" --features cef/dox --bins --lib
 done
 ```
+
+Then the web-layer and bundle tests:
+
+```sh
+tests/web/run.sh     # Playwright in the pinned official image (needs Docker); writes target/pages first
+bundle-cef-app lantern -o target/bundle --release
+tests/smoke.sh       # the bundle under xvfb-run, once per retro look, with --no-sandbox
+```
+
+`tests/web/run.sh` runs the suite with `docker run` in
+`mcr.microsoft.com/playwright:v<version>-noble`, the version pinned for
+`@playwright/test` in `package.json`, as CI does. Golden screenshots only
+match in that image, so don't compare them on the host's browser.
 
 Also run these when you touch the matching files:
 - `.github/` → `actionlint .github/workflows/*.yml` (`pip install actionlint-py`);

@@ -65,7 +65,9 @@ unless the release requires it, and call out any change there in the PR.
 - Bundle and run: `bundle-cef-app lantern -o target/bundle --release`, then
   start it under Xvfb (steward recipe) with `--no-sandbox --disable-gpu`.
   Load a long real page, each `--retro=` look, the About page (check the new
-  CEF and Chromium versions show) and a download. Run the bundle smoke test
-  too once it exists.
+  CEF and Chromium versions show) and a download.
+- Run the bundle smoke test, `tests/smoke.sh target/bundle`: it starts the
+  release bundle under `xvfb-run` once per retro look and must print `ok`
+  for each.
 - In the PR's **Testing**, list what ran on Linux and say plainly that macOS
   and Windows were type-checked and built by CI, not run.

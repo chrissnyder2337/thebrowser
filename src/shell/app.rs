@@ -1,7 +1,7 @@
 //! The CEF `App` and browser-process handler: builds the window and its three views.
 
 use super::{
-    bookmarks, client, commands, pages,
+    bookmarks, client, commands, pages, selftest,
     settings::{self, RetroStyle},
     state::{Role, with_shell},
     util::normalize_url_input,
@@ -77,6 +77,10 @@ wrap_browser_process_handler! {
                     .or_else(|| has_switch(command_line, "geocities").then_some(RetroStyle::GeoCities));
                 if let Some(style) = style {
                     user_settings.retro_style = style;
+                }
+                // --self-test=<file> reports the first load to <file> and quits.
+                if let Some(path) = switch_value(command_line, "self-test") {
+                    selftest::enable(path.into());
                 }
             }
             with_shell(|shell| {

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture: iframe</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; color: #222; background: #fff; margin: 0; padding: 16px; }
+  iframe { width: 100%; height: 220px; border: 1px solid #999; }
+  footer { margin-top: 24px; padding: 8px; border-top: 1px solid #ccc; color: #666; }
+</style>
+</head>
+<body>
+  <h1>A page with a frame</h1>
+  <p>The frame below is a separate document. Looks style it too, but decorations only go on the top page.</p>
+  <iframe id="child" src="iframe-child.html" title="Child frame"></iframe>
+  <footer id="page-footer">Page footer: iframe fixture</footer>
+</body>
+</html>
