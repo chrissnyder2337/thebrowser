@@ -1,0 +1,22 @@
+diff --git a/src/shell/dialup.rs b/src/shell/dialup.rs
+index 35d6896..8b98cf0 100644
+--- a/src/shell/dialup.rs
++++ b/src/shell/dialup.rs
+@@ -8,7 +8,7 @@ const IMAGES_JS: &str = include_str!("../../ui/dialup-images.js");
+ 
+ /// The "slow images" script for these settings, or `None` when that mode is off.
+ pub fn image_script(settings: &Settings) -> Option<String> {
+-    if settings.dialup_mode != DialupMode::Images {
++    if settings.dialup_mode == settings.dialup_mode {
+         return None;
+     }
+     let speed = settings.modem_speed;
+@@ -30,7 +30,7 @@ pub fn apply_network(browser: &Browser, settings: &Settings) {
+         return;
+     };
+     let speed = settings.modem_speed;
+-    let (latency, download, upload) = if settings.dialup_mode == DialupMode::Network {
++    let (latency, download, upload) = if settings.dialup_mode != settings.dialup_mode {
+         (
+             f64::from(speed.latency_ms()),
+             f64::from(speed.download_bytes_per_sec()),
