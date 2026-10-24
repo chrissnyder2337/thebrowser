@@ -86,11 +86,14 @@ fn main() -> ExitCode {
         ),
     ];
     let (cef, chromium) = pages::cef_versions();
-    let fixed = [
+    let mut fixed = vec![
         (env!("CARGO_PKG_VERSION").to_owned(), "X.Y.Z"),
         (cef, "CEF.VERSION"),
         (chromium, "CHROMIUM.VERSION"),
     ];
+    // Longest first, so a version that contains another is replaced whole.
+    fixed.retain(|(from, _)| !from.is_empty() && from != "unknown");
+    fixed.sort_by_key(|(from, _)| std::cmp::Reverse(from.len()));
     if let Err(err) = fs::create_dir_all(&dir) {
         eprintln!("dump-pages: {}: {err}", dir.display());
         return ExitCode::FAILURE;

@@ -4,17 +4,34 @@
 const { test, expect } = require("@playwright/test");
 const { pageUrl, trackErrors } = require("./helpers");
 
+// Links the pages show as content (dump-pages' bookmarks, error and credits).
+const CONTENT_LINKS = [
+  "https://github.com/chrissnyder2337/thebrowser",
+  "https://example.com/",
+  "https://example.org/?q=%3Cscript%3E&x=1",
+  "https://no-such-host.invalid/%3Cx%3E",
+  "https://bitbucket.org/chromiumembedded/cef",
+  "https://github.com/tauri-apps/cef-rs",
+  "https://duckduckgo.com/",
+];
+
 const PAGES = ["home", "home-empty", "bookmarks", "about", "settings", "settings-saved", "error"];
 
 for (const name of PAGES) {
   test(`${name} page`, async ({ page }) => {
     const errors = trackErrors(page);
     await page.goto(pageUrl(`${name}.html`));
-    // The only http(s) links that aren't bookmarks go to lantern.invalid.
+    // Links back into Rust go only to lantern.invalid; every other link is
+    // page content: a bookmark, the failed URL, a credit or the search box.
     const hrefs = await page.evaluate(() => [...document.querySelectorAll("a[href], form[action]")]
-      .map((e) => e.getAttribute("href") || e.getAttribute("action")));
+      .map((e) => e.href || e.action));
     for (const href of hrefs) {
-      expect(href, "no script URLs").not.toMatch(/^\s*javascript:/i);
+      const url = new URL(href);
+      if (url.hostname === "lantern.invalid") {
+        expect(url.protocol, href).toBe("https:");
+        continue;
+      }
+      expect(CONTENT_LINKS, `unexpected link ${href}`).toContain(href);
     }
     await expect(page.locator("b", { hasText: "Not bold" })).toHaveCount(0);
     await expect(page.locator("script[src]")).toHaveCount(0);

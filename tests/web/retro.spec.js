@@ -51,7 +51,12 @@ function buttonContrast() {
   return buttons.map((b) => {
     // The label is the button's own text, or its first text-bearing child.
     let label = b;
-    for (const child of b.querySelectorAll("span")) if (child.textContent.trim()) label = child;
+    for (const child of b.querySelectorAll("span")) {
+      if (child.textContent.trim()) {
+        label = child;
+        break;
+      }
+    }
     const fg = luminance(rgba(getComputedStyle(label).color));
     const bg = luminance(background(b));
     const ratio = (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);

@@ -30,10 +30,16 @@ port="$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0))
 python3 -m http.server "$port" --bind 127.0.0.1 --directory "$root/tests/fixtures" \
   > "$work/server.log" 2>&1 &
 server=$!
+up=0
 for _ in $(seq 50); do
-  curl -sf "http://127.0.0.1:$port/tables.html" > /dev/null && break
+  if curl -sf "http://127.0.0.1:$port/tables.html" > /dev/null; then up=1; break; fi
   sleep 0.1
 done
+if [ "$up" -ne 1 ]; then
+  echo "smoke: the fixture server didn't start on port $port" >&2
+  cat "$work/server.log" >&2
+  exit 1
+fi
 
 url="http://127.0.0.1:$port/tables.html"
 title="Fixture: tables"

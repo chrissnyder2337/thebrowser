@@ -19,7 +19,15 @@ if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 image="mcr.microsoft.com/playwright:v$version-noble"
 
-if [ -z "${LANTERN_PAGES:-}" ]; then
+# Only the repository is mounted in the container, so the pages must be in it.
+if [ -n "${LANTERN_PAGES:-}" ]; then
+  pages="$(realpath "$LANTERN_PAGES")"
+  case "$pages" in
+    "$root"/*) LANTERN_PAGES="${pages#"$root"/}" ;;
+    *) echo "run.sh: LANTERN_PAGES must be inside $root" >&2; exit 1 ;;
+  esac
+  export LANTERN_PAGES
+else
   export CEF_PATH="${CEF_PATH:-$HOME/.local/share/cef}"
   LD_LIBRARY_PATH="$CEF_PATH" cargo run --quiet --example dump-pages -- target/pages > /dev/null
 fi
@@ -31,8 +39,10 @@ if [ "$installed" != "$version" ]; then
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci --no-audit --no-fund
 fi
 
-# No network: fixtures are served by the tests themselves.
+# No network: fixtures are served by the tests themselves. Run as the host
+# user, so results and new goldens aren't owned by root.
 exec docker run --rm --init --ipc=host --network none \
+  --user "$(id -u):$(id -g)" -e HOME=/tmp \
   -v "$root:/work" -w /work \
   -e CI -e LANTERN_PAGES \
   "$image" npx playwright test "$@"
