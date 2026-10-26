@@ -98,8 +98,8 @@ jobs:
       # and Bash subprocesses get no Anthropic credentials, so injected PR
       # text can't post a secret. (The plugin's own frontmatter allows
       # `gh pr comment` on any PR of this repository, with the job's token.)
-      # The plugin comes from .claude-plugin/marketplace.json on main, pinned
-      # to a commit there.
+      # The plugin comes from .claude-plugin/marketplace.json in main's
+      # checkout, pinned to a commit there.
       - name: Review
         id: review
         uses: anthropics/claude-code-action@925afb53776cf1a2b738c6bdbed37b4d4000ef13 # v1.0.262
@@ -111,7 +111,9 @@ jobs:
           github_token: ${{ github.token }}
           show_full_output: false
           settings: ${{ runner.temp }}/review-settings.json
-          plugin_marketplaces: https://github.com/${{ github.repository }}.git#main
+          # main's checkout (the action takes a local path, or an https URL
+          # ending in .git with no ref).
+          plugin_marketplaces: ${{ github.workspace }}
           plugins: code-review@lantern-review
           prompt: /code-review:code-review --comment ${{ inputs.pr }}
           claude_args: >-
