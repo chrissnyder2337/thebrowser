@@ -106,7 +106,8 @@ jobs:
       # use only workspace paths and plain strings; if one ever trips the
       # guard, the review fails rather than running unguarded), and logs
       # each call's parent process, so the last step can count the calls
-      # from Claude's Bash (bash; the action's own shell-outs use sh). Claude's
+      # from Claude (bash, or claude when bash -c execs git directly; the
+      # action's own calls come from bun, node or sh). Claude's
       # settings (merged into ~/.claude/settings.json by the action) carry
       # main's attribution block.
       - name: Prepare the reviewer's git and settings
@@ -178,12 +179,13 @@ jobs:
       # only which tool calls the allowlist blocked, so a review that posts
       # nothing says why. Inputs are model-written, so only the tool name
       # goes out, plus for Bash the command names of the first five parts
-      # (and the subcommand for git and gh), and for file tools whether the
-      # path was inside the workspace. Lowercase letters and dashes only.
-      # It fails the job if Claude ran git that didn't go through the guard.
-      # With show_result, it then adds the review's final text, so a review
+      # (and the subcommand for gh, and the subcommand and option names for
+      # git), and for file tools whether the path was inside the workspace.
+      # Lowercase letters and dashes only.
+      # With show_result, it adds the review's final text, so a review
       # that posts nothing says why; off by default, since that text is
-      # model-written and the job summary is public.
+      # model-written and the job summary is public. Last, it fails the job
+      # if Claude ran git that didn't go through the guard.
       - name: List blocked tool calls
         if: ${{ !cancelled() && steps.review.outputs.execution_file != '' }}
         env:
@@ -195,7 +197,9 @@ jobs:
             def cmdname:
               [splits("\\s+")] | map(select(length > 0))
               | if .[0] == "git" then
-                  (if .[1] == "-C" then .[3] else .[1] end) as $sub | "git \($sub // "" | clean)"
+                  (if .[1] == "-C" then .[3:] else .[1:] end) as $rest
+                  | ([$rest[1:][] | select(startswith("-")) | sub("=.*"; "") | clean] | .[0:4] | join(" ")) as $flags
+                  | "git \($rest[0] // "" | clean) \($flags)" | sub(" +$"; "")
                 elif .[0] == "gh" then "gh \(.[1] // "" | clean) \(.[2] // "" | clean)"
                 else (.[0] // "" | clean) end;
             def where:
@@ -212,17 +216,6 @@ jobs:
                    else .tool_input | where end) as $what
                 | "- `\($tool)` `\($what)`")' \
             "$EXEC_FILE" | tee -a "$GITHUB_STEP_SUMMARY"
-          # Fail closed: Claude's shell ran git (calls the rules didn't deny)
-          # more often than the guard saw git called from a shell.
-          ran="$(jq '([.[] | select(.type == "result") | .permission_denials[]?.tool_use_id]) as $denied
-            | [.. | objects | select(.type? == "tool_use" and .name == "Bash")
-               | select(.id as $id | $denied | index($id) | not)
-               | .input.command? // "" | select(test("(^|[;&|(\\n] *)git "))] | length' "$EXEC_FILE")"
-          seen="$(grep -cx bash "$RUNNER_TEMP/review-git.log" 2> /dev/null || true)"
-          if [ "$ran" -gt "${seen:-0}" ]; then
-            echo "::error::Claude's shell ran git $ran times, but the review git guard saw ${seen:-0}."
-            exit 1
-          fi
           if [ "$SHOW_RESULT" = true ]; then
             {
               echo
@@ -232,4 +225,20 @@ jobs:
               jq -r '.[] | select(.type == "result") | (.result // "(no result text)") | tostring | .[0:6000] | gsub("~~~~~~~~"; "~ ~ ~ ~")' "$EXEC_FILE"
               echo '~~~~~~~~'
             } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # Fail closed: Claude's shell ran git (calls the rules didn't deny)
+          # more often than the guard saw git called from a shell.
+          ran="$(jq '([.[] | select(.type == "result") | .permission_denials[]?.tool_use_id]) as $denied
+            | [.. | objects | select(.type? == "tool_use" and .name == "Bash")
+               | select(.id as $id | $denied | index($id) | not)
+               | .input.command? // "" | select(test("(^|[;&|(\\n] *)git "))] | length' "$EXEC_FILE")"
+          # Claude's calls have bash or, when bash -c execs git directly,
+          # claude itself as parent; the action's and checkout's have bun,
+          # node or sh.
+          echo "git guard callers:"
+          sort "$RUNNER_TEMP/review-git.log" 2> /dev/null | uniq -c | sed 's/[^a-z0-9 -]//g' || true
+          seen="$(grep -cxE 'bash|claude' "$RUNNER_TEMP/review-git.log" 2> /dev/null || true)"
+          if [ "$ran" -gt "${seen:-0}" ]; then
+            echo "::error::Claude's shell ran git $ran times, but the review git guard saw ${seen:-0}."
+            exit 1
           fi
