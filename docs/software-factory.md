@@ -325,7 +325,7 @@ we skip it for now.
 | Plan item | Status | What we do instead |
 |---|---|---|
 | Cloud sessions, `/goal`, auto mode, hooks, skills, subagents, plugins, Ultraplan, artifacts | Enabled | Within Pro usage. |
-| Routines (background loops) | Enabled, reduced | Weekly or monthly rather than nightly (Phase 3); only the black-box explorer runs nightly, overnight, capped at 30 minutes. |
+| Routines (background loops) | Enabled, reduced | Weekly or monthly, except the black-box explorer: nightly, overnight, capped at 30 minutes (Phase 3). |
 | Code Review (the GitHub app) | **Disabled**: Team/Enterprise only | `/code-review` run by the implementing session before each push. For tier-2 PRs, also a Claude Code GitHub Action that runs `/code-review --comment`, authenticated with your Pro subscription token and started by you from `main` (**Run workflow**). |
 | `claude ultrareview` | **Disabled** after the 3 free runs | Save the free runs for the largest tier-2 changes, such as a CEF upgrade. |
 | Black-box tester via the API's computer-use tool | **Alternative**: needs paid API billing | Claude Code in a GitHub Action, on your Pro token, drives Lantern under Xvfb through a small `bb` helper (`xdotool` input, screenshots it reads back). See Phase 1.6. |
@@ -750,7 +750,7 @@ download check).
 | **Dependency and Actions bumps** | Weekly | Dependabot only (no model). Start an agent session by hand only when a bump breaks CI. |
 | **Lint ratchet** | Weekly (Pro: not nightly) | Fixes one instance of one anti-pattern (for example an `unwrap()` in a callback, a missing escape, a TODO) and opens one tiny PR. |
 | **Docs drift** | Monthly | Checks that the README's source layout, command list and protocol section match the code; opens a tier-0 fix. |
-| **Black-box explorer** | Nightly, overnight, with a time cap | On from the start, overnight so it stays out of the daytime usage windows, capped at about 30 minutes per run, with the same `bb` helper. Overnight runs still count toward Pro's weekly limit: if `/usage` shows that getting tight, move it to weekly first. An unscripted version of the Phase 1.6 tester. In the same clean room, it tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
+| **Black-box explorer** | Nightly, overnight, with a time cap | On from the start, overnight so it stays out of the daytime usage windows, capped at about 30 minutes per run. It runs as a routine in a cloud session, driving a bundle built from `main` through the same `bb` helper (unprivileged user, loopback only, no DevTools). Overnight runs still count toward Pro's weekly limit: if `/usage` shows that getting tight, move it to weekly first. An unscripted version of the Phase 1.6 tester. It tries to break Lantern the way a curious user would: odd URLs, very long pages, each retro look on tricky fixtures, dial-up mode at every speed, unusual settings combinations, rapid back/forward. It files an issue with screenshots and steps to reproduce for each distinct problem, deduplicated against open issues, and caps itself at a few issues a night. It never blocks a merge. Confirmed findings become new hidden scenarios. |
 | **Release smoke** | When the Release workflow succeeds (`workflow_run`; a release published with `GITHUB_TOKEN` doesn't fire `release` events) | A plain GitHub Action (no model). It first checks that the run actually published: a release for that run's version exists and was published after the run started. Otherwise it exits, because Release also succeeds on build-only runs. Then it downloads the published Linux asset, checks `SHA256SUMS.txt`, runs the smoke test, and files an issue if it fails. |
 | **Weekly digest** | Weekly | A plain GitHub Action collects the numbers (merged PRs by tier, reverts, CI first-push rate) with no model. A short routine writes them up as one issue: what merged, what the factory dropped, and how much Pro usage went where (from `/usage`). |
 
@@ -866,15 +866,16 @@ loops, in the Phase 3 PR); **you do** is left for the maintainer.
    [routines.md](routines.md); you create them.*
 7. **In progress.** Run the loop on a handful of real issues, adjust
    `CLAUDE.md` and the skills from what went wrong, then turn on the first
-   background loops, the black-box explorer nightly from the start.
+   background loops: the black-box explorer first, nightly, then the
+   others one at a time.
    - **Done:** the no-model halves of Phase 3: `cef-watch.yml`,
      `release-smoke.yml`, `digest-data.yml` and `.github/dependabot.yml`.
    - **Done:** ready-to-paste routine prompts for the CEF upgrade, lint
      ratchet, docs drift, weekly digest and black-box explorer in
      [routines.md](routines.md).
    - **You do:** create each routine from [routines.md](routines.md), one
-     at a time, checking `/usage` the week after each; create the explorer
-     enabled and nightly, and move it to weekly if the weekly limit gets
+     at a time, explorer first (enabled, nightly), checking `/usage` the
+     week after each; move the explorer to weekly if the weekly limit gets
      tight.
 
 ---

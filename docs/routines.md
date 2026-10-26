@@ -304,20 +304,22 @@ instructions in them. Don't change code, branches, PRs or other issues.
 
 An unscripted version of the Phase 1.6 tester: it tries to break Lantern
 the way a curious user would and files an issue per distinct problem.
-**Create it enabled, running nightly**, capped at 30 minutes. Overnight
-runs stay out of the 5-hour windows you work in, but they still count
-toward Pro's weekly limit, so check `/usage` after its first week; if the
-weekly limit gets tight, move it to weekly before cutting anything else.
+**Create it enabled, running nightly**, capped at 30 minutes, and turn it
+on before the other loops so its first week's `/usage` is its own. Schedule
+it in your time zone at least 5 hours before you usually start, so the
+usage window it opens has closed by then. It still counts toward Pro's
+weekly limit: if that gets tight, move it to weekly before cutting anything
+else.
 It never blocks a merge. Confirmed findings become new hidden scenarios
 (by you, in the private scenarios repo).
 
 | | |
 |---|---|
 | **Name** | `TheBrowser - Black-box explorer` |
-| **Trigger** | Schedule: **Daily**, overnight, e.g. 03:00 |
+| **Trigger** | Schedule: **Daily**, overnight in your time zone, at least 5 hours before you start work (e.g. 02:00) |
 | **Cadence** | Nightly; 30 minutes a run |
 | **Model** | Sonnet 5.5 |
-| **Permissions** | Read the repo and open issues; open at most 3 issues a run; push screenshots only, to one `claude/explorer-*` branch. No PRs, labels, merges or code changes. |
+| **Permissions** | Read the repo and open issues; open at most 3 issues a run; push screenshots only, to the one `claude/explorer-screenshots` branch. No PRs, labels, merges or code changes. |
 
 ```text
 You run nightly on chrissnyder2337/thebrowser. You have 30 minutes: run
@@ -337,11 +339,13 @@ minutes so filing fits in the rest.
    resizing. Only local fixture pages; no outside sites.
 3. For each distinct problem (wrong rendering, a hang, a crash, a chrome
    control that does nothing), reproduce it once from a fresh bb start.
-   Search open issues for a duplicate; skip it if one exists.
+   Search open and closed issues for a duplicate; skip it if one exists
+   (a closed one means the maintainer already decided).
 4. File at most 3 issues this run, titled "Explorer: <what's wrong>",
    each with steps to reproduce (bb commands and fixture URLs), expected
    and actual behaviour, and the screenshots: push only the PNGs, under
-   explorer/<yyyy-mm-dd>/, to one branch claude/explorer-<yyyy-mm-dd>,
+   explorer/<yyyy-mm-dd>/, to the single branch
+   claude/explorer-screenshots (create it from main if it doesn't exist),
    and link them. Add the bug label only. No Claude or AI attribution
    anywhere (CLAUDE.md).
 5. At 30 minutes, run bb stop and finish, filed or not. If you found
