@@ -26,8 +26,8 @@ TIERS = ("tier:0", "tier:1", "tier:2")
 def gh(path, key=None, stop=None):
     """Every item of a list endpoint (path has per_page=100), page by page.
 
-    Explicit page numbers rather than --paginate, whose Link URLs some
-    proxies refuse. key picks the list out of an object response; stop(item)
+    Explicit page numbers rather than --paginate, whose Link URLs the
+    cloud sessions' GitHub proxy refuses, so the script also runs there. key picks the list out of an object response; stop(item)
     ends the walk early on a sorted list.
     """
     items = []
@@ -91,21 +91,30 @@ def first_push_green(pr, runs):
     return first.get("conclusion") == "success"
 
 
-def summarize(prs, main_commits, runs_by_pr, now, days):
+def summarize(prs, direct_commits, runs_by_pr, now, days):
+    """The numbers for the `days` before `now`.
+
+    direct_commits are commits on main that belong to no PR (pushed
+    directly); revert PRs are found by title, so a revert inside a PR's
+    branch or a revert PR's merge commit isn't counted twice.
+    """
     since = now - timedelta(days=days)
-    merged = [p for p in prs if p.get("merged_at") and parse(p["merged_at"]) >= since]
+
+    def within(stamp):
+        return since <= parse(stamp) <= now
+
+    merged = [p for p in prs if p.get("merged_at") and within(p["merged_at"])]
     dropped = [
         p for p in prs
-        if not p.get("merged_at") and p.get("closed_at") and parse(p["closed_at"]) >= since
+        if not p.get("merged_at") and p.get("closed_at") and within(p["closed_at"])
     ]
     by_tier = {t: [] for t in (*TIERS, "none")}
     for p in merged:
         by_tier[tier_of(p)].append(p["number"])
     reverts = [{"pr": p["number"], "title": p["title"]} for p in merged if is_revert(p["title"])]
-    seen = {r["title"] for r in reverts}
-    for c in main_commits:
+    for c in direct_commits:
         subject = c["commit"]["message"].splitlines()[0]
-        if is_revert(subject) and parse(c["commit"]["committer"]["date"]) >= since and subject not in seen:
+        if is_revert(subject) and within(c["commit"]["committer"]["date"]):
             reverts.append({"commit": c["sha"][:7], "title": subject})
     verdicts = {p["number"]: first_push_green(p, runs_by_pr.get(p["number"], [])) for p in merged}
     judged = [n for n, v in verdicts.items() if v is not None]
@@ -148,14 +157,18 @@ def main():
         )
         if parse(p["closed_at"]) >= oldest
     ]
-    commits = gh(f"repos/{args.repo}/commits?sha=main&since={stamp}&per_page=100")
+    # Revert commits that no PR contains: pushed straight to main.
+    direct = [
+        c for c in gh(f"repos/{args.repo}/commits?sha=main&since={stamp}&per_page=100")
+        if is_revert(c["commit"]["message"]) and not gh(f"repos/{args.repo}/commits/{c['sha']}/pulls?per_page=100")
+    ]
     runs_by_pr = {
         p["number"]: ci_runs(args.repo, p["head"]["ref"]) for p in prs if p.get("merged_at")
     }
     print(json.dumps({
         "repo": args.repo,
         "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "windows": [summarize(prs, commits, runs_by_pr, now, d) for d in WINDOWS],
+        "windows": [summarize(prs, direct, runs_by_pr, now, d) for d in WINDOWS],
     }, indent=2))
 
 

@@ -8,24 +8,37 @@ name: Release smoke
 # Runs on workflow_run, not release: Release publishes with GITHUB_TOKEN, and
 # events made with that token don't start workflows. Release also succeeds on
 # build-only runs, so the gate job first checks that a release for the run's
-# version exists and was published after the run started.
+# version exists and was published after the run started. Run it by hand with
+# a tag to re-check a release that Release updated in place (a recovery
+# publish or a re-run keeps the old publish time, so the gate skips it).
 
 on:
   workflow_run:
     workflows: [Release]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to smoke-test (vX.Y.Z)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-smoke-${{ github.event.workflow_run.id }}
+  group: release-smoke-${{ github.event.workflow_run.id || github.run_id }}
   cancel-in-progress: false
+
+# `shell: bash` runs steps with -o pipefail; the default doesn't.
+defaults:
+  run:
+    shell: bash
 
 jobs:
   gate:
     name: Did the run publish?
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -41,10 +54,25 @@ jobs:
           REPO: ${{ github.repository }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           STARTED: ${{ github.event.workflow_run.run_started_at }}
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            if ! [[ "$INPUT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::tag must look like v1.2.3"
+              exit 1
+            fi
+            gh api "repos/$REPO/releases/tags/$INPUT_TAG" --jq 'select(.draft | not) | .tag_name' | grep -qx "$INPUT_TAG" || {
+              echo "::error::no published release $INPUT_TAG"
+              exit 1
+            }
+            echo "tag=$INPUT_TAG" >> "$GITHUB_OUTPUT"
+            echo "sha=$(gh api "repos/$REPO/commits/$INPUT_TAG" --jq .sha)" >> "$GITHUB_OUTPUT"
+            echo "Smoke-testing $INPUT_TAG by hand." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           # The version Release read: Cargo.toml at the run's commit.
           version="$(gh api "repos/$REPO/contents/Cargo.toml?ref=$HEAD_SHA" --jq .content \
-            | base64 -d | sed -n 's/^version = "\([^"]*\)"$/\1/p' | head -n1)"
+            | base64 -d | sed -n 's/^version = "\([^"]*\)"$/\1/p' | awk 'NR == 1')"
           if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::no version in Cargo.toml at $HEAD_SHA"
             exit 1
@@ -134,15 +162,21 @@ jobs:
           RELEASE_RUN_URL: ${{ github.event.workflow_run.html_url }}
         run: |
           export TITLE="Release smoke failed: ${TAG:-version unknown}"
-          existing="$(gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
-            --jq '.[] | select(.pull_request == null and .title == env.TITLE) | .number' | head -n1)"
+          # Explicit pages (not --paginate) so this also runs through the
+          # cloud sessions' GitHub proxy; the list includes PRs, skipped here.
+          existing=""
+          for page in $(seq 1 50); do
+            batch="$(gh api "repos/$REPO/issues?state=open&per_page=100&page=$page")"
+            existing="$(jq -r '[.[] | select(.pull_request == null and .title == env.TITLE) | .number][0] // empty' <<< "$batch")"
+            if [ -n "$existing" ] || [ "$(jq length <<< "$batch")" -lt 100 ]; then break; fi
+          done
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL"
             exit 0
           fi
           body="$(cat <<EOF
           The published Linux download failed its check after the Release run
-          $RELEASE_RUN_URL.
+          ${RELEASE_RUN_URL:-(a manual run)}.
 
           Failed run (download, SHA256SUMS.txt, \`tests/smoke.sh\`): $RUN_URL
 

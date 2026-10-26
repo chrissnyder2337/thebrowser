@@ -74,18 +74,24 @@ class Digest(unittest.TestCase):
         self.assertEqual(week["closed_unmerged"], [{"number": 5, "title": "Area: change"}])
         self.assertEqual(digest_data.summarize(prs, [], {}, NOW, 28)["merged"]["by_tier"]["tier:1"]["prs"], [4])
 
-    def test_reverts_from_prs_and_main_without_duplicates(self):
+    def test_reverts_from_pr_titles_and_direct_commits(self):
         prs = [pr(7, title='Revert "Art: palette"')]
-        commits = [
-            {"sha": "abcdef1234", "commit": {"message": 'Revert "Art: palette"\n\nbody',
+        direct = [
+            {"sha": "abcdef1234", "commit": {"message": 'Revert "UI: toolbar"\n\nbody',
                                               "committer": {"date": "2026-10-22T00:00:00Z"}}},
             {"sha": "1234567890", "commit": {"message": 'Revert "UI: old"',
                                               "committer": {"date": "2026-09-01T00:00:00Z"}}},
             {"sha": "fedcba9876", "commit": {"message": "Docs: Revert is a word",
                                               "committer": {"date": "2026-10-22T00:00:00Z"}}},
         ]
-        self.assertEqual(digest_data.summarize(prs, commits, {}, NOW, 7)["reverts"],
-                         [{"pr": 7, "title": 'Revert "Art: palette"'}])
+        self.assertEqual(digest_data.summarize(prs, direct, {}, NOW, 7)["reverts"], [
+            {"pr": 7, "title": 'Revert "Art: palette"'},
+            {"commit": "abcdef1", "title": 'Revert "UI: toolbar"'},
+        ])
+
+    def test_window_ends_at_now(self):
+        prs = [pr(1, merged="2026-10-25T00:00:00Z"), pr(2, merged="2026-10-27T00:00:00Z")]
+        self.assertEqual(digest_data.summarize(prs, [], {}, NOW, 7)["merged"]["by_tier"]["none"]["prs"], [1])
 
     def test_first_push_is_the_first_run_after_the_pr_opened(self):
         p = pr(9)

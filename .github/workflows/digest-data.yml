@@ -18,6 +18,11 @@ concurrency:
   group: digest-data
   cancel-in-progress: false
 
+# `shell: bash` runs steps with -o pipefail; the default doesn't.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   collect:
     name: Collect the numbers
