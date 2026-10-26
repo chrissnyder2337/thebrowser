@@ -840,24 +840,42 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
 
 ### First steps, in order
 
-1. Add `CLAUDE.md`, the cloud environment setup script and the SessionStart
-   hook fallback (Phase 0).
-2. Add the Playwright harness with fixtures, retro-look behavior tests and
-   chrome-page tests, and wire it into CI (Phase 1.1).
-3. Add golden screenshots and the oracle-protection CI check (Phase 1.2, 1.5).
-4. Add the `--self-test` flag and the Xvfb bundle smoke test (Phase 1.4).
-5. Try the `bb` approach on the real CEF bundle in a cloud session (start
-   it, click a toolbar button, read the screenshot). If that works, create
-   the private `thebrowser-scenarios` repo with 5–10 scenarios, the `bb`
-   helper and the broken-build patches. Then build the clean-room
-   `blackbox.yml` job on your Pro token, and check it catches every broken
-   build before it gates anything (Phase 1.6). If CEF won't run that way,
-   keep the scripted smoke test and mark black-box testing disabled.
-6. Add issue templates, labels, the path-to-tier CI step and the plan-gate
-   workflow (Phase 2).
-7. Run the loop on a handful of real issues, adjust `CLAUDE.md` and the
-   skills from what went wrong, then turn on the first background loops.
-   Turn on the black-box explorer only if `/usage` shows room.
+Status as of 2026-10-26: **done** means merged into `main` (or, for step 7's
+loops, in the Phase 3 PR); **you do** is left for the maintainer.
+
+1. **Done.** Add `CLAUDE.md`, the cloud environment setup script and the
+   SessionStart hook fallback (Phase 0).
+2. **Done.** Add the Playwright harness with fixtures, retro-look behavior
+   tests and chrome-page tests, and wire it into CI (Phase 1.1).
+3. **Done.** Add golden screenshots and the oracle-protection CI check
+   (Phase 1.2, 1.5).
+4. **Done.** Add the `--self-test` flag and the Xvfb bundle smoke test
+   (Phase 1.4).
+5. **Built; you do the rest.** Try the `bb` approach on the real CEF
+   bundle in a cloud session (start it, click a toolbar button, read the
+   screenshot). If that works, create the private `thebrowser-scenarios`
+   repo with 5–10 scenarios, the `bb` helper and the broken-build patches.
+   Then build the clean-room `blackbox.yml` job on your Pro token, and
+   check it catches every broken build before it gates anything (Phase
+   1.6). If CEF won't run that way, keep the scripted smoke test and mark
+   black-box testing disabled. *The `bb` check passed (2026-10-24) and
+   `blackbox.yml`, `mutants.yml` and `tools/blackbox/` are built; the
+   private scenarios repo and its secrets are yours to create.*
+6. **Done.** Add issue templates, labels, the path-to-tier CI step and the
+   plan-gate workflow (Phase 2). *The plan and triage routines are in
+   [routines.md](routines.md); you create them.*
+7. **In progress.** Run the loop on a handful of real issues, adjust
+   `CLAUDE.md` and the skills from what went wrong, then turn on the first
+   background loops. Turn on the black-box explorer only if `/usage` shows
+   room.
+   - **Done:** the no-model halves of Phase 3: `cef-watch.yml`,
+     `release-smoke.yml`, `digest-data.yml` and `.github/dependabot.yml`.
+   - **Done:** ready-to-paste routine prompts for the CEF upgrade, lint
+     ratchet, docs drift, weekly digest and black-box explorer in
+     [routines.md](routines.md).
+   - **You do:** create each routine from [routines.md](routines.md), one
+     at a time, checking `/usage` the week after each; create the explorer
+     disabled and turn it on only if `/usage` shows room.
 
 ---
 

@@ -1,0 +1,82 @@
+name: CEF watch
+
+# The CEF watcher's first half (docs/software-factory.md, Phase 3), with no
+# model: once a week, check crates.io for a `cef` release newer than the pin
+# in Cargo.toml, and open one tier:2 issue per new version. The "CEF upgrade"
+# routine (docs/routines.md) starts from that issue.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cef-watch
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check crates.io
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      pin: ${{ steps.check.outputs.pin }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            Cargo.toml
+            .github/scripts/cef_watch.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Compare the pin with crates.io
+        id: check
+        run: |
+          python3 -I .github/scripts/cef_watch.py --cargo-toml Cargo.toml | tee -a "$GITHUB_OUTPUT"
+
+  issue:
+    name: Open the upgrade issue
+    needs: check
+    if: needs.check.outputs.version != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue unless one exists for this version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          VERSION: ${{ needs.check.outputs.version }}
+          PIN: ${{ needs.check.outputs.pin }}
+        run: |
+          export TITLE="CEF upgrade: cef $VERSION is out"
+          # Any state: a closed issue means the maintainer already decided.
+          existing="$(gh api --paginate "repos/$REPO/issues?state=all&labels=tier:2&per_page=100" \
+            --jq '.[] | select(.pull_request == null and .title == env.TITLE) | .number' | head -n1)"
+          if [ -n "$existing" ]; then
+            echo "Issue #$existing already tracks cef $VERSION." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          body="$(cat <<EOF
+          crates.io has \`cef\` **$VERSION**; Cargo.toml pins \`=$PIN\`.
+
+          - Crate: https://crates.io/crates/cef/$VERSION
+          - How to upgrade: \`.claude/skills/cef-upgrade/SKILL.md\`. The pin,
+            \`Cargo.lock\` and \`CEF_CRATE_VERSION\` in the workflows move
+            together, in one tier-2 draft PR, with smoke-test results.
+
+          Opened by \`cef-watch.yml\` (no model). The "CEF upgrade" routine in
+          \`docs/routines.md\` starts from this issue. Close it to skip this
+          version; the watcher won't open it again.
+          EOF
+          )"
+          url="$(gh issue create --repo "$REPO" --title "$TITLE" --label tier:2 --body "$body")"
+          echo "Opened $url" >> "$GITHUB_STEP_SUMMARY"

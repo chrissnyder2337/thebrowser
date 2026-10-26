@@ -1,0 +1,51 @@
+name: Digest data
+
+# The weekly digest's numbers (docs/software-factory.md, Phase 3 → "Weekly
+# digest"), with no model: PRs merged into main by tier, PRs closed without
+# merging, reverts and the first-push green rate, for the last 7 and 28
+# days, as the digest-data artifact. The "Weekly digest" routine
+# (docs/routines.md) writes them up.
+
+on:
+  schedule:
+    - cron: "37 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digest-data
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: Collect the numbers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts/digest_data.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Collect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 -I .github/scripts/digest_data.py --repo "$REPO" > digest.json
+          jq -r '.windows[] | "\(.days) days: \(.merged.count) merged \(.merged.by_tier | to_entries | map("\(.key)=\(.value.count)") | join(" ")), \(.reverts | length) reverts, first-push green \(.first_push_green.green)/\(.first_push_green.judged)"' \
+            digest.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: digest-data
+          path: digest.json
+          if-no-files-found: error
+          retention-days: 35

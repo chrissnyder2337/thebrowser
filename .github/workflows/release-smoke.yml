@@ -1,0 +1,153 @@
+name: Release smoke
+
+# The release download check (docs/software-factory.md, Phase 3), with no
+# model: after a Release run that published, download the Linux asset as a
+# user would, check it against SHA256SUMS.txt, run tests/smoke.sh on it, and
+# open an issue if any of that fails.
+#
+# Runs on workflow_run, not release: Release publishes with GITHUB_TOKEN, and
+# events made with that token don't start workflows. Release also succeeds on
+# build-only runs, so the gate job first checks that a release for the run's
+# version exists and was published after the run started.
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-smoke-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: Did the run publish?
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.gate.outputs.tag }}
+      sha: ${{ steps.gate.outputs.sha }}
+    steps:
+      - name: Find the release this run published
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          STARTED: ${{ github.event.workflow_run.run_started_at }}
+        run: |
+          # The version Release read: Cargo.toml at the run's commit.
+          version="$(gh api "repos/$REPO/contents/Cargo.toml?ref=$HEAD_SHA" --jq .content \
+            | base64 -d | sed -n 's/^version = "\([^"]*\)"$/\1/p' | head -n1)"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::no version in Cargo.toml at $HEAD_SHA"
+            exit 1
+          fi
+          tag="v$version"
+          # Empty for a missing or draft release.
+          published="$(gh api "repos/$REPO/releases/tags/$tag" \
+            --jq 'select(.draft | not) | .published_at' 2>/dev/null || true)"
+          # Both are UTC ISO 8601 (…Z), so they compare as strings.
+          if [ -z "$published" ] || [[ ! "$published" > "$STARTED" ]]; then
+            echo "Run started $STARTED; $tag published ${published:-never}: build-only run, nothing to check." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # A later run may have published this version from another commit
+          # while this one only built; Release tags the commit it ran on.
+          tagged="$(gh api "repos/$REPO/commits/$tag" --jq .sha)"
+          if [ "$tagged" != "$HEAD_SHA" ]; then
+            echo "$tag points at ${tagged:0:7}, not this run's ${HEAD_SHA:0:7}: another run published it." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "Run started $STARTED; $tag published $published: smoke-testing it." | tee -a "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    name: Smoke-test the published Linux asset
+    needs: gate
+    if: needs.gate.outputs.tag != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      ASSET: lantern-linux-x86_64.tar.gz
+    steps:
+      # The smoke test and fixtures from the release's own commit, so its
+      # flags match the binary; the bundle comes from the release.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
+          sparse-checkout: tests/
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq xvfb
+
+      # The public download URLs, with no token, as a user would get them.
+      - name: Download and verify
+        env:
+          REPO: ${{ github.repository }}
+          TAG: ${{ needs.gate.outputs.tag }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/release"
+          cd "$RUNNER_TEMP/release"
+          for file in "$ASSET" SHA256SUMS.txt; do
+            curl -fsSL --retry 3 -o "$file" "https://github.com/$REPO/releases/download/$TAG/$file"
+          done
+          line="$(grep -E "^[0-9a-f]{64}  $ASSET\$" SHA256SUMS.txt)" || {
+            echo "::error::SHA256SUMS.txt has no line for $ASSET"
+            exit 1
+          }
+          sha256sum -c - <<< "$line"
+          tar -xzf "$ASSET"
+
+      - name: Smoke test
+        run: tests/smoke.sh "$RUNNER_TEMP/release/lantern"
+
+  report:
+    name: Open an issue
+    needs: [gate, smoke]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue unless one is open for this run's version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ needs.gate.outputs.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RELEASE_RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          export TITLE="Release smoke failed: ${TAG:-version unknown}"
+          existing="$(gh api --paginate "repos/$REPO/issues?state=open&per_page=100" \
+            --jq '.[] | select(.pull_request == null and .title == env.TITLE) | .number' | head -n1)"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL"
+            exit 0
+          fi
+          body="$(cat <<EOF
+          The published Linux download failed its check after the Release run
+          $RELEASE_RUN_URL.
+
+          Failed run (download, SHA256SUMS.txt, \`tests/smoke.sh\`): $RUN_URL
+
+          Opened by \`release-smoke.yml\` (no model). The release stays
+          published; fix it with a new version (\`.claude/skills/release/SKILL.md\`).
+          EOF
+          )"
+          gh issue create --repo "$REPO" --title "$TITLE" --label bug --body "$body"
