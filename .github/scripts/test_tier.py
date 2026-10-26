@@ -75,7 +75,8 @@ class PathTiers(unittest.TestCase):
                      "tools/blackbox/mutants/x.patch", "tools/bump-version.sh",
                      ".github/workflows/release.yml", ".github/tiers.yml",
                      ".github/scripts/tier.py", ".github/labels.yml",
-                     ".github/ISSUE_TEMPLATE/bug.yml", ".claude/settings.json"):
+                     ".github/ISSUE_TEMPLATE/bug.yml", ".claude/settings.json",
+                     ".claude-plugin/marketplace.json"):
             self.assertEqual(tier.path_tier(path, CONFIG), 2, path)
 
     def test_nothing_under_github_is_tier0_even_if_listed(self):

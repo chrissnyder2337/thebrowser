@@ -183,16 +183,26 @@ number). It is never triggered from a PR.
 
 ## Claude review
 
-`claude-review.yml` runs `/code-review --comment` on a PR in GitHub
-Actions, on the maintainer's Claude token. Like the black-box test, only the
-maintainer starts it (**Run workflow** on `main`, with the PR number), and it
-waits on the `review` environment. It reads the PR head as data, never
-builds or runs it, and can only read files and post comments.
+`claude-review.yml` runs Anthropic's `code-review` plugin with `--comment`
+on a PR in GitHub Actions, on the maintainer's Claude token. The plugin is
+pinned to a commit in `.claude-plugin/marketplace.json`. Like the black-box
+test, only the maintainer starts it (**Run workflow** on `main`, with the PR
+number), and it waits on the `review` environment. `main` is the workspace
+and the PR head is data in `pr-head/`, never built or run. The reviewer can
+read workspace files and run `gh pr view|diff|list|comment`, `gh issue
+view|list` and `gh search`; it posts its findings as one PR comment (the
+action's inline-comment tool only exists on PR events).
 
 - **When to ask for it:** on every tier-2 PR, once CI is green on the head
-  you want reviewed, and again only if a later push changes the code
-  substantially. Not on tier 0 or tier 1 (the in-session `/code-review`
+  you want reviewed. Not on tier 0 or tier 1 (the in-session `/code-review`
   covers those). Say in the PR description that it's due.
+- The plugin skips PRs that are closed, drafts, trivial, or already have a
+  comment from Claude, so mark the PR ready first. It reviews a PR once: to
+  review again after a substantial change, delete its earlier comment first.
+- It runs several agents, some on Opus, so one review uses noticeably more
+  Pro usage than an in-session `/code-review`.
+- To see why a review posted nothing, start it with `show_result`, which
+  adds the review's final text to the job summary (public on this repo).
 - Its comments are review findings like any other: fix and push, or reply
   on the thread with why not.
 
