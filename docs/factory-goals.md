@@ -93,6 +93,12 @@ the goal marked the phase disabled, just merge.
 
 ## Goal 4: Intake, tiers and review (Phase 2)
 
+*Done in PR #20. On purpose, the repo goes beyond items (1) and (2):
+`tier.yml` also runs on `ready_for_review` and `edited`, and only tiers
+PRs into `main`. Pixel art, app icons, edited fixtures and the factory's
+own docs are tier 1, and new fixture pages are tier 0 (see `tiers.yml`).
+Don't re-run this goal to "restore" the narrower wording.*
+
 ```text
 /goal Phase 2 of docs/software-factory.md is implemented and open as a draft PR titled "Factory phase 2: intake and tiers". Show as command output in this session:
 (1) .github/tiers.yml mapping paths to tiers as the plan's risk-tier table states. Tier 0 only when every changed path is on the tier-0 allowlist, and nothing under .github/ is tier 0. Dependabot PRs changing only uses: lines in workflows are tier 1. Any other .github/ change, tools/blackbox/, Cargo.toml and Cargo.lock are tier 2. Otherwise the highest tier touched. The logic lives in a script with unit tests (mixed tiers, renames, uses-only bumps, a PR editing tiers.yml), run here and passing.
