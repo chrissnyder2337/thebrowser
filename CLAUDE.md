@@ -49,9 +49,11 @@ don't repeat them here.
 ## Risk tiers
 
 Every PR has a risk tier, 0, 1 or 2, and the highest tier any changed path
-reaches wins. Which paths are in which tier, and what each tier's gate is,
-lives only in the [steward skill's table](.claude/skills/steward/SKILL.md#risk-tiers);
-don't copy or summarise it here.
+reaches wins. Which paths are in which tier lives only in
+[`.github/tiers.yml`](.github/tiers.yml), which the tier labeller applies;
+what each tier's gate is lives only in the
+[steward skill's table](.claude/skills/steward/SKILL.md#risk-tiers).
+Don't copy or summarise either here.
 
 Don't merge PRs yourself unless the maintainer explicitly asks: the
 maintainer merges them (steward skill → "Merging").
@@ -73,5 +75,6 @@ doc comments that say why). Commit messages follow the log: a short
 [steward](.claude/skills/steward/SKILL.md),
 [release](.claude/skills/release/SKILL.md),
 [chrome-command](.claude/skills/chrome-command/SKILL.md),
-[cef-upgrade](.claude/skills/cef-upgrade/SKILL.md). Security rules for edits:
+[cef-upgrade](.claude/skills/cef-upgrade/SKILL.md),
+[factory-issue](.claude/skills/factory-issue/SKILL.md). Security rules for edits:
 [.claude/claude-security-guidance.md](.claude/claude-security-guidance.md).
