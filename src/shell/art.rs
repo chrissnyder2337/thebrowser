@@ -8,6 +8,10 @@ use std::{collections::HashMap, fmt::Write};
 pub const LANTERN: &str = include_str!("../../ui/lantern.txt");
 pub const ICONS: &str = include_str!("../../ui/icons.txt");
 
+fn is_hex_color(color: &str) -> bool {
+    color.len() == 7 && color.starts_with('#') && color[1..].bytes().all(|b| b.is_ascii_hexdigit())
+}
+
 pub struct Sheet {
     palette: HashMap<char, String>,
     frames: Vec<(String, Vec<Vec<char>>)>,
@@ -27,6 +31,11 @@ impl Sheet {
                 if let (Some(key), Some(color)) = (parts.next(), parts.next())
                     && let Some(key) = key.chars().next()
                 {
+                    // Colors go into `fill="…"` unescaped, so only `#rrggbb` is accepted.
+                    assert!(
+                        is_hex_color(color),
+                        "pixel art color {color:?} isn't #rrggbb"
+                    );
                     palette.insert(key, color.to_owned());
                 }
             } else if let Some(name) = line.strip_prefix("frame ") {
@@ -170,6 +179,12 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    #[should_panic(expected = "isn't #rrggbb")]
+    fn rejects_colors_that_would_break_out_of_the_attribute() {
+        Sheet::parse("= A #000\"/><script>x</script>\nframe t\nA\n");
     }
 
     #[test]
