@@ -6,9 +6,14 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  # Tier-0 PRs merge through GITHUB_TOKEN auto-merge (tier.yml), and those
+  # merges don't start push workflows, so main also gets a daily run.
+  schedule:
+    - cron: "41 5 * * *"
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # The event too, so the daily run doesn't cancel a push run on main.
+  group: ci-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
@@ -218,6 +223,18 @@ jobs:
           if [ "$CHECK" = "success" ] && [ "$RESULT" = "changed" ] && [ "$APPROVAL" = "success" ]; then exit 0; fi
           echo "::error::Existing goldens, assertions, test settings or CI files changed together with src/ or ui/, without approval on the oracle environment (the Oracle check log lists them)."
           exit 1
+
+  # The tier labeller's rules (.github/scripts/tier.py, run by tier.yml).
+  tier-script:
+    name: Tier script tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s .github/scripts -v
 
   build:
     name: Build (${{ matrix.os }})

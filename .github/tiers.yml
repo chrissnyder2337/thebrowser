@@ -1,0 +1,66 @@
+# Risk tiers by path (docs/software-factory.md, Phase 2 → "Risk tiers"; the
+# steward skill's table). Read by .github/scripts/tier.py, which
+# .github/workflows/tier.yml runs from the base branch, never from the PR.
+#
+# A path is tier 2 if it matches `tier2`; else tier 1 if it matches `tier1`;
+# else tier 0 if it matches `tier0`, or matches `tier0_new` and the PR adds
+# it; else tier 1. A PR takes the highest tier of its paths (both sides of a
+# rename), so it is tier 0 only when every path is on the tier-0 list.
+# Two rules are built into the script and can't be configured away:
+#   - nothing under .github/ is tier 0 or 1, except a `uses_only_authors` PR
+#     whose diff changes only `uses:` lines in .github/workflows/ (tier 1);
+#   - a PR whose file list can't be read in full is tier 2.
+#
+# Globs: `*` stays within one directory, `**` spans directories.
+# Format: the five keys below, each a list of quoted strings. The script
+# reads only this shape (no YAML library on the runner).
+
+# Low-risk paths. Some tier-0 kinds in the plan (clippy fixes for new lints)
+# live in src/ and can't be told apart by path, so they stay tier 1. The
+# pixel-art text files (ui/icons.txt, ui/lantern.txt) are tier 1 too: their
+# palette colours reach the chrome pages' markup unescaped (src/shell/art.rs),
+# and so is ui/appicon/ (embedded in the binary by src/shell/window.rs).
+tier0:
+  - "docs/**"
+  - "README.md"
+
+# Tier 0 only when the PR adds the file: new fixture pages. Changing or
+# deleting an existing fixture changes what the tests check, so it's tier 1.
+tier0_new:
+  - "tests/fixtures/**"
+
+# Tier 1 even though `tier0` matches: docs that set how the factory runs.
+tier1:
+  - "docs/software-factory.md"
+  - "docs/routines.md"
+  - "docs/blackbox-scenarios.md"
+
+# Security-sensitive, CI, release and oracle paths. Never auto-merged.
+tier2:
+  - ".github/**"
+  - "Cargo.toml"
+  - "Cargo.lock"
+  - "build.rs"
+  - "src/shell/client.rs"
+  - "src/shell/commands.rs"
+  - "src/shell/util.rs"
+  - "src/main.rs"
+  - "src/shell/mod.rs"
+  - "src/lib.rs"
+  - "src/win.rs"
+  - "src/mac/**"
+  - "src/bin/**"
+  - "resources/**"
+  - "tools/blackbox/**"
+  - "tools/bump-version.sh"
+  - "tools/oracle-guard.sh"
+  - "tools/cloud-setup.sh"
+  - ".claude/settings.json"
+  - ".claude/hooks/**"
+  - "package.json"
+  - "package-lock.json"
+  - "playwright.config.js"
+
+# PR authors whose `uses:`-only workflow bumps are tier 1 instead of 2.
+uses_only_authors:
+  - "dependabot[bot]"

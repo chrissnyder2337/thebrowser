@@ -1,0 +1,124 @@
+name: Tier
+
+# The tier labeller (docs/software-factory.md, Phase 2 → "Risk tiers").
+# pull_request_target runs this file as it is on the base branch, and the job
+# checks out only the base branch: tiers.yml and the tier script come from
+# there, the PR's files come from the API, and no PR code ever runs. It holds
+# no Claude token. It labels the PR tier:0/1/2 and, in the same job (labels
+# and merges made with GITHUB_TOKEN don't start other workflows), turns
+# auto-merge on for tier-0 PRs from this repository's branches and off for
+# anything else. It re-tiers after every push.
+
+on:
+  pull_request_target:
+    # Also ready_for_review (auto-merge can't be turned on for a draft) and
+    # edited (retargeting a PR changes its diff).
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tier-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  tier:
+    name: Tier label and auto-merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Enabling auto-merge needs both; acceptable only because nothing here
+    # runs PR code or holds a Claude token.
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # Tiers are main's policy (and tiers.yml comes from the base), so a PR
+      # into any other branch only loses auto-merge.
+      - name: Leave PRs into other branches alone
+        id: base
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          if [ "$BASE" = main ]; then echo "main=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "Base is $BASE, not main: no tier."
+          if [ "$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge != null')" = true ]; then
+            gh pr merge "$PR" --repo "$REPO" --disable-auto
+          fi
+
+      # The base branch only, at the commit the event names: never the PR ref.
+      - name: Check out the base branch
+        if: steps.base.outputs.main == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          sparse-checkout: |
+            .github/tiers.yml
+            .github/scripts/tier.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Tier the PR
+        if: steps.base.outputs.main == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          # Head and file count from the API, read before the file list. If
+          # a push lands in between, the counts disagree (tier 2) or the
+          # auto-merge below refuses the moved head; the next event re-tiers.
+          gh api "repos/$REPO/pulls/$PR" \
+            --jq '[.head.sha, .changed_files, .draft, (.auto_merge != null)] | @tsv' > pr.tsv
+          IFS=$'\t' read -r head count draft auto < pr.tsv
+          gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" \
+            --jq '.[] | {filename, status, previous_filename, patch} | tojson' > files.jsonl
+          tier="$(python3 -I .github/scripts/tier.py --config .github/tiers.yml \
+            --files files.jsonl --author "$AUTHOR" --expected-count "$count")"
+          echo "PR #$PR at $head: tier $tier"
+          echo "PR #$PR at \`$head\`: **tier $tier**" >> "$GITHUB_STEP_SUMMARY"
+
+          # Off first, before anything else can fail, so a PR that left
+          # tier 0 never keeps auto-merge.
+          eligible=false
+          if [ "$tier" = 0 ] && [ "$HEAD_REPO" = "$REPO" ]; then eligible=true; fi
+          if [ "$eligible" = false ] && [ "$auto" = true ]; then
+            gh pr merge "$PR" --repo "$REPO" --disable-auto
+            echo "Auto-merge turned off: tier $tier, or a PR from a fork."
+          fi
+
+          labels="$(gh api "repos/$REPO/issues/$PR/labels" --jq '.[].name')"
+          for old in 0 1 2; do
+            if [ "$old" != "$tier" ] && grep -qx "tier:$old" <<< "$labels"; then
+              gh api -X DELETE "repos/$REPO/issues/$PR/labels/tier:$old" > /dev/null
+            fi
+          done
+          gh api -X POST "repos/$REPO/issues/$PR/labels" -f "labels[]=tier:$tier" > /dev/null
+
+          if [ "$eligible" = true ]; then
+            if [ "$draft" = true ]; then
+              echo "Draft PR: auto-merge waits for ready_for_review."
+            else
+              # Merge commits (steward skill), pinned to the head just tiered.
+              gh pr merge "$PR" --repo "$REPO" --auto --merge --match-head-commit "$head"
+              echo "Auto-merge on (merge commit) once the required checks pass."
+            fi
+          fi
+
+      # If tiering failed or was stopped partway, don't leave auto-merge on
+      # for a head that wasn't judged tier 0.
+      - name: Turn auto-merge off after a failure
+        if: failure() || cancelled()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if [ "$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge != null')" = true ]; then
+            gh pr merge "$PR" --repo "$REPO" --disable-auto
+          fi

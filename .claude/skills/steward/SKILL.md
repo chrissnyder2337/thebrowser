@@ -10,7 +10,10 @@ description: Lantern's conventions for getting a pull request merged — the che
 - **`main` is protected.** Changes land only through pull requests, with these
   three checks passing on the PR's current head:
   `Linux (fmt, clippy, test, bundle)`, `Build (macos-latest)` and
-  `Build (windows-latest)`. No approvals are required.
+  `Build (windows-latest)`. No approvals are required. Tier-0 auto-merge
+  waits only on required checks, so `Playwright (web layer, goldens)`,
+  `Bundle smoke test`, `Oracle guard` and `Tier script tests` should be
+  required too (the maintainer sets this).
 - **Merge with a merge commit.** Don't squash or rebase: the history keeps the
   separate steps (milestones, renames, fixes).
 - **Start work from the latest `origin/main`.** Once a branch's PR has merged,
@@ -45,11 +48,42 @@ Every PR has a tier; **the highest tier any changed path reaches wins**, and
 a PR is tier 0 only if every path is low-risk. Say the tier in the PR
 description.
 
+The examples below are a guide; the labeller's path lists in
+`.github/tiers.yml` decide.
+
 | Tier | Examples | Gate |
 |---|---|---|
-| **0** | Typo and docs fixes, README screenshots, clippy fixes for new lints, pixel-art tweaks, new fixture pages. Nothing under `.github/`. | Auto-merge through the tier labeller once it exists (Phase 2); see "Merging". |
+| **0** | Typo and docs fixes, README screenshots, new fixture pages. Nothing under `.github/`, nothing in `src/` or `ui/` (clippy fixes and pixel-art tweaks are tier 1 by path), and not the factory's own docs. | Auto-merge (merge commit) through the tier labeller once the required checks pass; see "Merging". |
 | **1** | Retro looks, internal page styling, new toolbar commands, settings additions, dial-up profiles; Dependabot bumps that only change `uses:` lines. | The maintainer looks at the plan, screenshots and test changes, and skims the code. |
-| **2** | `client.rs` request, popup and download handling; the `lantern.invalid` router in `commands.rs`; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml`, `Cargo.lock`; `release.yml`, `bump-version.sh`; anything else under `.github/`; `tools/blackbox/`. | The maintainer reads the whole diff; also run `/security-review` in the session. Never auto-merged. |
+| **2** | `client.rs` request, popup and download handling; the `lantern.invalid` router in `commands.rs`; `util.rs` escaping and URL normalization; sandbox and helper setup; the CEF pin, `Cargo.toml`, `Cargo.lock`; `release.yml`, `bump-version.sh`; anything else under `.github/`; `tools/blackbox/`. | The maintainer reads the whole diff; also run `/security-review` in the session, and ask for `claude-review.yml` (below). Never auto-merged. |
+
+### The tier labeller
+
+`.github/workflows/tier.yml` sets the tier; you don't. For PRs into `main`,
+on every `opened`, `synchronize`, `reopened`, `ready_for_review` and
+`edited` event, it runs from the base branch (`pull_request_target`, base checkout only, no PR code), reads
+`.github/tiers.yml` and `.github/scripts/tier.py` from there, takes the
+changed files from the API, and replaces any old `tier:*` label with
+`tier:0`, `tier:1` or `tier:2`. Which paths land where is in `tiers.yml`;
+both sides of a rename count, a fixture page is tier 0 only when it's
+new, and a Dependabot PR that only changes `uses:`
+lines in workflows is tier 1.
+
+- **Tier 0 auto-merges.** For a tier-0, non-draft PR from a branch in this
+  repository, the same job runs `gh pr merge --auto --merge`, so GitHub
+  merges it with a merge commit once the required checks pass. Fork PRs are
+  labelled but never auto-merged.
+- **Leaving tier 0 turns it off.** A push that makes the PR tier 1 or 2 gets
+  the new label and `gh pr merge --disable-auto` (so does any tier-1 or
+  tier-2 PR that has auto-merge on, and a PR moved off `main`).
+  The maintainer merges tier 1 and 2 by hand, not through auto-merge. Keep tier-0 PRs to tier-0
+  paths; split anything else into its own PR.
+- If the label disagrees with your reading of the diff, say so in the PR;
+  don't relabel by hand, and don't touch `tiers.yml` or the script in a
+  feature PR (that makes it tier 2).
+- Merges made by `GITHUB_TOKEN` don't start push workflows, so `ci.yml`
+  also runs daily on `main`. After a tier-0 auto-merge, CI on `main` shows
+  up in that run (or start **Run workflow** on `ci.yml`).
 
 ## Oracle rules
 
@@ -147,6 +181,21 @@ number). It is never triggered from a PR.
   and monthly, dispatch `mutants.yml`, then `blackbox.yml` once per broken
   build. Each one must fail a scenario.
 
+## Claude review
+
+`claude-review.yml` runs `/code-review --comment` on a PR in GitHub
+Actions, on the maintainer's Claude token. Like the black-box test, only the
+maintainer starts it (**Run workflow** on `main`, with the PR number), and it
+waits on the `review` environment. It reads the PR head as data, never
+builds or runs it, and can only read files and post comments.
+
+- **When to ask for it:** on every tier-2 PR, once CI is green on the head
+  you want reviewed, and again only if a later push changes the code
+  substantially. Not on tier 0 or tier 1 (the in-session `/code-review`
+  covers those). Say in the PR description that it's due.
+- Its comments are review findings like any other: fix and push, or reply
+  on the thread with why not.
+
 ## How CI is wired, and how it has failed
 
 - `.github/actions/setup-cef` restores the CEF distribution from cache (or
@@ -179,7 +228,7 @@ number). It is never triggered from a PR.
 
 **Never merge a tier 1 or tier 2 PR**: they wait for the maintainer, who
 merges them. Tier 0 PRs merge only through the tier labeller's auto-merge
-once it exists (Phase 2); until then, leave every PR for the maintainer.
+(above); never merge one yourself or turn auto-merge on by hand.
 The steps below are for the maintainer, or for a merge they explicitly ask
 for.
 
