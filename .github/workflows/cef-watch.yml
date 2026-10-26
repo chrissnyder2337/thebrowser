@@ -67,11 +67,16 @@ jobs:
           # Explicit pages (not --paginate) so this also runs through the
           # cloud sessions' GitHub proxy; the list includes PRs, skipped here.
           existing=""
+          listed=false
           for page in $(seq 1 50); do
             batch="$(gh api "repos/$REPO/issues?state=all&per_page=100&page=$page")"
             existing="$(jq -r '[.[] | select(.pull_request == null and .title == env.TITLE) | .number][0] // empty' <<< "$batch")"
-            if [ -n "$existing" ] || [ "$(jq length <<< "$batch")" -lt 100 ]; then break; fi
+            if [ -n "$existing" ] || [ "$(jq length <<< "$batch")" -lt 100 ]; then listed=true; break; fi
           done
+          if [ "$listed" != true ]; then
+            echo "::error::more than 5000 issues and PRs; can't rule out a duplicate"
+            exit 1
+          fi
           if [ -n "$existing" ]; then
             echo "Issue #$existing already tracks cef $VERSION." >> "$GITHUB_STEP_SUMMARY"
             exit 0

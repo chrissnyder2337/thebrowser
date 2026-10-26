@@ -61,12 +61,14 @@ jobs:
               echo "::error::tag must look like v1.2.3"
               exit 1
             fi
-            gh api "repos/$REPO/releases/tags/$INPUT_TAG" --jq 'select(.draft | not) | .tag_name' | grep -qx "$INPUT_TAG" || {
+            found="$(gh api "repos/$REPO/releases/tags/$INPUT_TAG" --jq 'select(.draft | not) | .tag_name' 2>/dev/null || true)"
+            if [ "$found" != "$INPUT_TAG" ]; then
               echo "::error::no published release $INPUT_TAG"
               exit 1
-            }
+            fi
+            sha="$(gh api "repos/$REPO/commits/$INPUT_TAG" --jq .sha)"
             echo "tag=$INPUT_TAG" >> "$GITHUB_OUTPUT"
-            echo "sha=$(gh api "repos/$REPO/commits/$INPUT_TAG" --jq .sha)" >> "$GITHUB_OUTPUT"
+            echo "sha=$sha" >> "$GITHUB_OUTPUT"
             echo "Smoke-testing $INPUT_TAG by hand." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -147,7 +149,9 @@ jobs:
   report:
     name: Open an issue
     needs: [gate, smoke]
-    if: failure()
+    # On a manual run only a failed smoke test counts: a gate failure there
+    # is a mistyped tag, not a broken release.
+    if: failure() && (github.event_name != 'workflow_dispatch' || needs.smoke.result == 'failure')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -165,11 +169,16 @@ jobs:
           # Explicit pages (not --paginate) so this also runs through the
           # cloud sessions' GitHub proxy; the list includes PRs, skipped here.
           existing=""
+          listed=false
           for page in $(seq 1 50); do
             batch="$(gh api "repos/$REPO/issues?state=open&per_page=100&page=$page")"
             existing="$(jq -r '[.[] | select(.pull_request == null and .title == env.TITLE) | .number][0] // empty' <<< "$batch")"
-            if [ -n "$existing" ] || [ "$(jq length <<< "$batch")" -lt 100 ]; then break; fi
+            if [ -n "$existing" ] || [ "$(jq length <<< "$batch")" -lt 100 ]; then listed=true; break; fi
           done
+          if [ "$listed" != true ]; then
+            echo "::error::more than 5000 issues and PRs; can't rule out a duplicate"
+            exit 1
+          fi
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --repo "$REPO" --body "Failed again: $RUN_URL"
             exit 0

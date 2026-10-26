@@ -27,8 +27,9 @@ def gh(path, key=None, stop=None):
     """Every item of a list endpoint (path has per_page=100), page by page.
 
     Explicit page numbers rather than --paginate, whose Link URLs the
-    cloud sessions' GitHub proxy refuses, so the script also runs there. key picks the list out of an object response; stop(item)
-    ends the walk early on a sorted list.
+    cloud sessions' GitHub proxy refuses, so the script also runs there.
+    key picks the list out of an object response; stop(item) ends the
+    walk early on a sorted list.
     """
     items = []
     for page in range(1, 100):
