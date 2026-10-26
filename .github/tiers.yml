@@ -38,6 +38,7 @@ tier1:
 # Security-sensitive, CI, release and oracle paths. Never auto-merged.
 tier2:
   - ".github/**"
+  - ".claude-plugin/**"
   - "Cargo.toml"
   - "Cargo.lock"
   - "build.rs"

@@ -1,0 +1,17 @@
+{
+  "name": "lantern-review",
+  "owner": { "name": "chrissnyder2337" },
+  "description": "Plugins that .github/workflows/claude-review.yml installs, each pinned to a commit. Nothing here is copied: the sources are fetched at those SHAs.",
+  "plugins": [
+    {
+      "name": "code-review",
+      "description": "Anthropic's code-review plugin (anthropics/claude-code, plugins/code-review), pinned",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/claude-code.git",
+        "path": "plugins/code-review",
+        "sha": "398b6d71cb850ddaa0a92e7005146d0f676a5db1"
+      }
+    }
+  ]
+}
