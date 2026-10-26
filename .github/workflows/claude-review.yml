@@ -89,6 +89,18 @@ jobs:
             -o -name CLAUDE.local.md -o -name .gitignore -o -name .ignore -o -name .rgignore \
             -o -type l \) -prune -exec rm -rf -- {} +
 
+      # CLAUDE_CODE_SUBPROCESS_ENV_SCRUB (below) runs Claude's Bash in its
+      # sandbox, which on Linux needs bubblewrap and socat, and on Ubuntu 24.04
+      # unprivileged user namespaces; without them every Bash call fails.
+      # claude-code-action sets this up itself only for allowed_non_write_users.
+      - name: Install the Bash sandbox's dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends bubblewrap socat
+          if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
       # Reads outside the workspace aren't auto-approved, so headless runs
       # deny them; on top of that, Read (which also covers Glob and Grep) is
       # denied for /proc, /etc, /tmp, the runner's temp, tool and action dirs,
