@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern Factory Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column with wide diagram plates; three swimlane colors (you / Claude / GitHub) carry through every diagram. */
+:root {
+  --bg: #f3f5f7;
+  --paper: #ffffff;
+  --ink: #17202b;
+  --muted: #5a6675;
+  --rule: #d5dbe2;
+  --lane: #e9edf1;
+  --you: #b86a00;      --you-soft: #fdf0dc;
+  --agent: #2f5fd0;    --agent-soft: #e5ecfc;
+  --bot: #4f5d6e;      --bot-soft: #e8ecf0;
+  --t0: #1d8a55; --t1: #b98a00; --t2: #c43b3b;
+  --t0-soft: #e2f4ea; --t1-soft: #fbf2d6; --t2-soft: #fbe5e5;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11161d; --paper: #18202a; --ink: #e6ebf1; --muted: #9aa6b4; --rule: #2c3744; --lane: #1d2631;
+  --you: #f0a43c; --you-soft: #3a2a12; --agent: #8aa9ff; --agent-soft: #1d2a4a; --bot: #a9b6c4; --bot-soft: #26303c;
+  --t0: #4fcb8a; --t1: #e6be3c; --t2: #f07a7a; --t0-soft: #15342a; --t1-soft: #3a3214; --t2-soft: #3d1c1e;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11161d; --paper: #18202a; --ink: #e6ebf1; --muted: #9aa6b4; --rule: #2c3744; --lane: #1d2631;
+  --you: #f0a43c; --you-soft: #3a2a12; --agent: #8aa9ff; --agent-soft: #1d2a4a; --bot: #a9b6c4; --bot-soft: #26303c;
+  --t0: #4fcb8a; --t1: #e6be3c; --t2: #f07a7a; --t0-soft: #15342a; --t1-soft: #3a3214; --t2-soft: #3d1c1e;
+  color-scheme: dark }
+
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.01em; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; max-width: 66ch; }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--lane); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font: 600 0.74rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 18px; }
+.lede { font-size: 1.12rem; color: var(--muted); }
+.lede strong { color: var(--ink); }
+
+header { display: grid; gap: 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 0.9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 2px solid; }
+.sw.you { background: var(--you-soft); border-color: var(--you); }
+.sw.agent { background: var(--agent-soft); border-color: var(--agent); }
+.sw.bot { background: var(--bot-soft); border-color: var(--bot); }
+
+.plate { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.plate svg { display: block; width: 100%; min-width: 640px; height: auto; }
+svg text { font-family: var(--body); fill: var(--ink); }
+svg .lanehead { font: 600 13px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+svg .t { font-weight: 600; font-size: 14.5px; }
+svg .s { font-size: 12px; fill: var(--muted); }
+svg .m { font-family: var(--mono); font-size: 11.5px; }
+svg .edge { fill: none; stroke: var(--muted); stroke-width: 1.6; }
+svg .dash { stroke-dasharray: 5 4; }
+svg .elabel { font: 11px var(--mono); fill: var(--muted); }
+svg .n-you { fill: var(--you-soft); stroke: var(--you); stroke-width: 1.6; }
+svg .n-agent { fill: var(--agent-soft); stroke: var(--agent); stroke-width: 1.6; }
+svg .n-bot { fill: var(--bot-soft); stroke: var(--bot); stroke-width: 1.6; }
+svg .lane { fill: var(--lane); }
+svg .gate { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+.caption { font-size: 0.9rem; color: var(--muted); }
+
+/* Oracle pipeline */
+.stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.stage { padding: 14px 14px 16px; border-left: 1px solid var(--rule); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.stage:first-child { border-left: 0; }
+.stage .when { font: 600 0.72rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.chip { display: block; padding: 7px 10px; border-radius: 6px; border: 1.5px solid; font-size: 0.86rem; line-height: 1.35; }
+.chip small { display: block; color: var(--muted); font-size: 0.78rem; }
+.chip.agent { background: var(--agent-soft); border-color: var(--agent); }
+.chip.bot { background: var(--bot-soft); border-color: var(--bot); }
+.chip.you { background: var(--you-soft); border-color: var(--you); }
+.arrowrow { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); font: 600 0.72rem var(--mono); color: var(--muted); }
+.arrowrow span { padding: 0 14px 6px; border-bottom: 2px solid var(--rule); position: relative; }
+.arrowrow span:last-child::after { content: ""; position: absolute; right: -1px; bottom: -6px; border: 5px solid transparent; border-left: 8px solid var(--rule); }
+@media (max-width: 760px) {
+  .stages, .arrowrow { grid-template-columns: 1fr 1fr; }
+  .stage:nth-child(3) { border-left: 0; }
+  .stage:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .arrowrow { display: none; }
+}
+@media (max-width: 460px) { .stages { grid-template-columns: 1fr; } .stage { border-left: 0; border-top: 1px solid var(--rule); } .stage:first-child { border-top: 0; } }
+
+/* Tiers */
+.tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tier { background: var(--paper); border: 1px solid var(--rule); border-top: 5px solid; border-radius: 8px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.tier.t0 { border-top-color: var(--t0); } .tier.t1 { border-top-color: var(--t1); } .tier.t2 { border-top-color: var(--t2); }
+.tier .label { font: 600 0.8rem var(--mono); }
+.t0 .label { color: var(--t0); } .t1 .label { color: var(--t1); } .t2 .label { color: var(--t2); }
+.tier dl { margin: 0; display: grid; gap: 8px; font-size: 0.9rem; }
+.tier dt { font: 600 0.7rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.tier dd { margin: 0; }
+.tier .you-do { background: var(--you-soft); border-radius: 6px; padding: 8px 10px; font-size: 0.88rem; }
+@media (max-width: 760px) { .tiers { grid-template-columns: 1fr; } }
+
+/* Touchpoints */
+.touch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.tp { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.tp .where { font: 600 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--you); }
+.tp ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 0.92rem; }
+@media (max-width: 680px) { .touch { grid-template-columns: 1fr; } }
+
+.tablewrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; min-width: 560px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 600 0.72rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font: 600 0.72rem var(--mono); padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.pill.model { background: var(--agent-soft); color: var(--agent); }
+.pill.nomodel { background: var(--bot-soft); color: var(--bot); }
+.pill.built { background: var(--t0-soft); color: var(--t0); }
+.pill.todo { background: var(--you-soft); color: var(--you); }
+
+.labels { display: flex; flex-wrap: wrap; gap: 10px; }
+.lbl { font: 600 0.82rem var(--mono); padding: 5px 10px; border-radius: 99px; border: 1.5px solid var(--rule); background: var(--paper); }
+.lbl em { font: 400 0.82rem var(--body); color: var(--muted); font-style: normal; margin-left: 6px; }
+
+.status { display: grid; gap: 10px; }
+.status li { display: grid; grid-template-columns: 86px minmax(0,1fr); gap: 12px; align-items: baseline; }
+.status ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Lantern · chrissnyder2337/thebrowser</div>
+  <h1>How the Lantern factory runs</h1>
+  <p class="lede">Claude sessions write the code. A wall of automated checks (the <strong>oracle</strong>) decides whether it works. The <strong>risk tier</strong> of the files touched decides who merges. <strong>You</strong> spend your time where it counts most: approving the issue, approving the plan, and reading the risky diffs.</p>
+  <div class="legend" aria-label="Diagram legend">
+    <span><i class="sw you"></i>You (the maintainer)</span>
+    <span><i class="sw agent"></i>Claude (routines and cloud sessions)</span>
+    <span><i class="sw bot"></i>GitHub Actions (no model, or run from <code>main</code>)</span>
+  </div>
+</header>
+
+<section>
+  <div class="eyebrow">Diagram 1</div>
+  <h2>One issue, start to merge</h2>
+  <p>The main loop from <code>docs/software-factory.md</code> Phase 2 and the <code>factory-issue</code> skill. Read top to bottom; arrows that cross a lane are hand-offs.</p>
+  <div class="plate">
+    <svg viewBox="0 0 780 1000" role="img" aria-labelledby="d1t">
+      <title id="d1t">Swimlane diagram of an issue moving from filing to merge across you, Claude and GitHub Actions</title>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" style="fill: var(--muted)"/>
+        </marker>
+      </defs>
+      <!-- lanes -->
+      <rect class="lane" x="10" y="10" width="240" height="760" rx="8"/>
+      <rect class="lane" x="270" y="10" width="240" height="760" rx="8"/>
+      <rect class="lane" x="530" y="10" width="240" height="760" rx="8"/>
+      <text class="lanehead" x="130" y="40" text-anchor="middle" style="fill: var(--you)">You</text>
+      <text class="lanehead" x="390" y="40" text-anchor="middle" style="fill: var(--agent)">Claude</text>
+      <text class="lanehead" x="650" y="40" text-anchor="middle" style="fill: var(--bot)">GitHub Actions</text>
+      <text class="elabel" x="390" y="56" text-anchor="middle">scheduled tasks · cloud sessions</text>
+      <text class="elabel" x="650" y="56" text-anchor="middle">thebrowser's runners</text>
+
+      <!-- row 1 -->
+      <rect class="n-you" x="25" y="64" width="210" height="66" rx="7"/>
+      <text class="t" x="40" y="88">1 · File an issue</text>
+      <text class="s" x="40" y="106">feature / bug / chore template:</text>
+      <text class="s" x="40" y="121">acceptance criteria, proposed tier</text>
+      <rect class="n-agent" x="285" y="64" width="210" height="66" rx="7"/>
+      <text class="t" x="300" y="88">Triage routine</text>
+      <text class="s" x="300" y="106">labels, duplicate check, asks</text>
+      <text class="s" x="300" y="121">questions. Never starts work.</text>
+      <path class="edge" d="M235 97 H283" marker-end="url(#ah)"/>
+      <text class="elabel" x="260" y="90" text-anchor="middle">opened</text>
+
+      <!-- row 2 -->
+      <path class="edge" d="M130 130 V160" marker-end="url(#ah)"/>
+      <rect class="n-you" x="25" y="162" width="210" height="58" rx="7"/>
+      <text class="t" x="40" y="186">2 · Add <tspan class="m">factory:ready</tspan></text>
+      <text class="s" x="40" y="206">only your label starts work</text>
+      <rect class="n-agent" x="285" y="162" width="210" height="88" rx="7"/>
+      <text class="t" x="300" y="186">Plan routine</text>
+      <text class="s" x="300" y="204">posts one "Plan" comment:</text>
+      <text class="s" x="300" y="220">files · approach · proving tests</text>
+      <text class="s" x="300" y="236">· tier. No code yet.</text>
+      <path class="edge" d="M235 191 H283" marker-end="url(#ah)"/>
+      <text class="elabel" x="260" y="184" text-anchor="middle">labeled</text>
+
+      <!-- row 3: plan gate -->
+      <path class="edge" d="M390 250 V292 H237" marker-end="url(#ah)"/>
+      <rect class="gate" x="25" y="264" width="210" height="80" rx="7"/>
+      <text class="t" x="40" y="288">3 · Approve the plan</text>
+      <text class="s" x="40" y="306">comment "approved" on the issue,</text>
+      <text class="s" x="40" y="321">or correct it: Claude posts a</text>
+      <text class="s" x="40" y="336">revised plan and waits again</text>
+      <text class="elabel" x="247" y="284">main human checkpoint</text>
+
+      <!-- row 4: implement -->
+      <path class="edge" d="M130 344 V372" marker-end="url(#ah)"/>
+      <rect class="n-you" x="25" y="374" width="210" height="58" rx="7"/>
+      <text class="t" x="40" y="398">4 · Start a cloud session</text>
+      <text class="s" x="40" y="418">"implement issue #N"</text>
+      <rect class="n-agent" x="285" y="374" width="210" height="150" rx="7"/>
+      <text class="t" x="300" y="398">Implement under /goal</text>
+      <text class="s" x="300" y="418">factory:in-progress, draft PR</text>
+      <text class="s" x="300" y="434">with Closes #N + Progress list</text>
+      <text class="s" x="300" y="452">writes code + proving tests</text>
+      <text class="s" x="300" y="470">fmt · clippy · tests · cef/dox</text>
+      <text class="s" x="300" y="486">Playwright · smoke · /code-review</text>
+      <text class="s" x="300" y="504">then push, mark ready</text>
+      <path class="edge" d="M235 403 H283" marker-end="url(#ah)"/>
+
+      <!-- CI -->
+      <rect class="n-bot" x="545" y="374" width="210" height="120" rx="7"/>
+      <text class="t" x="560" y="398">CI oracle (ci.yml)</text>
+      <text class="s" x="560" y="418">Linux: fmt, clippy, test, bundle</text>
+      <text class="s" x="560" y="436">Playwright + golden shots</text>
+      <text class="s" x="560" y="454">bundle smoke test (Xvfb)</text>
+      <text class="s" x="560" y="472">Oracle check: tests untouched?</text>
+      <path class="edge" d="M495 416 H543" marker-end="url(#ah)"/>
+      <text class="elabel" x="503" y="409">push</text>
+      <path class="edge dash" d="M545 470 H497" marker-end="url(#ah)"/>
+      <text class="elabel" x="501" y="462">red</text>
+      <text class="elabel" x="300" y="544" style="fill: var(--agent)">red CI → fix and re-push</text>
+
+      <!-- labeller -->
+      <rect class="n-bot" x="545" y="514" width="210" height="76" rx="7"/>
+      <text class="t" x="560" y="538">Tier labeller (tier.yml)</text>
+      <text class="s" x="560" y="556">reads tiers.yml from main,</text>
+      <text class="s" x="560" y="572">sets tier:0 / tier:1 / tier:2</text>
+      <path class="edge" d="M650 494 V512" marker-end="url(#ah)"/>
+
+      <!-- split bus -->
+      <path class="edge" d="M650 590 V612"/>
+      <path class="edge" d="M130 612 H650"/>
+      <path class="edge" d="M130 612 V632" marker-end="url(#ah)"/>
+      <path class="edge" d="M390 612 V632" marker-end="url(#ah)"/>
+      <path class="edge" d="M650 612 V632" marker-end="url(#ah)"/>
+
+      <!-- tier nodes -->
+      <rect x="25" y="634" width="210" height="124" rx="7" style="fill: var(--t1-soft); stroke: var(--t1); stroke-width: 1.6"/>
+      <text class="t" x="40" y="658">Tier 1 · skim</text>
+      <text class="s" x="40" y="678">you check plan, screenshots</text>
+      <text class="s" x="40" y="694">and test changes, skim code</text>
+      <text class="s" x="40" y="712">run blackbox.yml if users</text>
+      <text class="s" x="40" y="728">will see the change</text>
+      <text class="s" x="40" y="746" style="fill: var(--ink); font-weight:600">you merge</text>
+
+      <rect x="285" y="634" width="210" height="124" rx="7" style="fill: var(--t2-soft); stroke: var(--t2); stroke-width: 1.6"/>
+      <text class="t" x="300" y="658">Tier 2 · full review</text>
+      <text class="s" x="300" y="678">session runs /security-review</text>
+      <text class="s" x="300" y="694">you run claude-review.yml</text>
+      <text class="s" x="300" y="710">and blackbox.yml</text>
+      <text class="s" x="300" y="728">you read the whole diff</text>
+      <text class="s" x="300" y="746" style="fill: var(--ink); font-weight:600">you merge · never auto</text>
+
+      <rect x="545" y="634" width="210" height="124" rx="7" style="fill: var(--t0-soft); stroke: var(--t0); stroke-width: 1.6"/>
+      <text class="t" x="560" y="658">Tier 0 · dark lane</text>
+      <text class="s" x="560" y="678">docs, README, new fixtures</text>
+      <text class="s" x="560" y="694">labeller turns on auto-merge</text>
+      <text class="s" x="560" y="712">you read the weekly digest,</text>
+      <text class="s" x="560" y="728">not the diff</text>
+      <text class="s" x="560" y="746" style="fill: var(--ink); font-weight:600">merges itself when green</text>
+
+      <!-- merge -->
+      <path class="edge" d="M130 758 V800" marker-end="url(#ah)"/>
+      <path class="edge" d="M390 758 V800" marker-end="url(#ah)"/>
+      <path class="edge" d="M650 758 V800" marker-end="url(#ah)"/>
+      <rect class="gate" x="25" y="802" width="730" height="50" rx="7"/>
+      <text class="t" x="390" y="832" text-anchor="middle">Merged into main (merge commit) · issue closes</text>
+
+      <path class="edge dash" d="M390 852 V884" marker-end="url(#ah)"/>
+      <text class="elabel" x="400" y="874">only if the PR bumps the version</text>
+      <rect class="n-bot" x="135" y="886" width="510" height="78" rx="7"/>
+      <text class="t" x="390" y="910" text-anchor="middle">Release</text>
+      <text class="s" x="390" y="930" text-anchor="middle">release.yml builds Linux, macOS and Windows downloads,</text>
+      <text class="s" x="390" y="946" text-anchor="middle">then release-smoke.yml re-downloads and smoke-tests the Linux build</text>
+    </svg>
+  </div>
+  <p class="caption">If Claude hits a decision only you can make, it comments, adds <code>factory:needs-human</code> and stops. One implementing session runs at a time.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Diagram 2</div>
+  <h2>Where each piece runs</h2>
+  <p>The factory runs in three places: your Claude account, this repository's GitHub Actions, and a private repository that only stores the hidden test scenarios. Nothing runs on your own computer.</p>
+  <div class="plate">
+    <svg viewBox="0 0 780 710" role="img" aria-labelledby="d2t">
+      <title id="d2t">Map of where the factory runs: Claude scheduled tasks and cloud sessions, GitHub Actions in thebrowser, and the private scenarios repository</title>
+      <!-- zone A: claude.ai -->
+      <rect x="10" y="10" width="290" height="546" rx="8" style="fill: var(--lane); stroke: var(--agent); stroke-width: 1.5"/>
+      <text class="lanehead" x="25" y="36" style="fill: var(--agent)">claude.ai · Anthropic cloud</text>
+      <text class="s" x="25" y="54">runs as you · uses your Pro plan</text>
+      <rect class="n-agent" x="25" y="70" width="260" height="228" rx="7"/>
+      <text class="t" x="40" y="94">Scheduled tasks</text>
+      <text class="m" x="40" y="112" style="fill: var(--muted)">claude.ai/code/routines</text>
+      <g class="s">
+        <text x="40" y="138" style="fill: var(--ink); font-weight: 600">Triage</text><text x="168" y="138">issue opened</text>
+        <text x="40" y="160" style="fill: var(--ink); font-weight: 600">Plan</text><text x="168" y="160">factory:ready</text>
+        <text x="40" y="182" style="fill: var(--ink); font-weight: 600">CEF upgrade</text><text x="168" y="182">cef-watch issue</text>
+        <text x="40" y="204" style="fill: var(--ink); font-weight: 600">Black-box explorer</text><text x="168" y="204">nightly · 30 min</text>
+        <text x="40" y="226" style="fill: var(--ink); font-weight: 600">Lint ratchet</text><text x="168" y="226">weekly</text>
+        <text x="40" y="248" style="fill: var(--ink); font-weight: 600">Docs drift</text><text x="168" y="248">monthly</text>
+        <text x="40" y="270" style="fill: var(--ink); font-weight: 600">Weekly digest</text><text x="168" y="270">weekly</text>
+      </g>
+      <path class="edge" d="M155 298 V326" marker-end="url(#ah)"/>
+      <text class="elabel" x="162" y="318">new session per run</text>
+      <rect class="n-agent" x="25" y="328" width="260" height="112" rx="7"/>
+      <text class="t" x="40" y="352">Cloud session</text>
+      <text class="m" x="40" y="372">TheBrowserCloudEnvironment</text>
+      <text class="s" x="40" y="390">CEF preinstalled, setup cached</text>
+      <text class="s" x="40" y="406">repo: thebrowser · no connectors</text>
+      <text class="s" x="40" y="422">pushes only claude/ branches</text>
+      <path class="edge" d="M155 466 V442" marker-end="url(#ah)"/>
+      <text class="elabel" x="162" y="458">same setup</text>
+      <rect class="n-you" x="25" y="468" width="260" height="60" rx="7"/>
+      <text class="t" x="40" y="492">Your implementing session</text>
+      <text class="s" x="40" y="512">you start it · factory-issue skill</text>
+
+      <!-- zone B: thebrowser on GitHub -->
+      <rect x="480" y="10" width="290" height="546" rx="8" style="fill: var(--lane); stroke: var(--bot); stroke-width: 1.5"/>
+      <text class="lanehead" x="495" y="36" style="fill: var(--bot)">github.com · thebrowser</text>
+      <text class="s" x="495" y="54">GitHub-hosted Ubuntu runners</text>
+      <rect class="gate" x="495" y="70" width="260" height="56" rx="7"/>
+      <text class="t" x="510" y="94">Repository</text>
+      <text class="s" x="510" y="114">issues · PRs · branches · labels</text>
+      <rect class="n-bot" x="495" y="146" width="260" height="168" rx="7"/>
+      <text class="t" x="510" y="170">Plain Actions</text>
+      <text class="s" x="510" y="188">no model · no Claude token</text>
+      <g class="m">
+        <text x="510" y="210">ci.yml · PRs, pushes, daily</text>
+        <text x="510" y="226">tier.yml · base branch only</text>
+        <text x="510" y="242">mutants.yml · broken builds</text>
+        <text x="510" y="258">cef-watch · digest-data</text>
+        <text x="510" y="274">release · release-smoke</text>
+        <text x="510" y="290">Dependabot</text>
+      </g>
+      <rect x="495" y="330" width="260" height="52" rx="7" style="fill: var(--you-soft); stroke: var(--you); stroke-width: 1.6"/>
+      <text class="t" x="510" y="352"><tspan class="m" style="font-size:13px">oracle</tspan> environment</text>
+      <text class="s" x="510" y="372">your approval gate · holds no secret</text>
+      <rect x="495" y="398" width="260" height="144" rx="7" style="fill: var(--t2-soft); stroke: var(--t2); stroke-width: 1.6"/>
+      <text class="t" x="510" y="422">Holds your Claude token</text>
+      <text class="m" x="510" y="440">CLAUDE_CODE_OAUTH_TOKEN</text>
+      <text class="s" x="510" y="456">workflow file always from main</text>
+      <text class="m" x="510" y="480" style="font-weight:600">claude-review.yml</text>
+      <text class="s" x="510" y="496">review environment · you start it</text>
+      <text class="m" x="510" y="516" style="font-weight:600">blackbox.yml</text>
+      <text class="s" x="510" y="532">blackbox environment · you, or weekly</text>
+
+      <!-- links between A and B -->
+      <path class="edge" d="M493 92 H287" marker-end="url(#ah)"/>
+      <text class="elabel" x="390" y="84" text-anchor="middle">issue events</text>
+      <path class="edge" d="M287 384 H390 V116 H493" marker-end="url(#ah)"/>
+      <g class="elabel" text-anchor="end">
+        <text x="382" y="230">push claude/</text>
+        <text x="382" y="244">branches,</text>
+        <text x="382" y="258">comment,</text>
+        <text x="382" y="272">open PRs</text>
+      </g>
+
+      <!-- zone D: you -->
+      <rect x="10" y="580" width="290" height="116" rx="8" style="fill: var(--you-soft); stroke: var(--you); stroke-width: 1.5"/>
+      <text class="lanehead" x="25" y="606" style="fill: var(--you)">You · phone or browser</text>
+      <text class="s" x="25" y="628">Claude app: create scheduled tasks,</text>
+      <text class="s" x="25" y="644">start sessions, check /usage</text>
+      <text class="s" x="25" y="666">GitHub: labels, plan approvals,</text>
+      <text class="s" x="25" y="682">Run workflow, approvals, merges</text>
+      <path class="edge" d="M155 578 V530" marker-end="url(#ah)"/>
+      <path class="edge" d="M300 640 H430 V356 H493" marker-end="url(#ah)"/>
+      <text class="elabel" x="306" y="632">labels · approvals</text>
+      <text class="elabel" x="306" y="656">Run workflow · merge</text>
+
+      <!-- zone C: private scenarios repo -->
+      <rect x="480" y="580" width="290" height="116" rx="8" style="fill: var(--paper); stroke: var(--bot); stroke-width: 1.5; stroke-dasharray: 6 4"/>
+      <text class="lanehead" x="495" y="606" style="fill: var(--bot)">github.com · private repo</text>
+      <text class="m" x="495" y="626" style="font-weight:600">thebrowser-scenarios</text>
+      <text class="s" x="495" y="644">hidden scenarios + fixture pages</text>
+      <text class="s" x="495" y="662">stores only · nothing runs here</text>
+      <text class="s" x="495" y="680">never attached to a Claude session</text>
+      <path class="edge" d="M625 578 V544" marker-end="url(#ah)"/>
+      <text class="elabel" x="632" y="570">read-only deploy key</text>
+    </svg>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Where</th><th>What runs there</th><th>Set up in</th></tr></thead>
+      <tbody>
+        <tr><td><b>Claude scheduled tasks</b><br><span class="caption">Anthropic cloud, as you</span></td><td>Triage and Plan (fired by GitHub issue events), CEF upgrade (fired by the issue <code>cef-watch.yml</code> opens), Black-box explorer, Lint ratchet, Docs drift, Weekly digest. Each run is a fresh cloud session.</td><td>claude.ai/code/routines, prompts copied from <code>docs/routines.md</code>. Repository thebrowser, TheBrowserCloudEnvironment, all connectors removed.</td></tr>
+        <tr><td><b>Claude cloud sessions you start</b></td><td>The implementing session for each approved plan (and sessions like this one). Same environment, so CEF is already installed.</td><td>The Claude app or claude.ai/code. The setup script and SessionStart hook run <code>tools/cloud-setup.sh</code>.</td></tr>
+        <tr><td><b>GitHub Actions in thebrowser</b><br><span class="caption">no Claude token</span></td><td>CI, the tier labeller (from the base branch only), mutants, the CEF and digest data jobs, release and release smoke, Dependabot.</td><td><code>.github/workflows/</code>. All tier 2 to change.</td></tr>
+        <tr><td><b>GitHub Actions in thebrowser</b><br><span class="caption">with your Claude token</span></td><td><code>claude-review.yml</code> and <code>blackbox.yml</code>. They run Claude Code through the GitHub Action, only from <code>main</code>, and wait for your approval on the <code>review</code> or <code>blackbox</code> environment. The black-box job gets only the built bundle and <code>tools/blackbox/</code>, with no Lantern source.</td><td>Repo secret <code>CLAUDE_CODE_OAUTH_TOKEN</code> (from <code>claude setup-token</code>), plus the two environments with you as required reviewer.</td></tr>
+        <tr><td><b>Private repo thebrowser-scenarios</b></td><td>Nothing runs here. <code>blackbox.yml</code> checks it out read-only to get the hidden scenarios and their fixture pages.</td><td>You create it. Then set the <code>SCENARIOS_REPO</code> variable and the <code>SCENARIOS_DEPLOY_KEY</code> secret in thebrowser.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Diagram 3</div>
+  <h2>The oracle: what a change has to get past</h2>
+  <p>Each layer catches a kind of breakage the one before it can miss. The last layer is a tester that has never seen the code.</p>
+  <div class="plate" style="padding:0">
+    <div class="arrowrow" aria-hidden="true"><span style="padding-top:14px">before push</span><span style="padding-top:14px">on every PR push</span><span style="padding-top:14px">tier 1–2, on request</span><span style="padding-top:14px">after merge</span></div>
+    <div class="stages">
+      <div class="stage">
+        <div class="when">In the session</div>
+        <span class="chip agent">Steward "Before every push" checks<small>rustfmt, clippy -D warnings, unit tests, macOS + Windows cef/dox</small></span>
+        <span class="chip agent">/code-review on the branch<small>findings fixed or answered in the PR</small></span>
+        <span class="chip agent">Edit hook on <code>tests/golden/</code><small>asks before an existing golden changes</small></span>
+        <span class="chip agent">Xvfb screenshots<small>for UI changes; evidence, not a gate</small></span>
+      </div>
+      <div class="stage">
+        <div class="when">CI · required checks</div>
+        <span class="chip bot">Linux: fmt, clippy, test, bundle</span>
+        <span class="chip bot">Playwright + goldens<small>pinned Docker image, pixel compare</small></span>
+        <span class="chip bot">Bundle smoke test<small>real CEF build under Xvfb, <code>--self-test</code></small></span>
+        <span class="chip bot">Oracle check<small>src/ui changed <b>and</b> old tests changed → waits for <em>you</em> on the <code>oracle</code> environment</small></span>
+      </div>
+      <div class="stage">
+        <div class="when">You press Run workflow</div>
+        <span class="chip you">claude-review.yml<small>tier 2 · /code-review posted as a PR comment</small></span>
+        <span class="chip you">blackbox.yml<small>clean room on a thebrowser Actions runner: only the built bundle plus hidden scenarios read from the private repo; no source, no diff</small></span>
+        <span class="chip bot">mutants.yml<small>broken builds that prove the black-box judge catches faults</small></span>
+      </div>
+      <div class="stage">
+        <div class="when">On main</div>
+        <span class="chip bot">Daily CI run<small>covers tier-0 auto-merges</small></span>
+        <span class="chip bot">Weekly black-box run</span>
+        <span class="chip agent">Nightly black-box explorer<small>tries to break Lantern, files issues with screenshots</small></span>
+        <span class="chip bot">Release smoke</span>
+      </div>
+    </div>
+  </div>
+  <p class="caption">The rule underneath it: agents may <b>add</b> goldens and tests but never edit or loosen existing ones. Only your approval on the <code>oracle</code> environment overrides that, because a label could be added by the agent acting as you.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Diagram 4</div>
+  <h2>Risk tiers decide your review</h2>
+  <p>The labeller picks the tier from the paths changed, using <code>.github/tiers.yml</code> on <code>main</code>. The highest tier any file reaches wins, so one risky file makes the whole PR tier 2. Nobody can relabel from inside the PR.</p>
+  <div class="tiers">
+    <div class="tier t0">
+      <div class="label">tier:0 · dark lane</div>
+      <dl>
+        <div><dt>Paths</dt><dd><code>docs/**</code>, <code>README.md</code>, newly added <code>tests/fixtures/**</code></dd></div>
+        <div><dt>Gate</dt><dd>Required checks green, then GitHub auto-merges.</dd></div>
+      </dl>
+      <div class="you-do">You: nothing per PR. Read the weekly digest.</div>
+    </div>
+    <div class="tier t1">
+      <div class="label">tier:1 · skim</div>
+      <dl>
+        <div><dt>Paths</dt><dd>Most of <code>src/</code> and <code>ui/</code>: retro looks, internal pages, toolbar commands, settings, dial-up. Factory docs. Dependabot <code>uses:</code> bumps.</dd></div>
+        <div><dt>Gate</dt><dd>Green CI, then your look.</dd></div>
+      </dl>
+      <div class="you-do">You: check the plan, screenshots and test changes, skim the code, merge. Run the black-box test if users will see it.</div>
+    </div>
+    <div class="tier t2">
+      <div class="label">tier:2 · full review</div>
+      <dl>
+        <div><dt>Paths</dt><dd><code>client.rs</code>, <code>commands.rs</code>, <code>util.rs</code>, <code>main.rs</code>, sandbox, <code>Cargo.toml/lock</code>, all of <code>.github/</code>, <code>tools/blackbox/</code>, hooks, release scripts</dd></div>
+        <div><dt>Gate</dt><dd>/security-review, claude-review.yml, black-box test.</dd></div>
+      </dl>
+      <div class="you-do">You: start both workflows, approve their environment, read every line, merge. Never auto-merged.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Your controls</div>
+  <h2>Where you act, and what each action does</h2>
+  <div class="touch">
+    <div class="tp">
+      <div class="where">GitHub · Issues</div>
+      <h3>Set direction</h3>
+      <ul>
+        <li>File issues with the templates. Write acceptance criteria as things a user would see.</li>
+        <li>Add <code>factory:ready</code> to start the plan routine. Nobody else's label counts.</li>
+        <li>Reply "approved" (or "approved with: …") to the Plan comment, or correct it.</li>
+        <li>Answer anything tagged <code>factory:needs-human</code>.</li>
+      </ul>
+    </div>
+    <div class="tp">
+      <div class="where">Claude · cloud session</div>
+      <h3>Start the build</h3>
+      <ul>
+        <li>After approving a plan, open a session on this repo and ask it to implement issue #N. The <code>factory-issue</code> skill takes it from there.</li>
+        <li>Use TheBrowserCloudEnvironment so CEF is already installed.</li>
+        <li>Check <code>/usage</code> weekly. Everything shares your Pro budget.</li>
+      </ul>
+    </div>
+    <div class="tp">
+      <div class="where">GitHub · Actions</div>
+      <h3>Spend your token deliberately</h3>
+      <ul>
+        <li><b>Run workflow</b> on <code>claude-review.yml</code> or <code>blackbox.yml</code> with the PR number. They run from <code>main</code>, so a PR can't rewrite them.</li>
+        <li>Approve the <code>review</code>, <code>blackbox</code> or <code>oracle</code> environment when GitHub asks.</li>
+      </ul>
+    </div>
+    <div class="tp">
+      <div class="where">GitHub · Pull requests</div>
+      <h3>Decide what ships</h3>
+      <ul>
+        <li>Merge tier 1 and tier 2 PRs yourself, with a merge commit, once CI is green on the current head.</li>
+        <li>Claude never merges unless you ask it to.</li>
+        <li>To release, merge a version-bump PR (the <code>release</code> skill).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:8px">Labels at a glance</h3>
+  <div class="labels">
+    <span class="lbl">factory:ready<em>you approved the spec</em></span>
+    <span class="lbl">factory:in-progress<em>a session is building it</em></span>
+    <span class="lbl">factory:needs-human<em>waiting on you</em></span>
+    <span class="lbl" style="border-color:var(--t0)">tier:0</span>
+    <span class="lbl" style="border-color:var(--t1)">tier:1</span>
+    <span class="lbl" style="border-color:var(--t2)">tier:2</span>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Background loops</div>
+  <h2>What runs without you asking</h2>
+  <p>Each loop opens at most one small draft PR or issue, and stops quietly when there's nothing to do. Model-backed loops are scheduled tasks you create from <code>docs/routines.md</code>.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Loop</th><th>When</th><th>Runs on</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>Triage</td><td>Issue opened</td><td><span class="pill model">scheduled task</span></td><td>Labels, duplicate check, questions. Never adds <code>factory:ready</code>.</td></tr>
+        <tr><td>Plan</td><td><code>factory:ready</code> added by you</td><td><span class="pill model">scheduled task</span></td><td>One Plan comment on the issue.</td></tr>
+        <tr><td>Black-box explorer</td><td>Nightly, capped ~30 min</td><td><span class="pill model">scheduled task</span></td><td>Issues with screenshots and repro steps. Never blocks a merge.</td></tr>
+        <tr><td>CEF watcher</td><td>Mondays</td><td><span class="pill nomodel">cef-watch.yml</span> → <span class="pill model">scheduled task</span></td><td>Tier-2 draft PR moving the CEF pin, only when a new release exists.</td></tr>
+        <tr><td>Lint ratchet</td><td>Weekly</td><td><span class="pill model">scheduled task</span></td><td>One tiny PR fixing one anti-pattern.</td></tr>
+        <tr><td>Docs drift</td><td>Monthly</td><td><span class="pill model">scheduled task</span></td><td>Tier-0 PR syncing the README with the code.</td></tr>
+        <tr><td>Weekly digest</td><td>Mondays</td><td><span class="pill nomodel">digest-data.yml</span> → <span class="pill model">scheduled task</span></td><td>One issue: what merged by tier, reverts, first-push green rate, usage.</td></tr>
+        <tr><td>Dependency bumps</td><td>Weekly</td><td><span class="pill nomodel">Dependabot</span></td><td>Bump PRs; tier 1 if they only change <code>uses:</code> lines.</td></tr>
+        <tr><td>Release smoke</td><td>After a release publishes</td><td><span class="pill nomodel">release-smoke.yml</span></td><td>An issue if the published download fails its checksum or smoke test.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Status</div>
+  <h2>What's built and what's left for you</h2>
+  <p>From "First steps, in order" in <code>docs/software-factory.md</code>, as of 2026-10-26.</p>
+  <div class="status">
+    <ul>
+      <li><span class="pill built">built</span><span>CLAUDE.md, skills, cloud setup script and SessionStart hook; Playwright suite, goldens, smoke test and Oracle check; issue templates, labels and the tier labeller; claude-review, blackbox, mutants, cef-watch, digest-data and release-smoke workflows.</span></li>
+      <li><span class="pill todo">you do</span><span>Create the private <code>thebrowser-scenarios</code> repo with 5–10 hidden scenarios, plus its deploy key and secrets. Black-box testing gates nothing until it catches every broken build.</span></li>
+      <li><span class="pill todo">you do</span><span>Create the scheduled tasks from <code>docs/routines.md</code> one at a time, explorer first, watching <code>/usage</code> the week after each.</span></li>
+      <li><span class="pill todo">you do</span><span>Run the loop on a handful of real issues and fold what goes wrong back into CLAUDE.md and the skills.</span></li>
+    </ul>
+  </div>
+</section>
+
+<footer>Drawn from <code>docs/software-factory.md</code>, <code>docs/routines.md</code>, <code>.github/tiers.yml</code>, <code>.github/workflows/</code> and the <code>factory-issue</code> and <code>steward</code> skills. Over time, a month with no reverts in a category can move it to a lower tier. Tier 2 never goes dark.</footer>
+</div>
+</body>
+</html>
