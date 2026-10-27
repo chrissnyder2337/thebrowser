@@ -190,7 +190,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Compress-Archive -Path dist/lantern -DestinationPath "lantern-${{ matrix.name }}.zip"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lantern-${{ matrix.name }}
           path: |
@@ -206,7 +206,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           merge-multiple: true
@@ -217,7 +217,7 @@ jobs:
 
       # Creates the tag at this commit if it doesn't exist yet, and updates an
       # existing release for the tag rather than making a second one.
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.plan.outputs.tag }}
           target_commitish: ${{ github.sha }}

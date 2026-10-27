@@ -69,7 +69,7 @@ jobs:
       - name: Bundle
         run: bundle-cef-app lantern -o target/bundle --release
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lantern-linux-x86_64
           path: target/bundle
@@ -80,7 +80,7 @@ jobs:
       - name: Dump pages
         run: LD_LIBRARY_PATH="$CEF_PATH" cargo run --example dump-pages -- target/pages
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lantern-pages
           path: target/pages
@@ -102,7 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: lantern-pages
           path: target/pages
@@ -123,7 +123,7 @@ jobs:
       - name: Playwright tests
         run: HOME=/root npx playwright test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -146,7 +146,7 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -yq xvfb
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: lantern-linux-x86_64
           path: target/bundle
