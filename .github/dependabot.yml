@@ -1,0 +1,29 @@
+# Dependency and Actions bumps (docs/software-factory.md, Phase 3), weekly,
+# no model. A bump that breaks CI gets an agent session started by hand.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 3
+    ignore:
+      # The CEF pin moves only with its binaries and CEF_CRATE_VERSION, in
+      # one PR (CLAUDE.md); cef-watch.yml and the CEF upgrade routine do it.
+      - dependency-name: cef
+      - dependency-name: cef-dll-sys
+    commit-message:
+      prefix: "Deps:"
+
+  - package-ecosystem: github-actions
+    # The workflows, and the composite action they share.
+    directories:
+      - /
+      - /.github/actions/setup-cef
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "CI:"
