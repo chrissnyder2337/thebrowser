@@ -115,7 +115,7 @@ rewrite them to pass.
 ## Before every push
 
 Run what CI runs; one validated push beats several speculative ones. Set up
-CEF once (README → "CEF binaries"), then:
+CEF once (`docs/development.md` → "CEF binaries"), then:
 
 ```sh
 export CEF_PATH="$HOME/.local/share/cef"

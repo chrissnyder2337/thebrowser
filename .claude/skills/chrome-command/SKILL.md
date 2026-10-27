@@ -7,7 +7,7 @@ description: Add or change a Lantern toolbar (or status bar) command end to end 
 
 The toolbar and status bar are `data:` pages built from `ui/toolbar.html` and
 `ui/status.html`. They talk to Rust over the **title channel** and Rust talks
-back with **`lantern.update({...})`** (README → "How it works"). A new command
+back with **`lantern.update({...})`** (`docs/architecture.md` → "The window and its views"). A new command
 touches each hop below. New toolbar commands are **tier 1** (`CLAUDE.md`).
 Anything that changes `lantern.invalid` actions, `client.rs` request handling
 or `util.rs` escaping is **tier 2**: stop and say so in the PR.
@@ -91,4 +91,5 @@ Mention the shortcut in the button's `title`.
 - Run the steward skill's "Before every push" checks, then **run the app and
   look** (steward → Xvfb recipe): click the button, check the content view
   and stderr, and take a screenshot of the toolbar for the PR.
-- Update README → "How it works", which lists the toolbar commands.
+- Update `docs/architecture.md` → "The window and its views", which lists the
+  toolbar commands.

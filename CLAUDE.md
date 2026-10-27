@@ -9,8 +9,9 @@
 - Pull-request conventions are in `.claude/skills/steward/SKILL.md`; releases
   go through `.claude/skills/release/SKILL.md`.
 
-Architecture, build steps and the source layout are in [README.md](README.md);
-don't repeat them here.
+Architecture and the source layout are in
+[docs/architecture.md](docs/architecture.md), build steps and tests in
+[docs/development.md](docs/development.md); don't repeat them here.
 
 ## Before every push
 
