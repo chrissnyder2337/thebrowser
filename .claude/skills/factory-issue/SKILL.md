@@ -20,7 +20,7 @@ other repositories, secrets, or changes to the factory's own files.
 ## 1. Plan (no code yet)
 
 1. Read the issue (problem, acceptance criteria, out of scope, proposed
-   tier) and its comments; read `CLAUDE.md`, the README's source layout,
+   tier) and its comments; read `CLAUDE.md`, the source layout in `docs/architecture.md`,
    the skills that apply (`chrome-command`, `retro-look`, `cef-upgrade`)
    and the code you'd change.
 2. Post **one issue comment**, 5–15 lines, headed `Plan`:

@@ -225,8 +225,9 @@ more than one instance, and never merge.
 
 ### Docs drift
 
-Checks once a month that the README still matches the code, and opens one
-tier-0 fix (README or `docs/` only), which auto-merges when CI is green.
+Checks once a month that the README and the developer docs still match the
+code, and opens one tier-0 fix (README or `docs/` only), which auto-merges
+when CI is green.
 
 | | |
 |---|---|
@@ -241,12 +242,13 @@ You run monthly on chrissnyder2337/thebrowser. Do only this:
 
 1. Stop if an open pull request already comes from a claude/docs-drift-
    branch.
-2. Compare README.md with the code: "Source layout" against the files
-   under src/ and ui/, "Command-line options" against the flags the code
-   parses, the toolbar and status-bar features under "Using Lantern"
-   against the commands in src/shell/commands.rs, and "How it works"
-   (the title channel and the lantern.invalid protocol) against
-   handle_action_url. Also check that every path and
+2. Compare the docs with the code: "Source layout" in
+   docs/architecture.md against the files under src/ and ui/,
+   "Command-line options" in docs/development.md against the flags the
+   code parses, the toolbar and status-bar features under "Using Lantern"
+   in README.md against the commands in src/shell/commands.rs, and "The
+   window and its views" in docs/architecture.md (the title channel and
+   the lantern.invalid protocol) against handle_action_url. Also check that every path and
    skill CLAUDE.md links to exists.
 3. If everything matches, stop and post nothing.
 4. Otherwise fix the docs to match the code, never the other way round,
