@@ -28,6 +28,7 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 | [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 8 | 5 |
 | [Arena](#arena) | 1994-10-24 | Unix (X11), Linux, NeXT | 1 | 0 |
 | [SlipKnot](#slipknot) | 1994-11 | Windows 3.1 | 0 | 1 |
+| [OmniWeb](#omniweb) | 1995-03-17 | NeXTSTEP, OPENSTEP | 0 | 0 |
 | [Opera (MultiTorg Opera)](#opera) | 1995 | Windows, later others | 0 | 2 |
 | [Internet Explorer](#internet-explorer) | 1995-08-24 | Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX | 0 | 12 |
 | [Grail](#grail) | 1995-11 | Unix, Windows, Mac (Python/Tk) | 0 | 1 |
@@ -188,7 +189,7 @@ National Center for Supercomputing Applications (NCSA) · Unix (X11/Motif), Wind
 *Mosaic for X:* Main window with its button row, URL field and page.  
 Credit: Charles Severance · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:NCSA_Mosaic_Browser_Screenshot.png)
 
-Freely licensed on Commons, not copied here yet:
+Freely licensed elsewhere, not copied here yet:
 
 - [DEC VAXstation 4000 96 OpenVMS 6.1.jpeg](https://commons.wikimedia.org/wiki/File:DEC_VAXstation_4000_96_OpenVMS_6.1.jpeg) (CC BY-SA 2.0, Brian Pitts): Photo of a VAXstation running OpenVMS 6.1 with DECwindows, filed under Mosaic on Commons. Check the screen shows Mosaic before copying it.
 
@@ -302,9 +303,10 @@ Credit: 2204happy · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4
 *4.51 (IRIX):* Communicator-era Unix build on an SGI Indy.  
 Credit: Aeroid · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) · [source](https://commons.wikimedia.org/wiki/File:Irix_Netscape451.png)
 
-Freely licensed on Commons, not copied here yet:
+Freely licensed elsewhere, not copied here yet:
 
 - [Netscape Communicator 4.8 Screenshot.png](https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png) (CC0, Indolering): Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.
+- [Flickr: PowerBook Duo230 - NN 2.01](https://www.flickr.com/photos/7940758@N07/3556469060) (CC BY 2.0, MIKI Yoshihito): Photo of a PowerBook Duo 230 whose title says it is running Navigator 2.01. Check the screen before copying it.
 
 Copyrighted screenshots elsewhere (linked, not copied):
 
@@ -352,6 +354,23 @@ MicroMind · Windows 3.1 · [Wikipedia](https://en.wikipedia.org/wiki/SlipKnot_(
 Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Slipknot browser.gif](https://en.wikipedia.org/wiki/File:Slipknot_browser.gif): SlipKnot on Windows 3.1.
+
+<a id="omniweb"></a>
+
+## OmniWeb
+
+Omni Group · NeXTSTEP, OPENSTEP · [Wikipedia](https://en.wikipedia.org/wiki/OmniWeb)
+
+**Look:** A native NeXTSTEP application: commands live in the vertical NeXT menu, with the system's own window frames and controls.
+
+| Version | Released | Notes |
+| --- | --- | --- |
+| first release | 1995-03-17 |  |
+
+Freely licensed elsewhere, not copied here yet:
+
+- [Flickr: OmniWeb 3 on NeXT Cube showing Wikipedia page on NeXT](https://www.flickr.com/photos/45480083@N03/4230174099) (CC BY-SA 2.0, gctwnl): Photo of OmniWeb 3 running on a NeXT Cube.
+- [Flickr: OPENSTEP 4.2 on NeXTdimension Cube Launching OmniWeb 3](https://www.flickr.com/photos/45480083@N03/4230941190) (CC BY-SA 2.0, gctwnl): Photo of OmniWeb 3 starting up under OPENSTEP 4.2.
 
 <a id="opera"></a>
 
@@ -495,7 +514,7 @@ W3C (later with INRIA) · Unix (X11), Windows · [Wikipedia](https://en.wikipedi
 | --- | --- | --- |
 | first release | 1996-07 |  |
 
-Freely licensed on Commons, not copied here yet:
+Freely licensed elsewhere, not copied here yet:
 
 - [1998-amaya-ui.gif](https://commons.wikimedia.org/wiki/File:1998-amaya-ui.gif) (CC BY-SA 3.0, Amaya): The interface, version 1.1 or earlier, as published on the Amaya site in 1998.
 - [1999-v-2-1-amaya-ui.gif](https://commons.wikimedia.org/wiki/File:1999-v-2-1-amaya-ui.gif) (CC BY-SA 3.0, Amaya): The interface of version 2.1 (1999).
@@ -598,7 +617,6 @@ Browsers of the decade that still need a screenshot. A freely licensed one could
 | --- | --- |
 | [MidasWWW](https://en.wikipedia.org/wiki/MidasWWW) | 1992-11-16 |
 | [MacWeb](https://en.wikipedia.org/wiki/MacWeb) | 1994-05-31 |
-| [OmniWeb](https://en.wikipedia.org/wiki/OmniWeb) | 1995-03-17 |
 | [Cyberdog](https://en.wikipedia.org/wiki/Cyberdog) | 1996-02 (beta) |
 | [AWeb](https://en.wikipedia.org/wiki/AWeb) | 1996 |
 | [Voyager (Amiga)](https://en.wikipedia.org/wiki/Voyager_(web_browser)) | 1990s |
@@ -619,6 +637,7 @@ Browsers of the decade that still need a screenshot. A freely licensed one could
    (CC0, CC BY, CC BY-SA, GPL, FAL and similar). Anything marked fair use or
    non-free goes in `linked` instead.
 2. Add it to `catalog.json` with its author, licence, licence URL and source page.
-   A free file found but not downloaded yet goes in `to_copy`; move it to
+   A free file found (on Commons, or on Flickr under CC0, CC BY or CC BY-SA) but not
+   downloaded yet goes in `to_copy`; move it to
    `screenshots` once it is in `images/` and you have checked it shows the browser itself.
 3. Run `python3 render.py` to regenerate this file.
