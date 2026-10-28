@@ -840,8 +840,8 @@ Track these in the weekly digest (rolling 4 weeks). Don't use volume as a goal.
 
 ### First steps, in order
 
-Status as of 2026-10-26: **done** means merged into `main` (or, for step 7's
-loops, in the Phase 3 PR); **you do** is left for the maintainer.
+Status as of 2026-10-28: **done** means merged into `main` or set up by the
+maintainer; **you do** is left for the maintainer.
 
 1. **Done.** Add `CLAUDE.md`, the cloud environment setup script and the
    SessionStart hook fallback (Phase 0).
@@ -851,32 +851,30 @@ loops, in the Phase 3 PR); **you do** is left for the maintainer.
    (Phase 1.2, 1.5).
 4. **Done.** Add the `--self-test` flag and the Xvfb bundle smoke test
    (Phase 1.4).
-5. **Built; you do the rest.** Try the `bb` approach on the real CEF
-   bundle in a cloud session (start it, click a toolbar button, read the
-   screenshot). If that works, create the private `thebrowser-scenarios`
-   repo with 5–10 scenarios, the `bb` helper and the broken-build patches.
-   Then build the clean-room `blackbox.yml` job on your Pro token, and
-   check it catches every broken build before it gates anything (Phase
-   1.6). If CEF won't run that way, keep the scripted smoke test and mark
-   black-box testing disabled. *The `bb` check passed (2026-10-24) and
-   `blackbox.yml`, `mutants.yml` and `tools/blackbox/` are built; the
-   private scenarios repo and its secrets are yours to create.*
+5. **Done.** Try the `bb` approach on the real CEF bundle in a cloud
+   session (start it, click a toolbar button, read the screenshot). If that
+   works, create the private `thebrowser-scenarios` repo with 5–10
+   scenarios, the `bb` helper and the broken-build patches. Then build the
+   clean-room `blackbox.yml` job on your Pro token, and check it catches
+   every broken build before it gates anything (Phase 1.6). *The `bb` check
+   passed (2026-10-24); the scenarios repo and its secrets are set up, and
+   every `mutants.yml` broken build fails at least one scenario.*
 6. **Done.** Add issue templates, labels, the path-to-tier CI step and the
-   plan-gate workflow (Phase 2). *The plan and triage routines are in
-   [routines.md](routines.md); you create them.*
+   plan-gate workflow (Phase 2), and create the plan and triage routines
+   from [routines.md](routines.md).
 7. **In progress.** Run the loop on a handful of real issues, adjust
    `CLAUDE.md` and the skills from what went wrong, then turn on the first
    background loops: the black-box explorer first, nightly, then the
    others one at a time.
    - **Done:** the no-model halves of Phase 3: `cef-watch.yml`,
      `release-smoke.yml`, `digest-data.yml` and `.github/dependabot.yml`.
-   - **Done:** ready-to-paste routine prompts for the CEF upgrade, lint
-     ratchet, docs drift, weekly digest and black-box explorer in
-     [routines.md](routines.md).
-   - **You do:** create each routine from [routines.md](routines.md), one
-     at a time, explorer first (enabled, nightly), checking `/usage` the
-     week after each; move the explorer to weekly if the weekly limit gets
-     tight.
+   - **Done:** every routine in [routines.md](routines.md) is created:
+     the black-box explorer (nightly), CEF upgrade, lint ratchet, docs
+     drift and weekly digest, with `/usage` checked after.
+   - **Done:** a first real issue through the loop (#34, merged as #36);
+     the explorer has filed #39–#41 and the lint ratchet opened #42.
+   - **You do:** take #39–#41 from plan to PR, and fold what goes wrong
+     back into `CLAUDE.md` and the skills.
 
 ---
 
