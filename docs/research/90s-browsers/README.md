@@ -31,8 +31,10 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 | [Opera (MultiTorg Opera)](#opera) | 1995 | Windows, later others | 0 | 2 |
 | [Internet Explorer](#internet-explorer) | 1995-08-24 | Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX | 0 | 7 |
 | [Grail](#grail) | 1995-11 | Unix, Windows, Mac (Python/Tk) | 0 | 1 |
+| [w3m](#w3m) | 1995 | Unix-like | 0 | 0 |
 | [Oracle PowerBrowser](#oracle-powerbrowser) | 1996 | Windows | 1 | 0 |
 | [IBrowse](#ibrowse) | 1996-07-28 | AmigaOS | 0 | 1 |
+| [Amaya](#amaya) | 1996-07 | Unix (X11), Windows | 0 | 0 |
 | [WebTV](#webtv) | 1996-09-18 | Set-top box on a TV | 1 | 0 |
 | [Arachne](#arachne) | 1996-12-22 | DOS, later Linux | 2 | 0 |
 | [HotJava](#hotjava) | 1997-03-24 | Solaris, Windows, any Java platform | 1 | 0 |
@@ -181,6 +183,10 @@ National Center for Supercomputing Applications (NCSA) · Unix (X11/Motif), Wind
 *Mosaic for X:* Main window with its button row, URL field and page.  
 Credit: Charles Severance · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:NCSA_Mosaic_Browser_Screenshot.png)
 
+Freely licensed on Commons, not copied here yet:
+
+- [DEC VAXstation 4000 96 OpenVMS 6.1.jpeg](https://commons.wikimedia.org/wiki/File:DEC_VAXstation_4000_96_OpenVMS_6.1.jpeg) (CC BY-SA 2.0, Brian Pitts): Photo of a VAXstation running OpenVMS 6.1 with DECwindows, filed under Mosaic on Commons. Check the screen shows Mosaic before copying it.
+
 Fair-use screenshots on Wikipedia (linked, not copied):
 
 - [NCSAMosaic1.0Mac.png](https://en.wikipedia.org/wiki/File:NCSAMosaic1.0Mac.png): NCSA Mosaic 1.0 for Macintosh.
@@ -289,6 +295,10 @@ Credit: 2204happy · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4
 
 *4.51 (IRIX):* Communicator-era Unix build on an SGI Indy.  
 Credit: Aeroid · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) · [source](https://commons.wikimedia.org/wiki/File:Irix_Netscape451.png)
+
+Freely licensed on Commons, not copied here yet:
+
+- [Netscape Communicator 4.8 Screenshot.png](https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png) (CC0, Indolering): Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.
 
 Fair-use screenshots on Wikipedia (linked, not copied):
 
@@ -411,6 +421,22 @@ Fair-use screenshots on Wikipedia (linked, not copied):
 
 - [Grail browser on Linux.png](https://en.wikipedia.org/wiki/File:Grail_browser_on_Linux.png): Grail on Linux.
 
+<a id="w3m"></a>
+
+## w3m
+
+Akinori Ito · Unix-like · [Wikipedia](https://en.wikipedia.org/wiki/W3m)
+
+**Look:** A text pager that grew into a browser. It lays out tables and frames in the terminal.
+
+| Version | Released | Notes |
+| --- | --- | --- |
+| first release | 1995 |  |
+
+Freely licensed on Commons, not copied here yet:
+
+- [W3m-wikipedia.png](https://commons.wikimedia.org/wiki/File:W3m-wikipedia.png) (CC BY-SA 4.0, EdC (English Wikipedia)): A modern w3m build showing a Wikipedia page in a terminal.
+
 <a id="oracle-powerbrowser"></a>
 
 ## Oracle PowerBrowser
@@ -443,6 +469,23 @@ Stefan Burström and others · AmigaOS · [Wikipedia](https://en.wikipedia.org/w
 Fair-use screenshots on Wikipedia (linked, not copied):
 
 - [IBrowse Amiga.png](https://en.wikipedia.org/wiki/File:IBrowse_Amiga.png): IBrowse on AmigaOS.
+
+<a id="amaya"></a>
+
+## Amaya
+
+W3C (later with INRIA) · Unix (X11), Windows · [Wikipedia](https://en.wikipedia.org/wiki/Amaya_(web_editor))
+
+**Look:** W3C's test-bed browser, which is also a WYSIWYG editor: you edit a page in the same window you browse it in.
+
+| Version | Released | Notes |
+| --- | --- | --- |
+| first release | 1996-07 |  |
+
+Freely licensed on Commons, not copied here yet:
+
+- [1998-amaya-ui.gif](https://commons.wikimedia.org/wiki/File:1998-amaya-ui.gif) (CC BY-SA 3.0, Amaya): The interface, version 1.1 or earlier, as published on the Amaya site in 1998.
+- [1999-v-2-1-amaya-ui.gif](https://commons.wikimedia.org/wiki/File:1999-v-2-1-amaya-ui.gif) (CC BY-SA 3.0, Amaya): The interface of version 2.1 (1999).
 
 <a id="webtv"></a>
 
@@ -538,9 +581,7 @@ Browsers of the decade that still need a screenshot. A freely licensed one could
 | [MidasWWW](https://en.wikipedia.org/wiki/MidasWWW) | 1992-11-16 |
 | [MacWeb](https://en.wikipedia.org/wiki/MacWeb) | 1994-05-31 |
 | [OmniWeb](https://en.wikipedia.org/wiki/OmniWeb) | 1995-03-17 |
-| [w3m](https://en.wikipedia.org/wiki/W3m) | 1995 |
 | [Cyberdog](https://en.wikipedia.org/wiki/Cyberdog) | 1996-02 (beta) |
-| [Amaya](https://en.wikipedia.org/wiki/Amaya_(web_editor)) | 1996-07 |
 | [AWeb](https://en.wikipedia.org/wiki/AWeb) | 1996 |
 | [Voyager (Amiga)](https://en.wikipedia.org/wiki/Voyager_(web_browser)) | 1990s |
 
@@ -559,4 +600,6 @@ Browsers of the decade that still need a screenshot. A freely licensed one could
    (CC0, CC BY, CC BY-SA, GPL, FAL and similar). Anything marked fair use or
    non-free goes in `linked` instead.
 2. Add it to `catalog.json` with its author, licence, licence URL and source page.
+   A free file found but not downloaded yet goes in `to_copy`; move it to
+   `screenshots` once it is in `images/` and you have checked it shows the browser itself.
 3. Run `python3 render.py` to regenerate this file.

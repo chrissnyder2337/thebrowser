@@ -297,6 +297,15 @@
           "oldweb.today: NCSA Mosaic 3 for Mac, in emulation",
           "https://oldweb.today/?browser=nm3-mac"
         ]
+      ],
+      "to_copy": [
+        {
+          "commons_file": "DEC VAXstation 4000 96 OpenVMS 6.1.jpeg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:DEC_VAXstation_4000_96_OpenVMS_6.1.jpeg",
+          "license": "CC BY-SA 2.0",
+          "author": "Brian Pitts",
+          "shows": "Photo of a VAXstation running OpenVMS 6.1 with DECwindows, filed under Mosaic on Commons. Check the screen shows Mosaic before copying it."
+        }
       ]
     },
     {
@@ -579,6 +588,15 @@
           "oldweb.today: Navigator 4 for Mac, in emulation",
           "https://oldweb.today/?browser=ns4-mac"
         ]
+      ],
+      "to_copy": [
+        {
+          "commons_file": "Netscape Communicator 4.8 Screenshot.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png",
+          "license": "CC0",
+          "author": "Indolering",
+          "shows": "Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds."
+        }
       ]
     },
     {
@@ -859,6 +877,35 @@
       "try": []
     },
     {
+      "id": "w3m",
+      "name": "w3m",
+      "maker": "Akinori Ito",
+      "platforms": [
+        "Unix-like"
+      ],
+      "source": "https://en.wikipedia.org/wiki/W3m",
+      "look": "A text pager that grew into a browser. It lays out tables and frames in the terminal.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1995",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [],
+      "try": [],
+      "to_copy": [
+        {
+          "commons_file": "W3m-wikipedia.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:W3m-wikipedia.png",
+          "license": "CC BY-SA 4.0",
+          "author": "EdC (English Wikipedia)",
+          "shows": "A modern w3m build showing a Wikipedia page in a terminal."
+        }
+      ]
+    },
+    {
       "id": "oracle-powerbrowser",
       "name": "Oracle PowerBrowser",
       "maker": "Oracle",
@@ -915,6 +962,43 @@
         }
       ],
       "try": []
+    },
+    {
+      "id": "amaya",
+      "name": "Amaya",
+      "maker": "W3C (later with INRIA)",
+      "platforms": [
+        "Unix (X11)",
+        "Windows"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Amaya_(web_editor)",
+      "look": "W3C's test-bed browser, which is also a WYSIWYG editor: you edit a page in the same window you browse it in.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1996-07",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [],
+      "try": [],
+      "to_copy": [
+        {
+          "commons_file": "1998-amaya-ui.gif",
+          "source_url": "https://commons.wikimedia.org/wiki/File:1998-amaya-ui.gif",
+          "license": "CC BY-SA 3.0",
+          "author": "Amaya",
+          "shows": "The interface, version 1.1 or earlier, as published on the Amaya site in 1998."
+        },
+        {
+          "commons_file": "1999-v-2-1-amaya-ui.gif",
+          "source_url": "https://commons.wikimedia.org/wiki/File:1999-v-2-1-amaya-ui.gif",
+          "license": "CC BY-SA 3.0",
+          "author": "Amaya",
+          "shows": "The interface of version 2.1 (1999)."
+        }
+      ]
     },
     {
       "id": "webtv",
@@ -1094,19 +1178,9 @@
       "source": "https://en.wikipedia.org/wiki/OmniWeb"
     },
     {
-      "name": "w3m",
-      "date": "1995",
-      "source": "https://en.wikipedia.org/wiki/W3m"
-    },
-    {
       "name": "Cyberdog",
       "date": "1996-02 (beta)",
       "source": "https://en.wikipedia.org/wiki/Cyberdog"
-    },
-    {
-      "name": "Amaya",
-      "date": "1996-07",
-      "source": "https://en.wikipedia.org/wiki/Amaya_(web_editor)"
     },
     {
       "name": "AWeb",
