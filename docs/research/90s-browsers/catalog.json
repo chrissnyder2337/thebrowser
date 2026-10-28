@@ -106,7 +106,12 @@
         }
       ],
       "linked": [],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: MacLynx 2, in emulation",
+          "https://oldweb.today/?browser=ml-mac"
+        ]
+      ]
     },
     {
       "id": "violawww",
@@ -283,7 +288,16 @@
           "shows": "NCSA Mosaic 1.0 for Macintosh."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: NCSA Mosaic 2 for Mac, in emulation",
+          "https://oldweb.today/?browser=nm2-mac"
+        ],
+        [
+          "oldweb.today: NCSA Mosaic 3 for Mac, in emulation",
+          "https://oldweb.today/?browser=nm3-mac"
+        ]
+      ]
     },
     {
       "id": "cello",
@@ -496,9 +510,9 @@
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
         },
         {
-          "file": "images/netscape-3.02-gold.png",
-          "version": "3.02 Gold",
-          "shows": "Windows build (run under Wine).",
+          "file": "images/netscape-3.04-gold.png",
+          "version": "3.04 Gold",
+          "shows": "About page, Windows build (run under Wine). The Commons description says 3.02; the page itself says 3.04 Gold.",
           "commons_file": "Netscape Navigator 3 Screenshot.png",
           "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Navigator_3_Screenshot.png",
           "author": "Indolering",
@@ -562,7 +576,20 @@
           "shows": "Apple Unix with Finder, CommandShell and Netscape 3.01."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: Navigator 4 on Windows, in emulation",
+          "https://oldweb.today/?browser=ns4-win"
+        ],
+        [
+          "oldweb.today: Navigator 3 for Mac, in emulation",
+          "https://oldweb.today/?browser=ns3-mac"
+        ],
+        [
+          "oldweb.today: Navigator 4 for Mac, in emulation",
+          "https://oldweb.today/?browser=ns4-mac"
+        ]
+      ]
     },
     {
       "id": "arena",
@@ -796,7 +823,16 @@
           "shows": "Internet Explorer 5 and Outlook Express for UNIX."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: Internet Explorer 5 on Windows, in emulation",
+          "https://oldweb.today/?browser=ie5"
+        ],
+        [
+          "oldweb.today: Internet Explorer 4 for Mac, in emulation",
+          "https://oldweb.today/?browser=ie4-mac"
+        ]
+      ]
     },
     {
       "id": "grail",

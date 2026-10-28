@@ -92,6 +92,8 @@ University of Kansas; later Thomas Dickey · Unix-like, DOS, Windows, VMS · [Wi
 *2.8.8 (2010s):* The full-screen text interface, unchanged in style from the 1990s releases.  
 Credit: Shah-al · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:Lynx-2.8.8dev.5.png)
 
+Try it: [oldweb.today: MacLynx 2, in emulation](https://oldweb.today/?browser=ml-mac)
+
 <a id="violawww"></a>
 
 ## ViolaWWW
@@ -183,6 +185,10 @@ Fair-use screenshots on Wikipedia (linked, not copied):
 
 - [NCSAMosaic1.0Mac.png](https://en.wikipedia.org/wiki/File:NCSAMosaic1.0Mac.png): NCSA Mosaic 1.0 for Macintosh.
 
+Try it: [oldweb.today: NCSA Mosaic 2 for Mac, in emulation](https://oldweb.today/?browser=nm2-mac)
+
+Try it: [oldweb.today: NCSA Mosaic 3 for Mac, in emulation](https://oldweb.today/?browser=nm3-mac)
+
 <a id="cello"></a>
 
 ## Cello
@@ -269,9 +275,9 @@ Credit: Aeroid · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)
 *2.02:* About page, Windows build.  
 Credit: Indolering · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:Netscape_Navigator_2_Screenshot.png)
 
-<img src="images/netscape-3.02-gold.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 3.02 Gold">
+<img src="images/netscape-3.04-gold.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 3.04 Gold">
 
-*3.02 Gold:* Windows build (run under Wine).  
+*3.04 Gold:* About page, Windows build (run under Wine). The Commons description says 3.02; the page itself says 3.04 Gold.  
 Credit: Indolering · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:Netscape_Navigator_3_Screenshot.png)
 
 <img src="images/netscape-3.04-acid1.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 3.04 Gold">
@@ -295,6 +301,12 @@ Fair-use screenshots on Wikipedia (linked, not copied):
 - [Navigator 1-22.png](https://en.wikipedia.org/wiki/File:Navigator_1-22.png): Navigator 1.22.
 - [Welcome to Netscape.gif](https://en.wikipedia.org/wiki/File:Welcome_to_Netscape.gif): A Netscape window showing its welcome page.
 - [Apple Unix with Netscape.png](https://en.wikipedia.org/wiki/File:Apple_Unix_with_Netscape.png): Apple Unix with Finder, CommandShell and Netscape 3.01.
+
+Try it: [oldweb.today: Navigator 4 on Windows, in emulation](https://oldweb.today/?browser=ns4-win)
+
+Try it: [oldweb.today: Navigator 3 for Mac, in emulation](https://oldweb.today/?browser=ns3-mac)
+
+Try it: [oldweb.today: Navigator 4 for Mac, in emulation](https://oldweb.today/?browser=ns4-mac)
 
 <a id="arena"></a>
 
@@ -382,6 +394,10 @@ Fair-use screenshots on Wikipedia (linked, not copied):
 - [Internet Explorer 4 for Solaris screenshot.png](https://en.wikipedia.org/wiki/File:Internet_Explorer_4_for_Solaris_screenshot.png): Internet Explorer 4 for Solaris.
 - [Internet Explorer 5 on Windows 98.png](https://en.wikipedia.org/wiki/File:Internet_Explorer_5_on_Windows_98.png): Internet Explorer 5 on Windows 98.
 - [Oe-Ie5-unix.jpg](https://en.wikipedia.org/wiki/File:Oe-Ie5-unix.jpg): Internet Explorer 5 and Outlook Express for UNIX.
+
+Try it: [oldweb.today: Internet Explorer 5 on Windows, in emulation](https://oldweb.today/?browser=ie5)
+
+Try it: [oldweb.today: Internet Explorer 4 for Mac, in emulation](https://oldweb.today/?browser=ie4-mac)
 
 <a id="grail"></a>
 
