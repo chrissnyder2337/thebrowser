@@ -20,6 +20,10 @@ term=$!
 # the xterm window.
 sleep 6
 window=$(xdotool search --name "$title" | head -1)
+if [ -z "$window" ]; then
+  echo "no xterm window titled $title appeared" >&2
+  exit 1
+fi
 for key in ${KEYS:-}; do
   # xterm ignores synthetic events sent to a window, so focus it and type.
   xdotool windowfocus "$window" 2>/dev/null
