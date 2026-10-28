@@ -520,24 +520,14 @@
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
         },
         {
-          "file": "images/netscape-3.04-acid1.png",
-          "version": "3.04 Gold",
-          "shows": "Rendering the Acid1 CSS test.",
-          "commons_file": "Netscape 3 - Acid1.png",
-          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_3_-_Acid1.png",
-          "author": "Alessandro Antonelli",
-          "license": "Public domain",
-          "license_url": ""
-        },
-        {
-          "file": "images/netscape-4.03-acid1.png",
-          "version": "4.03",
-          "shows": "Rendering the Acid1 CSS test.",
-          "commons_file": "Netscape 4 - Acid1.png",
-          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_4_-_Acid1.png",
-          "author": "Alessandro Antonelli",
-          "license": "Public domain",
-          "license_url": ""
+          "file": "images/netscape-4-debian-2.1.png",
+          "version": "4.x (Linux)",
+          "shows": "Communicator-era window on a Debian 2.1 (1999) desktop: toolbar, Location bar with What's Related, personal toolbar and status bar.",
+          "commons_file": "Debian-Slink.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Debian-Slink.png",
+          "author": "2204happy",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
         },
         {
           "file": "images/netscape-4.51-irix.png",

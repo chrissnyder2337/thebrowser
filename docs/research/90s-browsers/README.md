@@ -25,7 +25,7 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 | [NCSA Mosaic](#ncsa-mosaic) | 1993-01-23 | Unix (X11/Motif), Windows, Classic Mac OS | 1 | 1 |
 | [Cello](#cello) | 1993-06-08 | Windows 3.1, OS/2 | 0 | 2 |
 | [IBM WebExplorer](#ibm-webexplorer) | 1994 | OS/2 | 0 | 1 |
-| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 9 | 4 |
+| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 8 | 4 |
 | [Arena](#arena) | 1994-10-24 | Unix (X11), Linux, NeXT | 1 | 0 |
 | [SlipKnot](#slipknot) | 1994-11 | Windows 3.1 | 0 | 1 |
 | [Opera (MultiTorg Opera)](#opera) | 1995 | Windows, later others | 0 | 2 |
@@ -280,15 +280,10 @@ Credit: Indolering · [CC0](http://creativecommons.org/publicdomain/zero/1.0/dee
 *3.04 Gold:* About page, Windows build (run under Wine). The Commons description says 3.02; the page itself says 3.04 Gold.  
 Credit: Indolering · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:Netscape_Navigator_3_Screenshot.png)
 
-<img src="images/netscape-3.04-acid1.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 3.04 Gold">
+<img src="images/netscape-4-debian-2.1.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 4.x (Linux)">
 
-*3.04 Gold:* Rendering the Acid1 CSS test.  
-Credit: Alessandro Antonelli · [Public domain](https://commons.wikimedia.org/wiki/File:Netscape_3_-_Acid1.png) · [source](https://commons.wikimedia.org/wiki/File:Netscape_3_-_Acid1.png)
-
-<img src="images/netscape-4.03-acid1.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 4.03">
-
-*4.03:* Rendering the Acid1 CSS test.  
-Credit: Alessandro Antonelli · [Public domain](https://commons.wikimedia.org/wiki/File:Netscape_4_-_Acid1.png) · [source](https://commons.wikimedia.org/wiki/File:Netscape_4_-_Acid1.png)
+*4.x (Linux):* Communicator-era window on a Debian 2.1 (1999) desktop: toolbar, Location bar with What's Related, personal toolbar and status bar.  
+Credit: 2204happy · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) · [source](https://commons.wikimedia.org/wiki/File:Debian-Slink.png)
 
 <img src="images/netscape-4.51-irix.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 4.51 (IRIX)">
 
