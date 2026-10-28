@@ -64,7 +64,7 @@ def render(cat):
                 w(f"- [{t['commons_file']}]({t['source_url']}) ({t['license']}, {t['author']}): {t['shows']}")
             w("")
         if b["linked"]:
-            w("Fair-use screenshots on Wikipedia (linked, not copied):")
+            w("Copyrighted screenshots elsewhere (linked, not copied):")
             w("")
             for l in b["linked"]:
                 w(f"- [{l['title']}]({l['source_url']}): {l['shows']}")

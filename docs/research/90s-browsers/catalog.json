@@ -2,9 +2,9 @@
   "about": "A reference catalog of the web browsers people used in the 1990s, version by version, with screenshots, for planning Lantern's retro looks. Dates and facts come from English Wikipedia (October 2026); each browser links to its article.",
   "rules": [
     "**Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.",
-    "**Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.",
+    "**Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.",
     "**A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.",
-    "**Fair-use screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia. Fair use covers Wikipedia's use of them, not redistribution from this repository."
+    "**Copyrighted screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia or on galleries such as GUIdebook. Fair use covers Wikipedia's use of them, not redistribution from this repository."
   ],
   "browsers": [
     {
@@ -103,6 +103,16 @@
           "author": "Shah-al",
           "license": "CC0",
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/lynx-2.9.0.png",
+          "version": "2.9.0 (current Ubuntu build)",
+          "shows": "This catalog's sample page, with the page counter at the top and the key help lines at the bottom."
         }
       ],
       "linked": [],
@@ -365,6 +375,12 @@
           "source_url": "https://en.wikipedia.org/wiki/File:OS2_IBM_WebExplorer.png",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "WebExplorer on OS/2."
+        },
+        {
+          "title": "GUIdebook: Browser in OS/2 Warp 4",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#os2warp4",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "WebExplorer 1.2 on OS/2 Warp 4."
         }
       ],
       "try": []
@@ -573,6 +589,12 @@
           "source_url": "https://en.wikipedia.org/wiki/File:Apple_Unix_with_Netscape.png",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "Apple Unix with Finder, CommandShell and Netscape 3.01."
+        },
+        {
+          "title": "GUIdebook: Browser in IRIX 5.3",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#irix53",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Netscape 4.08 on IRIX 5.3."
         }
       ],
       "try": [
@@ -829,6 +851,36 @@
           "source_url": "https://en.wikipedia.org/wiki/File:Oe-Ie5-unix.jpg",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "Internet Explorer 5 and Outlook Express for UNIX."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows NT 4.0",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#winnt40serv",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 2 on Windows NT 4.0."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 95B",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win95osr2",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 3 on Windows 95 OSR2."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 98",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win98",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 4 on Windows 98."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 98 SE",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win98se",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 5 on Windows 98 SE."
+        },
+        {
+          "title": "GUIdebook: Browser in Mac OS 9.0",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#macos90",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 4.5 for Mac."
         }
       ],
       "try": [
@@ -892,18 +944,21 @@
           "notes": ""
         }
       ],
-      "screenshots": [],
+      "screenshots": [
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/w3m-0.5.3.png",
+          "version": "0.5.3 (current Ubuntu build)",
+          "shows": "This catalog's sample page: an ASCII-ruled table, links in colour and the status line at the bottom."
+        }
+      ],
       "linked": [],
       "try": [],
-      "to_copy": [
-        {
-          "commons_file": "W3m-wikipedia.png",
-          "source_url": "https://commons.wikimedia.org/wiki/File:W3m-wikipedia.png",
-          "license": "CC BY-SA 4.0",
-          "author": "EdC (English Wikipedia)",
-          "shows": "A modern w3m build showing a Wikipedia page in a terminal."
-        }
-      ]
+      "to_copy": []
     },
     {
       "id": "oracle-powerbrowser",
@@ -1135,6 +1190,16 @@
           "author": "Gürkan Sengün",
           "license": "Public domain",
           "license_url": ""
+        },
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/links-2.29-menu.png",
+          "version": "2.29 (current Ubuntu build)",
+          "shows": "The File pull-down menu open over this catalog's sample page."
         }
       ],
       "linked": [],
@@ -1213,6 +1278,10 @@
     {
       "label": "Wikimedia Commons: Screenshots of web browsers",
       "url": "https://commons.wikimedia.org/wiki/Category:Screenshots_of_web_browsers"
+    },
+    {
+      "label": "GUIdebook: browser screenshots from each operating system",
+      "url": "https://guidebookgallery.org/screenshots/browser"
     }
   ]
 }

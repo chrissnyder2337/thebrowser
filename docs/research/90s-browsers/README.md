@@ -7,9 +7,9 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 ## Rules for using this material
 
 - **Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.
-- **Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.
+- **Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.
 - **A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.
-- **Fair-use screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia. Fair use covers Wikipedia's use of them, not redistribution from this repository.
+- **Copyrighted screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia or on galleries such as GUIdebook. Fair use covers Wikipedia's use of them, not redistribution from this repository.
 
 ## At a glance
 
@@ -17,28 +17,28 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 | --- | --- | --- | --- | --- |
 | [WorldWideWeb (later Nexus)](#worldwideweb) | 1990-12-25 | NeXTSTEP | 1 | 0 |
 | [Line Mode Browser](#line-mode) | 1991-05-14 | Any terminal (cross-platform via libwww) | 1 | 0 |
-| [Lynx](#lynx) | 1992 | Unix-like, DOS, Windows, VMS | 1 | 0 |
+| [Lynx](#lynx) | 1992 | Unix-like, DOS, Windows, VMS | 2 | 0 |
 | [ViolaWWW](#violawww) | 1992-03-09 | Unix (X11) | 0 | 1 |
 | [Erwise](#erwise) | 1992-04-15 | Unix (X11) | 0 | 1 |
 | [tkWWW](#tkwww) | 1992-07-25 | Unix (Tcl/Tk) | 1 | 0 |
 | [MacWWW (Samba)](#macwww) | 1992-12 | Classic Mac OS | 0 | 1 |
 | [NCSA Mosaic](#ncsa-mosaic) | 1993-01-23 | Unix (X11/Motif), Windows, Classic Mac OS | 1 | 1 |
 | [Cello](#cello) | 1993-06-08 | Windows 3.1, OS/2 | 0 | 2 |
-| [IBM WebExplorer](#ibm-webexplorer) | 1994 | OS/2 | 0 | 1 |
-| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 8 | 4 |
+| [IBM WebExplorer](#ibm-webexplorer) | 1994 | OS/2 | 0 | 2 |
+| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 8 | 5 |
 | [Arena](#arena) | 1994-10-24 | Unix (X11), Linux, NeXT | 1 | 0 |
 | [SlipKnot](#slipknot) | 1994-11 | Windows 3.1 | 0 | 1 |
 | [Opera (MultiTorg Opera)](#opera) | 1995 | Windows, later others | 0 | 2 |
-| [Internet Explorer](#internet-explorer) | 1995-08-24 | Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX | 0 | 7 |
+| [Internet Explorer](#internet-explorer) | 1995-08-24 | Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX | 0 | 12 |
 | [Grail](#grail) | 1995-11 | Unix, Windows, Mac (Python/Tk) | 0 | 1 |
-| [w3m](#w3m) | 1995 | Unix-like | 0 | 0 |
+| [w3m](#w3m) | 1995 | Unix-like | 1 | 0 |
 | [Oracle PowerBrowser](#oracle-powerbrowser) | 1996 | Windows | 1 | 0 |
 | [IBrowse](#ibrowse) | 1996-07-28 | AmigaOS | 0 | 1 |
 | [Amaya](#amaya) | 1996-07 | Unix (X11), Windows | 0 | 0 |
 | [WebTV](#webtv) | 1996-09-18 | Set-top box on a TV | 1 | 0 |
 | [Arachne](#arachne) | 1996-12-22 | DOS, later Linux | 2 | 0 |
 | [HotJava](#hotjava) | 1997-03-24 | Solaris, Windows, any Java platform | 1 | 0 |
-| [Links](#links) | 1999 | Unix-like, OS/2, DOS, Windows | 1 | 0 |
+| [Links](#links) | 1999 | Unix-like, OS/2, DOS, Windows | 2 | 0 |
 | [iCab](#icab) | 1999-02-17 | Classic Mac OS | 0 | 0 |
 
 <a id="worldwideweb"></a>
@@ -94,6 +94,11 @@ University of Kansas; later Thomas Dickey · Unix-like, DOS, Windows, VMS · [Wi
 *2.8.8 (2010s):* The full-screen text interface, unchanged in style from the 1990s releases.  
 Credit: Shah-al · [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) · [source](https://commons.wikimedia.org/wiki/File:Lynx-2.8.8dev.5.png)
 
+<img src="images/lynx-2.9.0.png" width="560" alt="Lynx 2.9.0 (current Ubuntu build)">
+
+*2.9.0 (current Ubuntu build):* This catalog's sample page, with the page counter at the top and the key help lines at the bottom.  
+Credit: Lantern contributors (made for this catalog) · [Apache-2.0 OR MIT, like this repository](../../../LICENSE-MIT) · [source](tools/shoot-text-browser.sh)
+
 Try it: [oldweb.today: MacLynx 2, in emulation](https://oldweb.today/?browser=ml-mac)
 
 <a id="violawww"></a>
@@ -108,7 +113,7 @@ Pei-Yuan Wei · Unix (X11) · [Wikipedia](https://en.wikipedia.org/wiki/ViolaWWW
 | --- | --- | --- |
 | first release | 1992-03-09 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [ViolaWWW.png](https://en.wikipedia.org/wiki/File:ViolaWWW.png): ViolaWWW on X11.
 
@@ -124,7 +129,7 @@ Helsinki University of Technology students · Unix (X11) · [Wikipedia](https://
 | --- | --- | --- |
 | 0.1 | 1992-04-15 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Erwise5.jpg](https://en.wikipedia.org/wiki/File:Erwise5.jpg): Erwise on X11.
 
@@ -157,7 +162,7 @@ Robert Cailliau, Nicola Pellow (CERN) · Classic Mac OS · [Wikipedia](https://e
 | --- | --- | --- |
 | first release | 1992-12 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [MacWWWscreenshot.gif](https://en.wikipedia.org/wiki/File:MacWWWscreenshot.gif): MacWWW on classic Mac OS.
 
@@ -187,7 +192,7 @@ Freely licensed on Commons, not copied here yet:
 
 - [DEC VAXstation 4000 96 OpenVMS 6.1.jpeg](https://commons.wikimedia.org/wiki/File:DEC_VAXstation_4000_96_OpenVMS_6.1.jpeg) (CC BY-SA 2.0, Brian Pitts): Photo of a VAXstation running OpenVMS 6.1 with DECwindows, filed under Mosaic on Commons. Check the screen shows Mosaic before copying it.
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [NCSAMosaic1.0Mac.png](https://en.wikipedia.org/wiki/File:NCSAMosaic1.0Mac.png): NCSA Mosaic 1.0 for Macintosh.
 
@@ -207,7 +212,7 @@ Legal Information Institute, Cornell Law School · Windows 3.1, OS/2 · [Wikiped
 | --- | --- | --- |
 | 0.1 beta | 1993-06-08 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Cello 2.0 (screenshot).gif](https://en.wikipedia.org/wiki/File:Cello_2.0_(screenshot).gif): Cello 2.0.
 - [Cello main page.png](https://en.wikipedia.org/wiki/File:Cello_main_page.png): Cello showing a page.
@@ -224,9 +229,10 @@ IBM · OS/2 · [Wikipedia](https://en.wikipedia.org/wiki/IBM_WebExplorer)
 | --- | --- | --- |
 | first release | 1994 | Shipped with OS/2 Warp 3; Wikipedia's infobox lists 1995-11-27 and a last version 1.2 in 1998. |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [OS2 IBM WebExplorer.png](https://en.wikipedia.org/wiki/File:OS2_IBM_WebExplorer.png): WebExplorer on OS/2.
+- [GUIdebook: Browser in OS/2 Warp 4](https://guidebookgallery.org/screenshots/browser#os2warp4): WebExplorer 1.2 on OS/2 Warp 4.
 
 <a id="netscape"></a>
 
@@ -300,12 +306,13 @@ Freely licensed on Commons, not copied here yet:
 
 - [Netscape Communicator 4.8 Screenshot.png](https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png) (CC0, Indolering): Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Mosaic Netscape 0.9 on Windows XP.png](https://en.wikipedia.org/wiki/File:Mosaic_Netscape_0.9_on_Windows_XP.png): Mosaic Netscape 0.9 (run on Windows XP).
 - [Navigator 1-22.png](https://en.wikipedia.org/wiki/File:Navigator_1-22.png): Navigator 1.22.
 - [Welcome to Netscape.gif](https://en.wikipedia.org/wiki/File:Welcome_to_Netscape.gif): A Netscape window showing its welcome page.
 - [Apple Unix with Netscape.png](https://en.wikipedia.org/wiki/File:Apple_Unix_with_Netscape.png): Apple Unix with Finder, CommandShell and Netscape 3.01.
+- [GUIdebook: Browser in IRIX 5.3](https://guidebookgallery.org/screenshots/browser#irix53): Netscape 4.08 on IRIX 5.3.
 
 Try it: [oldweb.today: Navigator 4 on Windows, in emulation](https://oldweb.today/?browser=ns4-win)
 
@@ -342,7 +349,7 @@ MicroMind · Windows 3.1 · [Wikipedia](https://en.wikipedia.org/wiki/SlipKnot_(
 | --- | --- | --- |
 | first release | 1994-11 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Slipknot browser.gif](https://en.wikipedia.org/wiki/File:Slipknot_browser.gif): SlipKnot on Windows 3.1.
 
@@ -361,7 +368,7 @@ Telenor research, then Opera Software · Windows, later others · [Wikipedia](ht
 | 3.0 | 1997-12-31 | First with JavaScript. |
 | 3.5 | 1998 | CSS support. |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [MultiTorg Opera.png](https://en.wikipedia.org/wiki/File:MultiTorg_Opera.png): MultiTorg Opera, before version 2.0.
 - [Opera 3.62.png](https://en.wikipedia.org/wiki/File:Opera_3.62.png): Opera 3.62 on Windows 9x.
@@ -390,7 +397,7 @@ Microsoft · Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX · [Wikiped
 | 4.5 (Mac) | 1999-01-05 |  |
 | 5.0 (Windows) | 1999-03-18 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Internet Explorer 1.0.png](https://en.wikipedia.org/wiki/File:Internet_Explorer_1.0.png): Internet Explorer 1.0.
 - [Internet Explorer 2.PNG](https://en.wikipedia.org/wiki/File:Internet_Explorer_2.PNG): Internet Explorer 2.0.
@@ -399,6 +406,11 @@ Fair-use screenshots on Wikipedia (linked, not copied):
 - [Internet Explorer 4 for Solaris screenshot.png](https://en.wikipedia.org/wiki/File:Internet_Explorer_4_for_Solaris_screenshot.png): Internet Explorer 4 for Solaris.
 - [Internet Explorer 5 on Windows 98.png](https://en.wikipedia.org/wiki/File:Internet_Explorer_5_on_Windows_98.png): Internet Explorer 5 on Windows 98.
 - [Oe-Ie5-unix.jpg](https://en.wikipedia.org/wiki/File:Oe-Ie5-unix.jpg): Internet Explorer 5 and Outlook Express for UNIX.
+- [GUIdebook: Browser in Windows NT 4.0](https://guidebookgallery.org/screenshots/browser#winnt40serv): Internet Explorer 2 on Windows NT 4.0.
+- [GUIdebook: Browser in Windows 95B](https://guidebookgallery.org/screenshots/browser#win95osr2): Internet Explorer 3 on Windows 95 OSR2.
+- [GUIdebook: Browser in Windows 98](https://guidebookgallery.org/screenshots/browser#win98): Internet Explorer 4 on Windows 98.
+- [GUIdebook: Browser in Windows 98 SE](https://guidebookgallery.org/screenshots/browser#win98se): Internet Explorer 5 on Windows 98 SE.
+- [GUIdebook: Browser in Mac OS 9.0](https://guidebookgallery.org/screenshots/browser#macos90): Internet Explorer 4.5 for Mac.
 
 Try it: [oldweb.today: Internet Explorer 5 on Windows, in emulation](https://oldweb.today/?browser=ie5)
 
@@ -417,7 +429,7 @@ Corporation for National Research Initiatives (CNRI) · Unix, Windows, Mac (Pyth
 | first public release | 1995-11 | Project started 1995-08. |
 | 0.6 | 1999-04-01 | Last release. |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [Grail browser on Linux.png](https://en.wikipedia.org/wiki/File:Grail_browser_on_Linux.png): Grail on Linux.
 
@@ -433,9 +445,10 @@ Akinori Ito · Unix-like · [Wikipedia](https://en.wikipedia.org/wiki/W3m)
 | --- | --- | --- |
 | first release | 1995 |  |
 
-Freely licensed on Commons, not copied here yet:
+<img src="images/w3m-0.5.3.png" width="560" alt="w3m 0.5.3 (current Ubuntu build)">
 
-- [W3m-wikipedia.png](https://commons.wikimedia.org/wiki/File:W3m-wikipedia.png) (CC BY-SA 4.0, EdC (English Wikipedia)): A modern w3m build showing a Wikipedia page in a terminal.
+*0.5.3 (current Ubuntu build):* This catalog's sample page: an ASCII-ruled table, links in colour and the status line at the bottom.  
+Credit: Lantern contributors (made for this catalog) · [Apache-2.0 OR MIT, like this repository](../../../LICENSE-MIT) · [source](tools/shoot-text-browser.sh)
 
 <a id="oracle-powerbrowser"></a>
 
@@ -466,7 +479,7 @@ Stefan Burström and others · AmigaOS · [Wikipedia](https://en.wikipedia.org/w
 | --- | --- | --- |
 | 1.0 | 1996-07-28 |  |
 
-Fair-use screenshots on Wikipedia (linked, not copied):
+Copyrighted screenshots elsewhere (linked, not copied):
 
 - [IBrowse Amiga.png](https://en.wikipedia.org/wiki/File:IBrowse_Amiga.png): IBrowse on AmigaOS.
 
@@ -560,6 +573,11 @@ Mikuláš Patočka · Unix-like, OS/2, DOS, Windows · [Wikipedia](https://en.wi
 *2000s build:* Text-mode interface.  
 Credit: Gürkan Sengün · [Public domain](https://commons.wikimedia.org/wiki/File:Webbrowser_Links.jpg) · [source](https://commons.wikimedia.org/wiki/File:Webbrowser_Links.jpg)
 
+<img src="images/links-2.29-menu.png" width="560" alt="Links 2.29 (current Ubuntu build)">
+
+*2.29 (current Ubuntu build):* The File pull-down menu open over this catalog's sample page.  
+Credit: Lantern contributors (made for this catalog) · [Apache-2.0 OR MIT, like this repository](../../../LICENSE-MIT) · [source](tools/shoot-text-browser.sh)
+
 <a id="icab"></a>
 
 ## iCab
@@ -592,6 +610,7 @@ Browsers of the decade that still need a screenshot. A freely licensed one could
 - [Wikipedia: History of the web browser](https://en.wikipedia.org/wiki/History_of_the_web_browser)
 - [Wikipedia: List of web browsers](https://en.wikipedia.org/wiki/List_of_web_browsers)
 - [Wikimedia Commons: Screenshots of web browsers](https://commons.wikimedia.org/wiki/Category:Screenshots_of_web_browsers)
+- [GUIdebook: browser screenshots from each operating system](https://guidebookgallery.org/screenshots/browser)
 
 ## Updating this catalog
 
