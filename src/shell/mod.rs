@@ -24,6 +24,8 @@ pub type Library = library_loader::LibraryLoader;
 #[cfg(not(target_os = "macos"))]
 pub struct Library;
 
+// Unused by `main` in Windows sandbox builds, which start from the bootstrap
+// executable's `win.rs` entry point instead.
 #[allow(dead_code)]
 pub fn load_cef() -> Library {
     #[cfg(target_os = "macos")]
@@ -44,6 +46,8 @@ pub fn load_cef() -> Library {
     library
 }
 
+// Unused by `main` in Windows sandbox builds, which start from the bootstrap
+// executable's `win.rs` entry point instead.
 #[allow(dead_code)]
 pub fn run_main(main_args: &MainArgs, cmd_line: &CommandLine, sandbox_info: *mut u8) {
     let switch = CefString::from("type");
