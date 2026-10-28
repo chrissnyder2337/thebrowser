@@ -560,11 +560,9 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   <div class="status">
     <ul>
       <li><span class="pill built">built</span><span>CLAUDE.md, skills, cloud setup script and SessionStart hook; Playwright suite, goldens, smoke test and Oracle check; issue templates, labels and the tier labeller; claude-review, blackbox, mutants, cef-watch, digest-data and release-smoke workflows.</span></li>
-      <li><span class="pill built">set up</span><span>The private <code>thebrowser-scenarios</code> repo and its secrets. <code>blackbox.yml</code> has run by hand on <code>main</code> (2026-10-26).</span></li>
+      <li><span class="pill built">set up</span><span>The private <code>thebrowser-scenarios</code> repo and its secrets. <code>blackbox.yml</code> has run on <code>main</code>, and every <code>mutants.yml</code> broken build fails at least one scenario.</span></li>
       <li><span class="pill built">set up</span><span>All seven scheduled tasks from <code>docs/routines.md</code>: triage, plan, CEF upgrade, black-box explorer (nightly), lint ratchet, docs drift and weekly digest. The explorer has filed #39–#41; the lint ratchet opened #42, now merged.</span></li>
       <li><span class="pill built">set up</span><span>A first real issue through the loop: #34 went from <code>factory:ready</code> to merged PR #36.</span></li>
-      <li><span class="pill todo">you do</span><span>Check that every <code>mutants.yml</code> broken build fails at least one scenario. Until it does, black-box testing gates nothing.</span></li>
-      <li><span class="pill todo">you do</span><span>Watch <code>/usage</code> this week, since the tasks went live together rather than one at a time. If the weekly limit gets tight, move the explorer to weekly. The digest first runs 2026-11-02 and docs drift 2026-11-01.</span></li>
       <li><span class="pill todo">you do</span><span>Take #39–#41 from plan to PR, and fold what goes wrong back into CLAUDE.md and the skills.</span></li>
     </ul>
   </div>
