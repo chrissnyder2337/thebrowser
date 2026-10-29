@@ -9,7 +9,7 @@ use super::{
         Role, content_browser, defer, exec_js, internal_url_key, push_all, push_status,
         push_toolbar, save_bookmarks, set_notice, with_shell,
     },
-    util::{normalize_url_input, parse_query, percent_decode},
+    util::{is_loadable_url, normalize_url_input, parse_query, percent_decode},
 };
 use cef::*;
 use std::cell::Cell;
@@ -132,6 +132,16 @@ pub fn navigate(url: &str) {
     }
     if let Some(page) = internal_page_for(url) {
         page();
+        return;
+    }
+    if !is_loadable_url(url) {
+        // CEF would drop it silently; say so instead.
+        show_error(
+            url,
+            sys::cef_errorcode_t::ERR_INVALID_URL as i32,
+            "Invalid address",
+        );
+        focus_content();
         return;
     }
     with_shell(|shell| shell.notice.clear());
