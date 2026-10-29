@@ -2,7 +2,7 @@
   "about": "A reference catalog of the web browsers people used in the 1990s, version by version, with screenshots, for planning Lantern's retro looks. Dates and facts come from English Wikipedia (October 2026); each browser links to its article.",
   "rules": [
     "**Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.",
-    "**Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.",
+    "**Images in `images/`** come from Wikimedia Commons or Flickr, where each is marked public domain or freely licensed (CC0, CC BY, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY, CC BY-SA, GPL or FAL image means keeping its credit and licence.",
     "**A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.",
     "**Copyrighted screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia or on galleries such as GUIdebook. Fair use covers Wikipedia's use of them, not redistribution from this repository."
   ],
@@ -525,6 +525,16 @@
           "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
         },
         {
+          "file": "images/netscape-2.01-mac-ja.jpg",
+          "version": "2.01 (Mac, Japanese)",
+          "shows": "Photo of a PowerBook Duo 230's screen: the classic Mac OS build with its button row, Location field and directory buttons, showing the about page.",
+          "commons_file": "",
+          "source_url": "https://www.flickr.com/photos/7940758@N07/3556469060",
+          "author": "MIKI Yoshihito",
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0/"
+        },
+        {
           "file": "images/netscape-2.02.png",
           "version": "2.02",
           "shows": "About page, Windows build.",
@@ -618,13 +628,6 @@
           "author": "Indolering",
           "shows": "Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.",
           "title": "Netscape Communicator 4.8 Screenshot.png"
-        },
-        {
-          "title": "Flickr: PowerBook Duo230 - NN 2.01",
-          "source_url": "https://www.flickr.com/photos/7940758@N07/3556469060",
-          "license": "CC BY 2.0",
-          "author": "MIKI Yoshihito",
-          "shows": "Photo of a PowerBook Duo 230 whose title says it is running Navigator 2.01. Check the screen before copying it."
         }
       ]
     },
@@ -705,25 +708,21 @@
           "notes": ""
         }
       ],
-      "screenshots": [],
+      "screenshots": [
+        {
+          "file": "images/omniweb-3-next.jpg",
+          "version": "3 (OPENSTEP)",
+          "shows": "Photo of a NeXT Cube's screen: the OmniWeb window with its icon toolbar and address field, the NeXT menu at the left and the Dock at the right.",
+          "commons_file": "",
+          "source_url": "https://www.flickr.com/photos/45480083@N03/4230174099",
+          "author": "Gerben Wierda (gctwnl on Flickr)",
+          "license": "CC BY-SA 2.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+        }
+      ],
       "linked": [],
       "try": [],
-      "to_copy": [
-        {
-          "title": "Flickr: OmniWeb 3 on NeXT Cube showing Wikipedia page on NeXT",
-          "source_url": "https://www.flickr.com/photos/45480083@N03/4230174099",
-          "license": "CC BY-SA 2.0",
-          "author": "gctwnl",
-          "shows": "Photo of OmniWeb 3 running on a NeXT Cube."
-        },
-        {
-          "title": "Flickr: OPENSTEP 4.2 on NeXTdimension Cube Launching OmniWeb 3",
-          "source_url": "https://www.flickr.com/photos/45480083@N03/4230941190",
-          "license": "CC BY-SA 2.0",
-          "author": "gctwnl",
-          "shows": "Photo of OmniWeb 3 starting up under OPENSTEP 4.2."
-        }
-      ]
+      "to_copy": []
     },
     {
       "id": "opera",

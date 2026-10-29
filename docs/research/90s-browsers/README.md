@@ -7,7 +7,7 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 ## Rules for using this material
 
 - **Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.
-- **Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.
+- **Images in `images/`** come from Wikimedia Commons or Flickr, where each is marked public domain or freely licensed (CC0, CC BY, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY, CC BY-SA, GPL or FAL image means keeping its credit and licence.
 - **A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.
 - **Copyrighted screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia or on galleries such as GUIdebook. Fair use covers Wikipedia's use of them, not redistribution from this repository.
 
@@ -25,10 +25,10 @@ A reference catalog of the web browsers people used in the 1990s, version by ver
 | [NCSA Mosaic](#ncsa-mosaic) | 1993-01-23 | Unix (X11/Motif), Windows, Classic Mac OS | 1 | 1 |
 | [Cello](#cello) | 1993-06-08 | Windows 3.1, OS/2 | 0 | 2 |
 | [IBM WebExplorer](#ibm-webexplorer) | 1994 | OS/2 | 0 | 2 |
-| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 8 | 5 |
+| [Netscape (Mosaic Netscape, Navigator, Communicator)](#netscape) | 1994-10-13 | Windows 3.1/95/NT, Classic Mac OS, Unix (many) | 9 | 5 |
 | [Arena](#arena) | 1994-10-24 | Unix (X11), Linux, NeXT | 1 | 0 |
 | [SlipKnot](#slipknot) | 1994-11 | Windows 3.1 | 0 | 1 |
-| [OmniWeb](#omniweb) | 1995-03-17 | NeXTSTEP, OPENSTEP | 0 | 0 |
+| [OmniWeb](#omniweb) | 1995-03-17 | NeXTSTEP, OPENSTEP | 1 | 0 |
 | [Opera (MultiTorg Opera)](#opera) | 1995 | Windows, later others | 0 | 2 |
 | [Internet Explorer](#internet-explorer) | 1995-08-24 | Windows 3.1/95/98/NT, Classic Mac OS, Solaris and HP-UX | 0 | 12 |
 | [Grail](#grail) | 1995-11 | Unix, Windows, Mac (Python/Tk) | 0 | 1 |
@@ -283,6 +283,11 @@ Credit: Indolering · [CC0](http://creativecommons.org/publicdomain/zero/1.0/dee
 *2.01 (IRIX):* Unix (Motif) build on an SGI Indy.  
 Credit: Aeroid · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) · [source](https://commons.wikimedia.org/wiki/File:Irix_Netscape_Welcome.png)
 
+<img src="images/netscape-2.01-mac-ja.jpg" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 2.01 (Mac, Japanese)">
+
+*2.01 (Mac, Japanese):* Photo of a PowerBook Duo 230's screen: the classic Mac OS build with its button row, Location field and directory buttons, showing the about page.  
+Credit: MIKI Yoshihito · [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) · [source](https://www.flickr.com/photos/7940758@N07/3556469060)
+
 <img src="images/netscape-2.02.png" width="560" alt="Netscape (Mosaic Netscape, Navigator, Communicator) 2.02">
 
 *2.02:* About page, Windows build.  
@@ -306,7 +311,6 @@ Credit: Aeroid · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)
 Freely licensed elsewhere, not copied here yet:
 
 - [Netscape Communicator 4.8 Screenshot.png](https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png) (CC0, Indolering): Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.
-- [Flickr: PowerBook Duo230 - NN 2.01](https://www.flickr.com/photos/7940758@N07/3556469060) (CC BY 2.0, MIKI Yoshihito): Photo of a PowerBook Duo 230 whose title says it is running Navigator 2.01. Check the screen before copying it.
 
 Copyrighted screenshots elsewhere (linked, not copied):
 
@@ -367,10 +371,10 @@ Omni Group · NeXTSTEP, OPENSTEP · [Wikipedia](https://en.wikipedia.org/wiki/Om
 | --- | --- | --- |
 | first release | 1995-03-17 |  |
 
-Freely licensed elsewhere, not copied here yet:
+<img src="images/omniweb-3-next.jpg" width="560" alt="OmniWeb 3 (OPENSTEP)">
 
-- [Flickr: OmniWeb 3 on NeXT Cube showing Wikipedia page on NeXT](https://www.flickr.com/photos/45480083@N03/4230174099) (CC BY-SA 2.0, gctwnl): Photo of OmniWeb 3 running on a NeXT Cube.
-- [Flickr: OPENSTEP 4.2 on NeXTdimension Cube Launching OmniWeb 3](https://www.flickr.com/photos/45480083@N03/4230941190) (CC BY-SA 2.0, gctwnl): Photo of OmniWeb 3 starting up under OPENSTEP 4.2.
+*3 (OPENSTEP):* Photo of a NeXT Cube's screen: the OmniWeb window with its icon toolbar and address field, the NeXT menu at the left and the Dock at the right.  
+Credit: Gerben Wierda (gctwnl on Flickr) · [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) · [source](https://www.flickr.com/photos/45480083@N03/4230174099)
 
 <a id="opera"></a>
 
