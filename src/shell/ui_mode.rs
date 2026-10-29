@@ -48,6 +48,15 @@ impl Layout {
         }
     }
 
+    /// The same, with a border of `color` around the page.
+    const fn inset(self, inset: [i32; 4], color: u32) -> Self {
+        Self {
+            inset,
+            inset_color: color,
+            ..self
+        }
+    }
+
     /// The status view's height, given whether the panel is open.
     pub fn status_height(&self, panel_open: bool) -> i32 {
         if panel_open && self.status_open > 0 {
@@ -68,7 +77,7 @@ thread_local! {
 pub fn layout(mode: UiMode) -> Layout {
     match mode {
         UiMode::Lantern => Layout::bars(112, 24),
-        UiMode::Workstation1993 => Layout::bars(106, 98),
+        UiMode::Workstation1993 => Layout::bars(106, 98).inset([6, 8, 8, 8], 0xFFBFBFBF),
         UiMode::Toolbar1996 => Layout::bars(118, 22),
         UiMode::Desktop1996 => Layout::bars(104, 22),
         UiMode::Applet1997 => Layout::bars(102, 22),
@@ -76,7 +85,7 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Terminal1992 => Layout::bars(20, 80),
         UiMode::Pc1993 => Layout::bars(52, 22),
         UiMode::Toolbar1995 => Layout::bars(114, 22),
-        UiMode::Desktop1995 => Layout::bars(80, 22),
+        UiMode::Desktop1995 => Layout::bars(80, 22).inset([0, 2, 2, 2], 0xFFC0C0C0),
     }
 }
 
@@ -117,7 +126,7 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
             include_str!("../../ui/chrome/terminal-1992/pages.css"),
             "#000000",
         )),
-        UiMode::Pc1993 => Some((include_str!("../../ui/chrome/pc-1993/pages.css"), "#ffffff")),
+        UiMode::Pc1993 => Some((include_str!("../../ui/chrome/pc-1993/pages.css"), "#ffffe8")),
         UiMode::Toolbar1995 => Some((
             include_str!("../../ui/chrome/toolbar-1995/pages.css"),
             "#c0c0c0",
