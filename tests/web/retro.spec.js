@@ -231,3 +231,21 @@ for (const look of LOOKS) {
     });
   });
 }
+
+// The portal look gives input buttons the same bevel as <button>; without it
+// they were bare text. The contrast check can't see this: a transparent
+// background counts as white.
+test("portal: input buttons look like buttons", async ({ page }) => {
+  await openWithLook(page, "forms", "portal");
+  const styles = await page.evaluate(() =>
+    ["button.primary", "input[type=submit]", "input[type=button]"].map((sel) => {
+      const s = getComputedStyle(document.querySelector(sel));
+      return { sel, background: s.backgroundColor, border: s.borderTopWidth, style: s.borderTopStyle };
+    }),
+  );
+  for (const { sel, background, border, style } of styles) {
+    expect(background, `${sel} background`).toBe("rgb(212, 208, 200)");
+    expect(border, `${sel} border width`).toBe("2px");
+    expect(style, `${sel} border style`).toBe("outset");
+  }
+});
