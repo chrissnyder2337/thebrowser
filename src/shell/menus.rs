@@ -5,7 +5,7 @@
 
 use super::{
     commands, retro,
-    settings::{RetroStyle, Settings, UiMode},
+    settings::{ModePages, RetroStyle, Settings, UiMode},
     state::{Role, defer, with_shell},
     ui_mode,
 };
@@ -51,6 +51,7 @@ enum Item {
     Splash,
     Style(RetroStyle),
     Mode(UiMode),
+    Pages(ModePages),
 }
 
 const PLAIN: [Item; 12] = [
@@ -69,6 +70,7 @@ const PLAIN: [Item; 12] = [
 ];
 const STYLE_BASE: i32 = 100;
 const MODE_BASE: i32 = 300;
+const PAGES_BASE: i32 = 400;
 // Submenus need ids too; they never reach execute_command.
 const RETRO_SUBMENU: i32 = 900;
 const UI_SUBMENU: i32 = 901;
@@ -86,13 +88,20 @@ impl Item {
             Self::Mode(mode) => {
                 MODE_BASE + UiMode::ALL.iter().position(|m| *m == mode).unwrap_or(0) as i32
             }
+            Self::Pages(pages) => {
+                PAGES_BASE + ModePages::ALL.iter().position(|p| *p == pages).unwrap_or(0) as i32
+            }
             _ => 1 + PLAIN.iter().position(|item| *item == self).unwrap_or(0) as i32,
         }
     }
 
     fn from_id(id: i32) -> Option<Self> {
         let index = |base: i32| usize::try_from(id - base).ok();
-        if id >= MODE_BASE {
+        if id >= PAGES_BASE {
+            index(PAGES_BASE)
+                .and_then(|i| ModePages::ALL.get(i))
+                .map(|p| Self::Pages(*p))
+        } else if id >= MODE_BASE {
             index(MODE_BASE)
                 .and_then(|i| UiMode::ALL.get(i))
                 .map(|m| Self::Mode(*m))
@@ -122,6 +131,7 @@ fn run(item: Item) {
         Item::Splash => retro::set_splash(!with_shell(|shell| shell.settings.splash_intro)),
         Item::Style(style) => retro::set_style(style),
         Item::Mode(mode) => ui_mode::set_mode(mode),
+        Item::Pages(pages) => ui_mode::set_pages(pages),
     }
 }
 
@@ -159,7 +169,7 @@ fn add_styles(model: &MenuModel, ctx: &Context) {
     for style in RetroStyle::ALL {
         let id = Item::Style(style).id();
         model.add_radio_item(id, Some(&CefString::from(style.name())), 1);
-        model.set_checked(id, (ctx.settings.retro_style == style).into());
+        model.set_checked(id, (ctx.settings.page_look() == style).into());
     }
     model.add_separator();
     model.add_check_item(
@@ -174,6 +184,12 @@ fn add_modes(model: &MenuModel, ctx: &Context) {
         let id = Item::Mode(mode).id();
         model.add_radio_item(id, Some(&CefString::from(mode.name())), 2);
         model.set_checked(id, (ctx.settings.ui_mode == mode).into());
+    }
+    model.add_separator();
+    for pages in ModePages::ALL {
+        let id = Item::Pages(pages).id();
+        model.add_radio_item(id, Some(&CefString::from(pages.name())), 3);
+        model.set_checked(id, (ctx.settings.mode_pages == pages).into());
     }
 }
 
@@ -291,6 +307,7 @@ mod tests {
         let mut items: Vec<Item> = PLAIN.to_vec();
         items.extend(RetroStyle::ALL.map(Item::Style));
         items.extend(UiMode::ALL.map(Item::Mode));
+        items.extend(ModePages::ALL.map(Item::Pages));
         let mut ids: Vec<i32> = items.iter().map(|item| item.id()).collect();
         for (item, id) in items.iter().zip(&ids) {
             assert_eq!(Item::from_id(*id), Some(*item));

@@ -106,6 +106,12 @@ picks one for a single run. More modes are on the way: see
   fields, and a row of text buttons under the page, modelled on NCSA Mosaic
   for X.
 
+Pages can follow the mode too, picked under **Browser UI**: as their sites
+made them, with the mode's browser defaults (a grey page and Times on plain
+pages that have no style sheets of their own; the default), or in the
+mode's era look (a full retro look). A retro look you pick yourself always
+wins.
+
 ![Workstation (1993) mode showing a Wikipedia article](docs/ui-workstation-1993.png)
 
 Product names are trademarks of their owners. Lantern isn't affiliated with

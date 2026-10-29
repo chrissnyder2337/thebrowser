@@ -21,6 +21,7 @@ Update the tables below in the same commit as the work they describe.
 | 3. Mode setting | `UiMode` in `settings.rs`, saved as `ui_mode` | Done |
 | 4. Switching | `--ui=`, runtime switch and relayout, the lockdown change, native menus (`menu` command), Browser UI submenu, Ctrl+Shift+M | Done |
 | 5. First mode | `workstation-1993`, with contract tests and goldens | Done |
+| 5b. Page styles | Each mode's browser defaults under pages, and its era look on request (`mode_pages`) | Done |
 | 6. Settings page | A Browser UI section; needs the maintainer to approve new settings goldens | Not started |
 | 7. Layout extras | Hidden views, chrome below the page, inset border, content zoom (the TV modes) | Not started |
 | 8. More modes | See below; next: `toolbar-1996`, `desktop-1996`, `applet-1997` | Not started |

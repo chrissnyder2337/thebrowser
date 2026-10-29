@@ -3,7 +3,8 @@
 //! Lantern runs for each retro look to `<dir>/retro-<look>.js`, so the
 //! Playwright suite in tests/web can use them without CEF. Every UI mode's
 //! chrome pages go to `toolbar-<mode>.html` and `status-<mode>.html`, with
-//! the modes' keys and view heights in `ui-modes.json`.
+//! the modes' keys and view heights in `ui-modes.json`, and each mode's page
+//! defaults script to `mode-pages-<mode>.js` (`mode-pages-off.js` removes them).
 //!
 //! Usage: `LD_LIBRARY_PATH="$CEF_PATH" cargo run --example dump-pages -- <dir>`
 //!
@@ -131,6 +132,27 @@ fn main() -> ExitCode {
         }
         let path = dir.join(format!("{name}.html"));
         if let Err(err) = fs::write(&path, html) {
+            eprintln!("dump-pages: {}: {err}", path.display());
+            return ExitCode::FAILURE;
+        }
+        println!("{}", path.display());
+    }
+    let mut scripts = vec![(
+        "mode-pages-off.js".to_owned(),
+        ui_mode::remove_page_defaults_script(),
+    )];
+    for mode in UiMode::ALL {
+        let settings = Settings {
+            ui_mode: mode,
+            ..Settings::default()
+        };
+        if let Some(script) = ui_mode::page_defaults_script(&settings) {
+            scripts.push((format!("mode-pages-{}.js", mode.key()), script));
+        }
+    }
+    for (name, script) in scripts {
+        let path = dir.join(name);
+        if let Err(err) = fs::write(&path, script) {
             eprintln!("dump-pages: {}: {err}", path.display());
             return ExitCode::FAILURE;
         }

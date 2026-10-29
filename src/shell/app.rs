@@ -2,7 +2,7 @@
 
 use super::{
     bookmarks, client, commands, pages, selftest,
-    settings::{self, RetroStyle, UiMode},
+    settings::{self, ModePages, RetroStyle, UiMode},
     state::{Role, with_shell},
     util::normalize_url_input,
     window::{FACE_GRAY, LanternBrowserViewDelegate, LanternWindowDelegate},
@@ -77,6 +77,9 @@ wrap_browser_process_handler! {
                     .or_else(|| has_switch(command_line, "geocities").then_some(RetroStyle::GeoCities));
                 if let Some(style) = style {
                     user_settings.retro_style = style;
+                    if style == RetroStyle::Off && user_settings.mode_pages == ModePages::EraLook {
+                        user_settings.mode_pages = ModePages::Defaults;
+                    }
                 }
                 // --ui=<mode> picks a UI mode for this run the same way.
                 if let Some(mode) = switch_value(command_line, "ui").and_then(|key| UiMode::from_key(&key)) {

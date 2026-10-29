@@ -98,7 +98,8 @@ src/shell/ui_mode.rs            UI modes: view heights, switching and relayout
 src/shell/selftest.rs           --self-test=<file>: report the first load and quit
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
 ui/chrome/chrome.js             controller shared by every chrome page (title channel, lantern.update)
-ui/chrome/<mode>/               each UI mode's toolbar.html and status.html (markup and CSS)
+ui/chrome/<mode>/               each UI mode's toolbar.html and status.html (markup and CSS), and its pages.css
+ui/chrome/page-defaults.js      puts a UI mode's browser defaults (pages.css) under content pages
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
 ui/retro/{geocities,early-web,portal}.js the looks
 ui/retro/splash.js              Flash-style splash intro

@@ -167,6 +167,52 @@ impl UiMode {
             Self::Workstation1993 => "Workstation (1993)",
         }
     }
+
+    /// The retro look that renders pages the way this mode's browsers did.
+    pub fn era_look(self) -> RetroStyle {
+        match self {
+            Self::Lantern => RetroStyle::Off,
+            Self::Workstation1993 => RetroStyle::EarlyWeb,
+        }
+    }
+}
+
+/// How pages look under a UI mode, when no retro look is picked.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum ModePages {
+    /// As their sites made them.
+    AsIs,
+    /// With the mode's browser defaults (page color, fonts, link colors)
+    /// wherever the site doesn't set its own (`ui/chrome/<mode>/pages.css`).
+    #[default]
+    Defaults,
+    /// In the mode's era look (`UiMode::era_look`).
+    EraLook,
+}
+
+impl ModePages {
+    pub const ALL: [Self; 3] = [Self::AsIs, Self::Defaults, Self::EraLook];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::AsIs => "as-is",
+            Self::Defaults => "defaults",
+            Self::EraLook => "era-look",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|pages| pages.key() == key)
+    }
+
+    /// Name for menus.
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::AsIs => "Pages as their sites made them",
+            Self::Defaults => "Pages with this browser's defaults",
+            Self::EraLook => "Pages in this browser's era look",
+        }
+    }
 }
 
 fn parse_bool(value: &str) -> bool {
@@ -181,6 +227,7 @@ pub struct Settings {
     /// Show a Flash-style splash intro when entering a site.
     pub splash_intro: bool,
     pub ui_mode: UiMode,
+    pub mode_pages: ModePages,
 }
 
 impl Settings {
@@ -203,6 +250,9 @@ impl Settings {
                 }
                 "splash_intro" => settings.splash_intro = parse_bool(value),
                 "ui_mode" => settings.ui_mode = UiMode::from_key(value).unwrap_or_default(),
+                "mode_pages" => {
+                    settings.mode_pages = ModePages::from_key(value).unwrap_or_default()
+                }
                 // Written by the first release of GeoCities mode.
                 "geocities" if parse_bool(value) => settings.retro_style = RetroStyle::GeoCities,
                 _ => {}
@@ -213,13 +263,29 @@ impl Settings {
 
     fn serialize(&self) -> String {
         format!(
-            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\nui_mode={}\n",
+            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\nui_mode={}\nmode_pages={}\n",
             self.dialup_mode.key(),
             self.modem_speed.key(),
             self.retro_style.key(),
             self.splash_intro,
-            self.ui_mode.key()
+            self.ui_mode.key(),
+            self.mode_pages.key()
         )
+    }
+
+    /// The look pages get: the retro look the user picked, else the UI
+    /// mode's era look if they asked for it.
+    pub fn page_look(&self) -> RetroStyle {
+        if self.retro_style == RetroStyle::Off && self.mode_pages == ModePages::EraLook {
+            self.ui_mode.era_look()
+        } else {
+            self.retro_style
+        }
+    }
+
+    /// Whether pages get the UI mode's browser defaults underneath.
+    pub fn mode_defaults(&self) -> bool {
+        self.mode_pages != ModePages::AsIs
     }
 
     /// Apply `dialup=<mode>&speed=<speed>&retro=<style>&splash=<0|1>` query
@@ -298,6 +364,7 @@ mod tests {
                 retro_style: RetroStyle::Portal,
                 splash_intro: true,
                 ui_mode: UiMode::Lantern,
+                mode_pages: ModePages::Defaults,
             }
         );
         assert_eq!(Settings::parse(&settings.serialize()), settings);
@@ -354,6 +421,33 @@ mod tests {
         assert_eq!(Settings::parse("ui_mode=kiosk\n").ui_mode, UiMode::Lantern);
     }
 
+    #[test]
+    fn page_look_prefers_the_users_look() {
+        let mut settings = Settings {
+            ui_mode: UiMode::Workstation1993,
+            ..Settings::default()
+        };
+        assert_eq!(settings.mode_pages, ModePages::Defaults);
+        assert!(settings.mode_defaults());
+        assert_eq!(settings.page_look(), RetroStyle::Off);
+        settings.mode_pages = ModePages::EraLook;
+        assert_eq!(settings.page_look(), RetroStyle::EarlyWeb);
+        settings.retro_style = RetroStyle::Portal;
+        assert_eq!(settings.page_look(), RetroStyle::Portal);
+        settings.mode_pages = ModePages::AsIs;
+        assert!(!settings.mode_defaults());
+        assert_eq!(UiMode::Lantern.era_look(), RetroStyle::Off);
+        for pages in ModePages::ALL {
+            assert_eq!(ModePages::from_key(pages.key()), Some(pages));
+            let saved = Settings {
+                mode_pages: pages,
+                ..Settings::default()
+            }
+            .serialize();
+            assert_eq!(Settings::parse(&saved).mode_pages, pages);
+        }
+    }
+
     /// The branding rule (steward skill): modes are named after an era and a
     /// kind of machine, never after a real browser.
     #[test]
@@ -403,6 +497,7 @@ mod tests {
             retro_style: RetroStyle::GeoCities,
             splash_intro: true,
             ui_mode: UiMode::Workstation1993,
+            mode_pages: ModePages::EraLook,
         };
         save_to(&path, &settings).unwrap();
         assert_eq!(load_from(&path), settings);

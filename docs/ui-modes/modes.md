@@ -18,6 +18,11 @@ or endorsed by them.
 Heights are the toolbar and status views' heights in DIP. Planned ones may
 change when the mode is built.
 
+**Pages** gives each mode's browser defaults (for plain pages with no style
+sheets of their own; [spec.md](spec.md#pages-under-a-mode)) and its era
+look (a full retro look, when the user asks for it). Defaults are from
+memory unless noted: check them against a source before building.
+
 ## Lantern
 
 ### `lantern`: Lantern (default)
@@ -37,6 +42,8 @@ Modelled on NCSA Mosaic for X 1.x–2.6 (screenshot in the catalog).
 - Motif bevels, grey `#b3b3b3`, navy labels, Helvetica bold, Courier fields.
 - Left out: Annotate, Documents and Manuals menus, Search Keyword, Clone,
   New Window, Close Window (no matching feature).
+- **Pages**: grey `#bfbfbf` page, Times, black text (screenshot in the
+  catalog). Era look: Early web (1995).
 
 ### `workstation-1996`: Workstation (1996)
 Modelled on NCSA Mosaic for X 2.7 (from memory). As 1993, but an icon
@@ -48,6 +55,7 @@ status text and Stop.
 Modelled on NCSA Mosaic for Windows 2.0 (from memory). Menu bar; one row of
 small icon buttons; URL combo; activity box at the right; status bar with
 message, progress bar, NUM and clock panes.
+**Pages**: grey page, Times. Era look: Early web (1995).
 
 ## Desktop family
 
@@ -63,6 +71,9 @@ Modelled on Internet Explorer 3 (from memory). Menu bar; bands with grip
 handles: large labelled grey-until-hover buttons (Back, Forward, Stop,
 Refresh, Home, Search, Favorites, Print, Font, Mail ▾); Address band and
 Links band; tall activity box at the right of the bands.
+**Pages** (whole Desktop family): white page, Times, blue and purple links.
+Era look: none yet (a "Desktop web (1996)" look: tables, MS Sans Serif
+forms, no CSS3).
 
 ### `desktop-1997`: Desktop (1997)
 Modelled on Internet Explorer 4 (from memory). The menu bar is a band;
@@ -83,7 +94,9 @@ Edit, View, Go, Bookmarks, Options, Directory; Help at the right); grouped
 icon-only buttons (Back, Forward, Home | Reload, Images, Open, Print, Find |
 Stop); Location combo; directory buttons (What's New!, What's Cool!,
 Handbook, Net Search, Net Directory, Newsgroups); activity box spanning
-Location and directory rows; grey page background. Status: key pane,
+Location and directory rows.
+**Pages** (Toolbar 1995 and 1996): grey `#c0c0c0` page, Times, blue and
+purple links (screenshots in the catalog). Era look: Early web (1995). Status: key pane,
 "Document: Done", progress.
 
 ### `toolbar-1996`: Toolbar (1996)
@@ -99,6 +112,7 @@ toolbars with collapse tabs: navigation (Back, Forward, Reload, Home,
 Search, Guide, Print, Security, Stop, activity box), location (Bookmarks
 button, Location field, What's Related), personal toolbar (quick links).
 Status: padlock, text, progress, a component bar of four small icons.
+**Pages**: white page by then, Times. Era look: Web portal (1997).
 
 ## Classic desktop family
 
@@ -106,6 +120,8 @@ Status: padlock, text, progress, a component bar of four small icons.
 Modelled on MacWWW (from memory; no screenshot yet). One-bit black and
 white, almost no toolbar: a URL strip under the title; navigation lives in
 the menus (File, Edit, Navigate, Bookmarks).
+**Pages**: white page, black text, Times or New York; images may need a
+one-bit look. Era look: Early web (1995), or a new one-bit look.
 
 ### `classic-1994`: Classic desktop (1994)
 Modelled on NCSA Mosaic for the Mac (from memory). Grey bevelled rounded
@@ -129,6 +145,8 @@ Reload, Stop, Help), status text and the activity box.
 Modelled on HotJava 1.x–3 (screenshot in the catalog). Menu bar; icon
 buttons with small labels (Back, Forward, Home, Reload, Stop, Search,
 Print); activity box at the right; Address row; plain status bar.
+**Pages** (both Applet modes): white page, sans-serif text (Dialog), as in
+the catalog screenshot. Era look: none yet.
 
 ## Set-top TV family
 
@@ -139,6 +157,10 @@ content zoom and arrow-key link navigation with a highlight box.
 Modelled on WebTV (from memory). No toolbar: the page fills the screen,
 the selected link has a yellow highlight box, and a bar along the bottom
 shows the page title and a progress bar.
+**Pages** (both TV modes): large type, a light grey-blue page, links shown
+by the highlight box rather than underlines. Era look: a new "Set-top TV"
+look (large text, single column, no small fonts), together with the layout
+extras.
 
 ### `tv-1997`: Set-top TV (1997)
 Modelled on WebTV (from memory). As 1996, with the Options panel open over
@@ -157,8 +179,11 @@ the scroller on the left. Probably needs a frameless window; not planned.
 ### `terminal-1992`: Text terminal (1992)
 Modelled on Lynx (screenshot in the catalog). An 80-column terminal: title
 at the top right, highlighted links, a "press space for next page" bar and
-two lines of key help. Best done with the Early web retro look plus a
-monospace chrome.
+two lines of key help.
+**Pages**: black page, light grey monospace text, bright links. This mode
+only works with its era look, so `era-look` should be its default: a new
+"Text terminal" retro look (monospace, no images but their alt text,
+highlighted links, everything in one column).
 
 ### `pc-1993`: Early PC (1993)
 Modelled on Cello (from memory). A Windows 3.1 frame; menu bar (File, Edit,
@@ -170,6 +195,7 @@ Modelled on Arachne (screenshot in the catalog). Title and URL rows on top;
 a right-hand panel with a big activity box, a 3×3 grid of icon buttons
 (Back, Forward, Home, Reload, Add, Bookmarks, Stop, Search, Help), a list
 of shortcuts and a system-stats box. Needs a side view.
+**Pages**: white page, Arial-like text. Era look: Early web (1995).
 
 ### `workspace-1997`: Workspace (1997)
 Modelled on Opera 3 (from memory). Several page windows inside one main

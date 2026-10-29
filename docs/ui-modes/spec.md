@@ -116,6 +116,43 @@ built for that view and the current mode**
 (`pages::chrome_navigation_allowed`, unit-tested). Web content can't produce
 that URI, and the views still never open popups. This is a tier-2 change.
 
+### Pages under a mode
+
+Each mode can also change how pages look, in two strengths. The setting is
+`mode_pages` (saved in `settings.txt`, picked under **Browser UI** in the
+menus):
+
+| Key | Menu | What pages get |
+|---|---|---|
+| `as-is` | Pages as their sites made them | Nothing. |
+| `defaults` (default) | Pages with this browser's defaults | On plain pages (no style sheets of their own), the mode's **browser defaults**: what that browser drew when a page didn't say, such as a grey page, Times and black text. |
+| `era-look` | Pages in this browser's era look | The defaults, plus the mode's **era look**, a full retro look (`UiMode::era_look`) that overrides the site's styles. |
+
+- **Browser defaults** are `ui/chrome/<mode>/pages.css` plus a page color
+  in `ui_mode.rs`. `ui/chrome/page-defaults.js` adopts them as a
+  constructed stylesheet, first in the list, in each content frame once it
+  has loaded, and only if the page has **no style sheets of its own**:
+  that's when an old browser's defaults showed, and it keeps modern sites
+  exactly as they are (a per-property check can't, since a site's cascade
+  layers lose to any unlayered rule). Every rule is one line with a
+  `:where()` selector (checked by a unit test), so style attributes still
+  win. The page color goes only on the top page, and only when its `html`
+  and `body` set no background, so framed embeds stay see-through.
+- **Era looks** are ordinary retro looks (`ui/retro/`). Workstation (1993)
+  uses Early web (1995). A mode that needs a look that doesn't exist yet,
+  such as the text terminal, adds one; a new retro look adds a choice to
+  the settings page, so its golden screenshots need the maintainer's
+  approval.
+- **A retro look the user picks wins.** `Settings::page_look()` returns
+  the user's retro look if there is one, and the mode's era look only when
+  the look is Off and `mode_pages` is `era-look`. The toolbar's Retro
+  button, the Retro menu and the self-test report show `page_look()`, and
+  picking Off in the Retro menu (or `--retro=off`) turns an era look off
+  too. A look that switches page styles off (Early web) switches the
+  browser defaults off with them; it brings its own.
+- Lantern's internal pages (`data:` URLs) are never touched, as with the
+  retro looks.
+
 ### Shortcut
 
 **Ctrl+Shift+M** (Cmd+Shift+M on macOS) opens the Browser UI menu at the top
@@ -143,7 +180,8 @@ every mode.
 ## Testing
 
 - **Rust unit tests**: the setting round-trips; unknown keys fall back; mode
-  names and keys avoid product names; `chrome_navigation_allowed`'s truth
+  names and keys avoid product names; `page_look` lets the user's look win;
+  every browser-defaults rule is zero-specificity; `chrome_navigation_allowed`'s truth
   table; menu keys and command ids round-trip; every mode's templates fill
   without unknown placeholders.
 - **Playwright**: `dump-pages` writes every mode's toolbar and status page
@@ -152,6 +190,9 @@ every mode.
   buttons send the right title-channel messages, that `lantern.update`
   shows the state, and adds golden screenshots for each mode. The Lantern
   mode's existing goldens must keep passing unchanged.
+- **Page defaults** (`mode-pages.spec.js`): on a plain fixture page the
+  mode's defaults apply (with a golden); on a fixture that styles itself,
+  nothing changes; switching them off removes the sheet.
 - **The real app** under Xvfb (steward skill recipe): switch modes at
   runtime, check the views resize and the mode survives a restart.
 

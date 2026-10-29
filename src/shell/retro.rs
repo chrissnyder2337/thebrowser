@@ -5,8 +5,9 @@
 
 use super::{
     settings,
-    settings::RetroStyle,
+    settings::{ModePages, RetroStyle},
     state::{content_browser, push_toolbar, set_notice, with_shell},
+    ui_mode,
     util::{js_string, url_host},
 };
 use cef::*;
@@ -101,8 +102,8 @@ pub fn on_load_start(frame: &Frame) {
         return;
     }
     let settings = with_shell(|shell| shell.settings);
-    if settings.retro_style != RetroStyle::Off {
-        run(frame, &style_script(settings.retro_style));
+    if settings.page_look() != RetroStyle::Off {
+        run(frame, &style_script(settings.page_look()));
     }
     if !settings.splash_intro || frame.is_main() == 0 {
         return;
@@ -122,9 +123,16 @@ pub fn on_load_start(frame: &Frame) {
 
 /// A content frame finished loading: style what arrived since the start.
 pub fn on_load_end(frame: &Frame) {
-    let style = with_shell(|shell| shell.settings.retro_style);
-    if style != RetroStyle::Off && !is_internal(&frame_url(frame)) {
-        run(frame, &style_script(style));
+    let settings = with_shell(|shell| shell.settings);
+    if is_internal(&frame_url(frame)) {
+        return;
+    }
+    // Only once loaded: whether the page has style sheets of its own decides.
+    if let Some(script) = ui_mode::page_defaults_script(&settings) {
+        run(frame, &script);
+    }
+    if settings.page_look() != RetroStyle::Off {
+        run(frame, &style_script(settings.page_look()));
     }
 }
 
@@ -132,7 +140,12 @@ pub fn on_load_end(frame: &Frame) {
 /// or the menu changed them).
 pub fn refresh() {
     let settings = with_shell(|shell| shell.settings);
-    run_in_content(&style_script(settings.retro_style), true);
+    run_in_content(
+        &ui_mode::page_defaults_script(&settings)
+            .unwrap_or_else(ui_mode::remove_page_defaults_script),
+        true,
+    );
+    run_in_content(&style_script(settings.page_look()), true);
     if !settings.splash_intro {
         run_in_content(REMOVE_SPLASH, false);
     }
@@ -150,7 +163,13 @@ fn update(change: impl FnOnce(&mut settings::Settings)) -> settings::Settings {
 }
 
 pub fn set_style(style: RetroStyle) {
-    update(|s| s.retro_style = style);
+    update(|s| {
+        s.retro_style = style;
+        // Off means off, including the UI mode's era look.
+        if style == RetroStyle::Off && s.mode_pages == ModePages::EraLook {
+            s.mode_pages = ModePages::Defaults;
+        }
+    });
     set_notice(match style {
         RetroStyle::Off => "Back to the modern web.",
         RetroStyle::GeoCities => "GeoCities mode on. Welcome to the information superhighway!",

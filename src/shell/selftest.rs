@@ -33,7 +33,7 @@ fn finish(status: String) {
             (
                 shell.current_url.clone(),
                 shell.current_title.clone(),
-                shell.settings.retro_style.key(),
+                shell.settings.page_look().key(),
             )
         });
         let text = report(&url, &title, &status, retro);

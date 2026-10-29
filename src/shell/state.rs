@@ -150,8 +150,8 @@ impl Shell {
             ("loading", Json::Bool(self.is_loading)),
             ("secure", Json::Bool(self.is_secure())),
             ("bookmarks", Json::Arr(quick)),
-            ("retro", Json::str(self.settings.retro_style.key())),
-            ("retroName", Json::str(self.settings.retro_style.name())),
+            ("retro", Json::str(self.settings.page_look().key())),
+            ("retroName", Json::str(self.settings.page_look().name())),
             ("title", Json::str(self.page_title())),
         ])
         .render()
