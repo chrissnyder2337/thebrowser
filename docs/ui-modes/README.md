@@ -9,6 +9,8 @@ significantly. This folder tracks the work.
   modelled on.
 - Mockups: the design canvas linked from [modes.md](modes.md).
 - Research: [`docs/research/90s-browsers/`](../research/90s-browsers/).
+- [goal.md](goal.md): the `/goal` prompt that builds every mode, and
+  [agent-brief.md](agent-brief.md), the brief for subagents drafting one.
 
 Update the tables below in the same commit as the work they describe.
 
@@ -49,7 +51,7 @@ Update the tables below in the same commit as the work they describe.
 | `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Planned |
 | `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Planned |
 | `pc-1993` | Early PC (1993) | Cello | menus | Planned |
-| `terminal-1992` | Text terminal (1992) | Lynx | monospace chrome | Later |
+| `terminal-1992` | Text terminal (1992) | Lynx | the Text terminal look | Next batch |
 | `terminal-1999` | Text terminal (1999) | Links | the Text terminal look | Built (not yet merged) |
 | `dos-1996` | DOS graphics (1996) | Arachne | a side view | Later |
 | `cube-1990` | Cube workstation (1990) | WorldWideWeb | floating windows | Not planned |
