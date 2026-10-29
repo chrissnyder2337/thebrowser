@@ -51,5 +51,27 @@
     </div>
   </div>
   <div class="foot"><span>Lantern {{VERSION}}</span><span>Settings are saved in your Lantern profile.</span></div>
+<script>
+  // Settings apply as soon as they change; Save just applies them again.
+  // Saving reloads this page, so window.name carries the changed control's
+  // position in the form (not its value) and its place on screen, and the
+  // control comes back focused where it was.
+  (function () {
+    var KEY = "lantern-settings:";
+    var form = document.querySelector("form");
+    var inputs = form.querySelectorAll("input:not([type=hidden])");
+    form.addEventListener("change", function (e) {
+      var index = Array.prototype.indexOf.call(inputs, e.target);
+      window.name = KEY + index + ":" + Math.round(e.target.getBoundingClientRect().top);
+      form.submit();
+    });
+    var saved = /^lantern-settings:(\d+):(-?\d+)$/.exec(window.name);
+    if (window.name.indexOf(KEY) === 0) window.name = "";
+    var el = saved && inputs[+saved[1]];
+    if (!el) return;
+    window.scrollBy(0, el.getBoundingClientRect().top - saved[2]);
+    el.focus({ preventScroll: true });
+  })();
+</script>
 </body>
 </html>

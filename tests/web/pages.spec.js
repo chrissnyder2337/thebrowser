@@ -1,6 +1,7 @@
 // Lantern's internal pages (ui/pages/), as written by
 // `cargo run --example dump-pages`: no script errors, untrusted text shown as
 // text, links back into Rust only through lantern.invalid, and a golden each.
+const fs = require("fs");
 const { test, expect } = require("@playwright/test");
 const { pageUrl, trackErrors } = require("./helpers");
 
@@ -62,4 +63,43 @@ test("error page escapes the failed URL", async ({ page }) => {
   await page.goto(pageUrl("error.html"));
   await expect(page.getByText("https://no-such-host.invalid/<x>").first()).toBeVisible();
   await expect(page.locator("x")).toHaveCount(0);
+});
+
+// Settings apply as soon as they change: pressing Save, below the fold on a
+// small window, was easy to miss (issue #39). Rust answers the save by
+// reloading the page with "Settings saved", served here by the route.
+test.describe("settings apply on change", () => {
+  async function openSettings(page) {
+    const saves = [];
+    await page.route("https://lantern.invalid/**", async (route) => {
+      saves.push(route.request().url());
+      await route.fulfill({ contentType: "text/html", body: fs.readFileSync(new URL(pageUrl("settings-saved.html"))) });
+    });
+    await page.setViewportSize({ width: 800, height: 400 });
+    await page.goto(pageUrl("settings.html"));
+    return saves;
+  }
+
+  for (const [label, selector, param] of [
+    ["a radio button", "input[name=speed][value='14.4']", "speed=14.4"],
+    ["the splash checkbox", "input[type=checkbox][name=splash]", "splash=1"],
+  ]) {
+    test(`changing ${label} saves without Save`, async ({ page }) => {
+      const errors = trackErrors(page);
+      const saves = await openSettings(page);
+      const control = page.locator(selector);
+      await control.scrollIntoViewIfNeeded();
+      const before = (await control.boundingBox()).y;
+      // click(), not check(): check() verifies the box after the page has gone.
+      await Promise.all([page.waitForURL("https://lantern.invalid/**"), control.click()]);
+      expect(saves).toHaveLength(1);
+      expect(saves[0]).toContain(param);
+      // Back on the reloaded page, the control is where it was, and focused.
+      const after = page.locator(selector);
+      await expect(after).toBeFocused();
+      expect(Math.abs((await after.boundingBox()).y - before)).toBeLessThanOrEqual(2);
+      expect(await page.evaluate(() => window.name)).toBe("");
+      expect(errors).toEqual([]);
+    });
+  }
 });
