@@ -1,0 +1,43 @@
+# The menu bar of a browser written for the Java platform, 1997.
+menu File
+- New Window
+open-url Open Page...
+- Save As...
+---
+print Print...
+---
+close-window Close
+- Exit
+menu Edit
+- Cut
+- Copy
+- Paste
+---
+search Find...
+---
+settings Preferences...
+menu View
+reload Reload
+stop Stop
+---
+view-source Document Source
+- Document Info
+---
+zoom-in Larger Text
+zoom-out Smaller Text
+---
+retro Retro looks
+browser-ui Browser UI
+menu Places
+back Back
+forward Forward
+home Home
+---
+add-bookmark Add to Hotlist
+bookmarks Hotlist...
+- History...
+menu Help
+- Help Topics
+- Index
+---
+about About...

@@ -18,13 +18,38 @@ pub const SETTINGS: &str = "lantern:settings";
 /// Host whose URLs internal pages use as "links back into Rust".
 pub const ACTION_HOST: &str = "lantern.invalid";
 
-/// A UI mode's chrome templates, from `ui/chrome/<key>/`.
-macro_rules! chrome {
-    ($key:literal) => {
-        (
-            include_str!(concat!("../../ui/chrome/", $key, "/toolbar.html")),
-            include_str!(concat!("../../ui/chrome/", $key, "/status.html")),
-        )
+/// A UI mode's files (`ui/chrome/<key>/`): the toolbar and status pages, and
+/// whichever of `menus.txt`, `side.html` and `frame.html` the mode has.
+#[derive(Clone, Copy)]
+struct ModeFiles {
+    toolbar: &'static str,
+    status: &'static str,
+    menus: Option<&'static str>,
+    side: Option<&'static str>,
+    frame: Option<&'static str>,
+}
+
+macro_rules! mode_files {
+    ($key:literal $(, $extra:ident)*) => {{
+        #[allow(unused_mut)]
+        let mut files = ModeFiles {
+            toolbar: include_str!(concat!("../../ui/chrome/", $key, "/toolbar.html")),
+            status: include_str!(concat!("../../ui/chrome/", $key, "/status.html")),
+            menus: None,
+            side: None,
+            frame: None,
+        };
+        $(mode_files!(@ files, $key, $extra);)*
+        files
+    }};
+    (@ $files:ident, $key:literal, menus) => {
+        $files.menus = Some(include_str!(concat!("../../ui/chrome/", $key, "/menus.txt")))
+    };
+    (@ $files:ident, $key:literal, side) => {
+        $files.side = Some(include_str!(concat!("../../ui/chrome/", $key, "/side.html")))
+    };
+    (@ $files:ident, $key:literal, frame) => {
+        $files.frame = Some(include_str!(concat!("../../ui/chrome/", $key, "/frame.html")))
     };
 }
 
@@ -100,31 +125,24 @@ fn common_vars() -> Vec<(&'static str, String)> {
     ]
 }
 
-/// A UI mode's toolbar and status bar templates (`ui/chrome/<mode>/`).
-fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
+fn mode_files(mode: UiMode) -> ModeFiles {
     match mode {
-        UiMode::Lantern => chrome!("lantern"),
-        UiMode::Workstation1993 => chrome!("workstation-1993"),
-        UiMode::Toolbar1996 => chrome!("toolbar-1996"),
-        UiMode::Desktop1996 => chrome!("desktop-1996"),
-        UiMode::Applet1997 => chrome!("applet-1997"),
-        UiMode::Terminal1999 => chrome!("terminal-1999"),
+        UiMode::Lantern => mode_files!("lantern"),
+        UiMode::Workstation1993 => mode_files!("workstation-1993", menus),
+        UiMode::Toolbar1996 => mode_files!("toolbar-1996", menus),
+        UiMode::Desktop1996 => mode_files!("desktop-1996", menus),
+        UiMode::Applet1997 => mode_files!("applet-1997", menus),
+        UiMode::Terminal1999 => mode_files!("terminal-1999", menus),
+        UiMode::Terminal1992 => mode_files!("terminal-1992", menus),
+        UiMode::Pc1993 => mode_files!("pc-1993", menus),
+        UiMode::Toolbar1995 => mode_files!("toolbar-1995", menus),
+        UiMode::Desktop1995 => mode_files!("desktop-1995", menus),
     }
 }
 
 /// A UI mode's menu bar (`ui/chrome/<mode>/menus.txt`), if it has its own.
-pub fn menus_text(_mode: UiMode) -> Option<&'static str> {
-    None
-}
-
-/// A UI mode's side view template, if it has a side view.
-fn side_template(_mode: UiMode) -> Option<&'static str> {
-    None
-}
-
-/// A UI mode's frame view template, if it has a frame view.
-fn frame_template(_mode: UiMode) -> Option<&'static str> {
-    None
+pub fn menus_text(mode: UiMode) -> Option<&'static str> {
+    mode_files(mode).menus
 }
 
 /// Whether a chrome view (toolbar or status bar) may navigate to `url`: only
@@ -181,20 +199,20 @@ fn fill_chrome(template: &str) -> String {
 }
 
 pub fn toolbar_uri(mode: UiMode) -> String {
-    fill_chrome(chrome_templates(mode).0)
+    fill_chrome(mode_files(mode).toolbar)
 }
 
 pub fn status_uri(mode: UiMode) -> String {
-    fill_chrome(chrome_templates(mode).1)
+    fill_chrome(mode_files(mode).status)
 }
 
 /// The chrome views `mode` has a page of its own for.
 pub fn chrome_views(mode: UiMode) -> Vec<Role> {
     let mut views = vec![Role::Toolbar, Role::Status];
-    if side_template(mode).is_some() {
+    if mode_files(mode).side.is_some() {
         views.push(Role::Side);
     }
-    if frame_template(mode).is_some() {
+    if mode_files(mode).frame.is_some() {
         views.push(Role::Frame);
     }
     views
@@ -206,8 +224,8 @@ pub fn chrome_uri(role: Role, mode: UiMode) -> String {
     match role {
         Role::Toolbar => toolbar_uri(mode),
         Role::Status => status_uri(mode),
-        Role::Side => fill_chrome(side_template(mode).unwrap_or(BLANK_HTML)),
-        Role::Frame => fill_chrome(frame_template(mode).unwrap_or(BLANK_HTML)),
+        Role::Side => fill_chrome(mode_files(mode).side.unwrap_or(BLANK_HTML)),
+        Role::Frame => fill_chrome(mode_files(mode).frame.unwrap_or(BLANK_HTML)),
         Role::Content => fill_chrome(BLANK_HTML),
     }
 }
@@ -357,6 +375,22 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Terminal1999 => {
             "A menu bar and URL prompt over the page and a status line under it, all \
              monospace on black, modelled on Links."
+        }
+        UiMode::Terminal1992 => {
+            "The page title at the top and a status line, address prompt and key help \
+             at the bottom, monospace on black, modelled on Lynx."
+        }
+        UiMode::Pc1993 => {
+            "A Windows 3.1 menu bar, a strip with the page title, and the address in the \
+             status line, modelled on Cello."
+        }
+        UiMode::Toolbar1995 => {
+            "Icon buttons with labels, a Location field and directory buttons, with a \
+             key in the status bar, modelled on Netscape Navigator 1."
+        }
+        UiMode::Desktop1995 => {
+            "One row of small icon buttons and an Address row beside the activity box, \
+             modelled on Internet Explorer 2."
         }
     }
 }
@@ -561,10 +595,20 @@ mod tests {
             for uri in [toolbar_uri(mode), status_uri(mode)] {
                 assert!(uri.starts_with("data:text/html;base64,"), "{mode:?}");
             }
-            let (toolbar, status) = chrome_templates(mode);
-            for template in [toolbar, status] {
+            let files = mode_files(mode);
+            for template in [
+                Some(files.toolbar),
+                Some(files.status),
+                files.side,
+                files.frame,
+            ]
+            .into_iter()
+            .flatten()
+            {
                 assert!(template.contains("{{CHROME_JS}}"), "{mode:?}");
             }
+            // Every mode but Lantern has the original's menu bar.
+            assert_eq!(files.menus.is_some(), mode != UiMode::Lantern, "{mode:?}");
         }
         assert_ne!(
             toolbar_uri(UiMode::Lantern),

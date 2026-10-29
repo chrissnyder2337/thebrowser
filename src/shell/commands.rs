@@ -62,7 +62,7 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
 }
 
 /// The commands the status bar may send.
-const STATUS_COMMANDS: [&str; 12] = [
+const STATUS_COMMANDS: [&str; 13] = [
     "back",
     "forward",
     "reload",
@@ -76,6 +76,9 @@ const STATUS_COMMANDS: [&str; 12] = [
     "panel",
     // A typed address: the TV modes' Go to box is in their bottom panel.
     "go",
+    // Opens one of the mode's own menus (menus.txt), for browsers whose
+    // menu keys sat at the bottom (the text terminal's O)ptions).
+    "menu",
 ];
 
 fn run_chrome_command(role: Role, name: &str, arg: &str) {

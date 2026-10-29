@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Toolbar (1995): a menu bar (Help at the right) over grouped icon-and-label
+     buttons, a Location row and a row of directory buttons, with the activity
+     box at the right spanning both rows (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #c0c0c0;
+    --raised: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+    --pressed: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+    --thin-down: inset 1px 1px #808080, inset -1px -1px #fff;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar { height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px; }
+  .menu { height: 18px; padding: 0 6px; }
+  .menu.help { margin-left: auto; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--raised); }
+  .menu:active { box-shadow: var(--pressed); }
+
+  /* ---- Toolbar buttons ---- */
+  #buttons {
+    height: 42px; flex: none; display: flex; align-items: center; padding: 0 6px;
+    border-top: 1px solid #808080; box-shadow: inset 0 1px #fff;
+  }
+  .grp { display: flex; gap: 2px; margin-right: 10px; }
+  .tb {
+    width: 38px; height: 36px; flex: none; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1px;
+    font-size: 9px; line-height: 10px; box-shadow: var(--raised);
+  }
+  .tb:active:not(.disabled) { box-shadow: var(--pressed); }
+  .tb:active:not(.disabled) > * { transform: translate(1px, 1px); }
+  .tb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .tb svg.off { display: none; }
+  .tb.disabled { color: #808080; text-shadow: 1px 1px #fff; }
+  .tb.disabled svg.on { display: none; }
+  .tb.disabled svg.off { display: block; }
+
+  /* ---- Location and directory rows ---- */
+  #rows { height: 52px; flex: none; display: flex; padding: 0 4px 0 0; border-top: 1px solid #fff; border-bottom: 2px solid #808080; box-shadow: 0 1px #fff; }
+  #left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-top: 2px; }
+  #loc { height: 24px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 3px 0 14px; }
+  #loc label { flex: none; }
+  #field { flex: 1; min-width: 0; height: 22px; position: relative; display: flex; align-items: center; background: #fff; box-shadow: var(--sunken); padding-right: 18px; }
+  #url {
+    width: 100%; height: 18px; border: 0; padding: 0 4px; margin: 0; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+  /* The drop-down arrow of the original's Location combo (decoration). */
+  #field .drop { position: absolute; right: 2px; top: 2px; width: 16px; height: 18px; background: var(--face); box-shadow: var(--raised); }
+  #field .drop::after { content: ""; position: absolute; left: 4px; top: 7px; border: 4px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+  #field svg.lock { display: none; position: absolute; right: 22px; top: 5px; }
+  #field.secure #url { padding-right: 22px; }
+  #field.secure svg.lock { display: block; }
+
+  /* ---- Directory buttons ---- */
+  #dirs { height: 24px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 6px 1px 4px; overflow: hidden; }
+  .dir {
+    height: 20px; flex: none; padding: 0 9px; white-space: nowrap;
+    display: flex; align-items: center; box-shadow: var(--raised);
+  }
+  .dir:active { box-shadow: var(--pressed); }
+  .dir:active > * { transform: translate(1px, 1px); }
+  .dir:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 48px; height: 48px; flex: none; margin: 2px 0 0 6px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    background: #0a2840; box-shadow: var(--thin-down);
+  }
+  #throbber:active { box-shadow: inset 1px 1px #000; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu"><u>V</u>iew</button>
+    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu"><u>G</u>o</button>
+    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu"><u>B</u>ookmarks</button>
+    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings"><u>O</u>ptions</button>
+    <button class="menu" data-cmd="menu" data-arg="directory" data-anchor aria-haspopup="menu"><u>D</u>irectory</button>
+    <button class="menu help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+  </div>
+  <div id="buttons">
+    <div class="grp">
+      <button class="tb disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_T95_BACK}}<span>Back</span></button>
+      <button class="tb disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_T95_FORWARD}}<span>Forward</span></button>
+      <button class="tb" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_T95_HOME}}<span>Home</span></button>
+    </div>
+    <div class="grp">
+      <button class="tb" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_T95_RELOAD}}<span>Reload</span></button>
+      <button class="tb disabled" id="images" title="Load images (not needed: images load automatically)">{{ICON_T95_IMAGES}}<span>Images</span></button>
+      <button class="tb" id="open" data-cmd="focus-url" title="Type an address (Ctrl+L)">{{ICON_T95_OPEN}}<span>Open</span></button>
+      <button class="tb" id="print" title="Print (see the File menu)">{{ICON_T95_PRINT}}<span>Print</span></button>
+      <button class="tb" id="find" title="Find (see the Edit menu)">{{ICON_T95_FIND}}<span>Find</span></button>
+    </div>
+    <div class="grp">
+      <button class="tb disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_T95_STOP}}<span>Stop</span></button>
+    </div>
+  </div>
+  <div id="rows">
+    <div id="left">
+      <div id="loc">
+        <label for="url">Location:</label>
+        <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}<span class="drop"></span></div>
+      </div>
+      <div id="dirs">
+        <button class="dir" title="What's new">What's New!</button>
+        <button class="dir" title="What's cool">What's Cool!</button>
+        <button class="dir" title="Handbook">Handbook</button>
+        <button class="dir" data-cmd="search" title="Search the web">Net Search</button>
+        <button class="dir" title="Net directory">Net Directory</button>
+        <button class="dir" title="Newsgroups">Newsgroups</button>
+      </div>
+    </div>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

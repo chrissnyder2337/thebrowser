@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Text terminal (1992): the page title at the top right of an 80-column
+     terminal, and a "URL to open:" prompt line (docs/ui-modes/modes.md). The
+     prompt screens are three small buttons at the left of the title line,
+     because the status view may not open menus. -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #000; color: #c0c0c0;
+    font: 15px/20px "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, "Courier New", monospace;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; cursor: default;
+  }
+
+  /* ---- Title line ---- */
+  #head { height: 20px; flex: none; display: flex; align-items: center; }
+  #title {
+    flex: 1; min-width: 0; text-align: right; padding: 0 1ch; color: #c000c0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+</style>
+</head>
+<body>
+  <div id="head">
+    <div id="title"></div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

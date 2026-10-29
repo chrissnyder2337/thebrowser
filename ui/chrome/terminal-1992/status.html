@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<!-- Text terminal (1992): a blue status bar over the lines of key help an
+     80-column text browser printed (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #000; color: #c0c0c0;
+    font: 15px/20px "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, "Courier New", monospace;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; cursor: default; white-space: pre;
+  }
+
+  /* ---- Status bar (blue, bold white) ---- */
+  #line { height: 20px; flex: none; display: flex; background: #0000c8; color: #fff; font-weight: bold; white-space: pre; }
+  .pane { height: 20px; flex: none; display: flex; align-items: center; }
+  #text { flex: 1; min-width: 0; }
+  #msg { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #modem-pane { padding: 0 1ch; }
+  #modem-pane:hover { background: #c0c0c0; color: #000; }
+  #modem-label { white-space: nowrap; }
+  #meter-pane { width: 12ch; }
+  #meter { height: 20px; display: flex; visibility: hidden; align-items: center; }
+  #meter.on { visibility: visible; }
+  #meter i { width: 1ch; height: 14px; flex: none; background: #c0c0c0; }
+  #lock-pane { width: 7ch; }
+  #lock-pane::after { content: "[SSL]"; visibility: hidden; }
+  #lock-pane.secure::after { visibility: visible; }
+
+  /* ---- Key help ---- */
+  .help { height: 20px; flex: none; display: flex; white-space: pre; color: #c0c0c0; }
+  .k { height: 20px; }
+  button.k:hover:not(.disabled), button.k:focus-visible { background: #c0c0c0; color: #000; }
+  button.k.disabled { color: #707070; }
+  /* ---- URL prompt ---- */
+  #prompt { height: 20px; flex: none; display: flex; align-items: center; }
+  #keys { flex: none; white-space: pre; }
+  #prompt label { flex: none; white-space: pre; padding-left: 1ch; }
+  #field { flex: 1; min-width: 0; height: 20px; display: flex; align-items: center; }
+  #url {
+    flex: 1; min-width: 0; height: 20px; border: 0; padding: 0; margin: 0; outline: none;
+    background: transparent; color: #fff; font: inherit; user-select: text;
+    caret-color: #c0c0c0; caret-shape: block;
+  }
+  #url::selection { background: #c0c0c0; color: #000; }
+</style>
+</head>
+<body>
+  <div id="line">
+    <div class="pane" id="text"><span id="msg">Ready.</span></div>
+    <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator"><span id="modem-label"></span></div>
+    <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
+    <div class="pane" id="lock-pane" title=""></div>
+  </div>
+  <div id="prompt">
+    <label for="url">URL to open: </label>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
+  <span id="keys"><button class="k disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">Right=forward</button><span class="k">  </span><button class="k" id="reload" data-cmd="reload" title="Reload this page (F5)">^R)eload</button><span class="k">  </span><button class="k disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">Esc=stop</button></span>
+  </div>
+  <div class="help"><span class="k">  Arrow keys: Up and Down to move.  Right to follow a link; </span><button class="k disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">Left to go back.</button></div>
+  <div class="help"><span class="k"> </span><button class="k" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu" title="Help and About">H)elp</button><span class="k"> </span><button class="k" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Options, retro looks and Browser UI">O)ptions</button><span class="k"> </span><button class="k" data-cmd="menu" data-arg="main" data-anchor aria-haspopup="menu" title="Print, source and more">P)rint</button><span class="k"> </span><button class="k" data-cmd="focus-url" title="Type an address (Ctrl+L)">G)o</button><span class="k"> </span><button class="k" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">M)ain screen</button><span class="k"> Q)uit </span><button class="k" data-cmd="search" title="Search this page">/=search</button><span class="k"> </span><button class="k" data-cmd="bookmarks" title="Show bookmarks">[delete]=history list</button></div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

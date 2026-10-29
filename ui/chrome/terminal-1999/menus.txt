@@ -1,0 +1,44 @@
+# The menu bar of a text-mode browser, 1999.
+menu File
+back Go back
+forward Go forward
+- History
+reload Reload
+---
+bookmarks Bookmarks
+add-bookmark Add bookmark
+---
+- New window
+- Save as
+- Save formatted document
+---
+close-window Exit
+menu View
+search Search
+- Search backward
+- Find next
+- Find previous
+---
+view-source Toggle html/plain
+- Document info
+menu Link
+- Follow link
+- Open in new window
+- Download link
+menu Downloads
+- No downloads
+menu Setup
+- Character set
+- Terminal options
+- Network options
+- Miscellaneous options
+---
+settings Save options
+retro Retro looks
+browser-ui Browser UI
+menu Help
+about About
+- Keys
+- Manual
+- Homepage
+- Copying

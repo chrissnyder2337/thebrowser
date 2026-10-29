@@ -167,16 +167,32 @@ pub enum UiMode {
     /// A text-mode browser: a menu bar and URL prompt on top, a status line
     /// and text buttons at the bottom, monospace on black.
     Terminal1999,
+    /// A text-mode browser: the title at the top right, a status line, an
+    /// address prompt and two lines of key help at the bottom.
+    Terminal1992,
+    /// An early Windows browser: a menu bar, a strip with the activity box and
+    /// the page title, and the address in the status line.
+    Pc1993,
+    /// The first toolbar browser: icon-over-label buttons, a Location field and
+    /// a row of directory buttons.
+    Toolbar1995,
+    /// An early desktop browser: one row of small icon buttons, an Address
+    /// row, and the activity box beside both.
+    Desktop1995,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 10] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
         Self::Desktop1996,
         Self::Applet1997,
         Self::Terminal1999,
+        Self::Terminal1992,
+        Self::Pc1993,
+        Self::Toolbar1995,
+        Self::Desktop1995,
     ];
 
     pub fn key(self) -> &'static str {
@@ -187,6 +203,10 @@ impl UiMode {
             Self::Desktop1996 => "desktop-1996",
             Self::Applet1997 => "applet-1997",
             Self::Terminal1999 => "terminal-1999",
+            Self::Terminal1992 => "terminal-1992",
+            Self::Pc1993 => "pc-1993",
+            Self::Toolbar1995 => "toolbar-1995",
+            Self::Desktop1995 => "desktop-1995",
         }
     }
 
@@ -203,21 +223,32 @@ impl UiMode {
             Self::Desktop1996 => "Desktop (1996)",
             Self::Applet1997 => "Applet browser (1997)",
             Self::Terminal1999 => "Text terminal (1999)",
+            Self::Terminal1992 => "Text terminal (1992)",
+            Self::Pc1993 => "Early PC (1993)",
+            Self::Toolbar1995 => "Toolbar (1995)",
+            Self::Desktop1995 => "Desktop (1995)",
         }
     }
 
     /// Whether pages only make sense in this mode's era look (a terminal
     /// can't show a modern page), so the default `mode_pages` gives it.
     pub fn needs_era_look(self) -> bool {
-        self == Self::Terminal1999
+        matches!(self, Self::Terminal1999 | Self::Terminal1992)
     }
 
     /// The retro look that renders pages the way this mode's browsers did.
     pub fn era_look(self) -> RetroStyle {
         match self {
-            Self::Lantern | Self::Desktop1996 | Self::Applet1997 => RetroStyle::Off,
-            Self::Workstation1993 | Self::Toolbar1996 => RetroStyle::EarlyWeb,
+            Self::Lantern => RetroStyle::Off,
+            Self::Workstation1993 => RetroStyle::EarlyWeb,
+            Self::Toolbar1996 => RetroStyle::EarlyWeb,
+            Self::Desktop1996 => RetroStyle::Off,
+            Self::Applet1997 => RetroStyle::Off,
             Self::Terminal1999 => RetroStyle::Terminal,
+            Self::Terminal1992 => RetroStyle::Terminal,
+            Self::Pc1993 => RetroStyle::EarlyWeb,
+            Self::Toolbar1995 => RetroStyle::EarlyWeb,
+            Self::Desktop1995 => RetroStyle::Off,
         }
     }
 }

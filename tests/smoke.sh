@@ -78,7 +78,11 @@ done
 # <mode>:<the look its pages get by default>.
 for entry in \
   lantern:off workstation-1993:off toolbar-1996:off desktop-1996:off \
-  applet-1997:off terminal-1999:terminal; do
+  applet-1997:off terminal-1999:terminal \
+  terminal-1992:terminal \
+  pc-1993:off \
+  toolbar-1995:off \
+  desktop-1995:off; do
   mode="${entry%%:*}"
   run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
 done

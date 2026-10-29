@@ -1,0 +1,79 @@
+menu File
+- New Window
+open-url Open Location...
+- Open File...
+---
+- Save as...
+- Mail Document...
+- Document Info
+---
+print Print...
+---
+close-window Close
+- Exit
+menu Edit
+- Undo
+---
+- Cut
+- Copy
+- Paste
+---
+- Select All
+---
+- Find...
+- Find Again
+menu View
+reload Reload
+- Load Images
+reload Refresh
+---
+view-source Source...
+menu Go
+back Back
+forward Forward
+home Home
+stop Stop Loading
+menu Bookmarks
+add-bookmark Add Bookmark
+bookmarks View Bookmarks...
+menu Options
+settings General Preferences...
+- Mail and News Preferences...
+- Network Preferences...
+- Security Preferences...
+---
+- Show Toolbar
+- Show Location
+- Show Directory Buttons
+- Auto Load Images
+- Show FTP File Information
+---
+- Save Options
+---
+browser-ui Browser UI
+retro Retro looks
+menu Directory
+home Home Page
+---
+- What's New!
+- What's Cool!
+- Upgrades
+---
+search Net Search
+- Net Directory
+- Newsgroups
+---
+- Internet White Pages
+- About the Internet
+menu Help
+about About...
+- Registration Information...
+---
+- Handbook
+- Release Notes
+- Frequently Asked Questions
+- On Security
+---
+- How to Give Feedback
+- How to Get Support
+- How to Create Web Services

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Early PC (1993): a white menu bar over a strip with the activity box and
+     two small icon buttons at the left, the page title centred and a Home
+     icon at the right; no toolbar of buttons (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #ffffe8; color: #000;
+    font: bold 12px "MS Sans Serif", "Microsoft Sans Serif", Arial, Helvetica, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar {
+    height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px;
+    background: #fff; border-bottom: 1px solid #000;
+  }
+  .menu { height: 19px; padding: 0 8px; }
+  .menu:hover, .menu:focus-visible { background: #000; color: #fff; }
+
+  /* ---- Title strip ---- */
+  #strip {
+    height: 32px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 2px;
+    background: #ffffe8; border-bottom: 2px solid #808080; box-shadow: 0 -1px #fff inset;
+  }
+  #throbber {
+    width: 28px; height: 28px; flex: none; margin-right: 2px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid #000; background: #fff;
+  }
+  #throbber > svg, #throbber .lit-box { zoom: 0.5; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+  #throbber:active { background: #c0c0c0; }
+
+  .ic {
+    width: 26px; height: 26px; flex: none; display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent;
+  }
+  .ic svg { width: 20px; height: 20px; }
+  .ic svg.off { display: none; }
+  .ic.disabled svg.on { display: none; }
+  .ic.disabled svg.off { display: block; }
+  .ic:hover:not(.disabled) { border-color: #000; background: #c0c0c0; }
+  .ic:active:not(.disabled) { background: #808080; }
+  .ic:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+
+  #title {
+    flex: 1; min-width: 0; text-align: center; padding: 0 6px;
+    font: 18px "Times New Roman", Times, serif; color: #1c1c9c;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
+    <button class="menu" data-cmd="menu" data-arg="search" data-anchor aria-haspopup="menu"><u>S</u>earch</button>
+    <button class="menu" data-cmd="menu" data-arg="configure" data-anchor aria-haspopup="menu" title="Fonts, colors, Browser UI and Retro looks"><u>C</u>onfigure</button>
+    <button class="menu" data-cmd="menu" data-arg="jump" data-anchor aria-haspopup="menu"><u>J</u>ump</button>
+    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu"><u>B</u>ookmarks</button>
+    <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+  </div>
+  <div id="strip">
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+    <button class="ic disabled" id="back" data-cmd="back" title="Back (Alt+Left)" aria-label="Back">{{ICON_PC_BACK}}</button>
+    <button class="ic disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)" aria-label="Stop">{{ICON_PC_STOP}}</button>
+    <div id="title"></div>
+    <button class="ic" id="home" data-cmd="home" title="Home (Alt+Home)" aria-label="Home">{{ICON_PC_HOME}}</button>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

@@ -48,10 +48,23 @@ another 1990s browser's layout. Read these first:
    (K N T t R r m S W M O o D g Y y) and, if you need more colours, ONLY your reserved
    characters; declare those at the top of your file. All frames of one size per role
    (e.g. all toolbar buttons 20x20). Draw clear, original 1990s-style icons.
-4. `<scratchpad>/notes-<key>.md`:
-   toolbar and status view heights in px (the pages must fit exactly: body is
+4. `ui/chrome/<key>/menus.txt` (see the contract).
+5. `<scratchpad>/notes-<key>.md`:
+   the layout (toolbar and status view heights in px, and any side/frame/inset/panel) (the pages must fit exactly: body is
    `height: 100vh; overflow: hidden`), the page colour for pages.css, the era look
-   (one of: off, early-web, portal) and anything you were unsure about.
+   (one of: off, early-web, portal, terminal) and anything you were unsure about.
+   List every difference from the reference image you couldn't remove, and why.
+
+## Layout beyond two bars
+
+Most modes are a toolbar over the page and a status bar under it. If the original needs
+more, say so in your notes as a layout (`ui_mode::Layout`, spec.md "Window layout"):
+`status_open` (a panel the status view grows into, toggled by `data-cmd="panel"`; style it
+with `html.panel-open`), `side` + `side_left` (a side view beside the page: write
+`side.html`, same rules as the toolbar), `frame` (a view right above the page inside the
+inset: write `frame.html`), `inset` [top,left,bottom,right] + `inset_color` (a border
+around frame and page). Chrome buttons may live in any of the views; the contract counts
+them across all of them.
 
 ## The contract (tests check it)
 
@@ -63,16 +76,23 @@ another 1990s browser's layout. Read these first:
   one `#meter` (progress; chrome.js fills it with `<i>` blocks, `data-blocks="N"` = how
   many fill it; hidden until class `on`) across both pages; a `#lock-pane` and a
   `#modem-pane` (`data-cmd="settings"`, with `#modem-label`) in the status bar.
-- A way to the Browser UI menu: a menu-bar item
-  `data-cmd="menu" data-arg="options" data-anchor`.
-- Menu-bar items may only use `data-arg` file, navigate, options or help (`data-cmd="menu"`,
-  `data-anchor`, `aria-haspopup="menu"`). Map the real menus onto those: File -> file,
-  Go/Navigate -> navigate, View/Options/Preferences -> options, Help -> help; leave out
-  menus with no match (Edit, Bookmarks/Favorites/Places as a menu); a Bookmarks or
-  Favorites BUTTON is fine with `data-cmd="bookmarks"`.
+- **Menus are the original's.** Write `ui/chrome/<key>/menus.txt` with the original
+  browser's menu bar: every menu in its order with its own name, and its items with their
+  original labels (spec.md "Menus" has the format). An item Lantern can do names one of the
+  actions (`back forward reload stop home search bookmarks add-bookmark open-url settings
+  about splash print view-source zoom-in zoom-out zoom-reset fullscreen close-window`); an
+  item it can't is `- <label>` (shown greyed). Put `browser-ui Browser UI` (and, if you like,
+  `retro Retro looks`) at the end of the menu where the original kept its preferences
+  (Options, View, Configure...). Aim for the real menus' items, not an invented list.
+- Menu-bar items are `<button class="menu" data-cmd="menu" data-arg="<key>" data-anchor
+  aria-haspopup="menu">`, where `<key>` is the menu's name lower-cased with spaces as
+  dashes (`Go` -> `go`, `Window` -> `window`). Every menu in menus.txt gets its button, in
+  order, and a button may only name a menu in menus.txt. A browser with no menu bar of its
+  own (the TV modes) still needs one way to the Browser UI menu: a button sending
+  `data-cmd="menu"` for a menus.txt menu holding `browser-ui`.
 - Other commands you may use on buttons: `search`, `bookmarks`, `bookmark-add`,
-  `focus-url` (the status bar may send only: back forward reload stop home search
-  bookmarks bookmark-add focus-url settings).
+  `focus-url`, `settings`, `panel` (the status bar may send only: back forward reload stop
+  home search bookmarks bookmark-add focus-url settings panel go).
 - `#throbber` (activity box) holds the lantern; clicking it opens About (chrome.js does it);
   class `loading` while a page loads: show the lit strip then.
 - Optional: `#title` (page title text), `#links` with `<template id="page-icon">{{ICON_PAGE}}</template>`
@@ -90,5 +110,9 @@ right size, opens it at 800 x <your height>, calls
 `lantern.update({url:"https://example.com/",title:"Example",canBack:true,canFwd:false,loading:true,secure:true,text:"Loading example.com...",progress:0.5,modem:"28.8K"})`,
 and screenshots it to the scratchpad. Check there are no console errors, nothing overflows,
 and it matches the mockup's layout. Report the screenshot paths.
+
+Compare your screenshot with the reference image side by side (same scale) and fix
+differences in rows, control order, labels, proportions, colours, fonts and bevels before
+reporting.
 
 Finish with a short report: files written, heights, page colour, era look, doubts.

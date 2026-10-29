@@ -68,11 +68,15 @@ thread_local! {
 pub fn layout(mode: UiMode) -> Layout {
     match mode {
         UiMode::Lantern => Layout::bars(112, 24),
-        UiMode::Workstation1993 => Layout::bars(104, 72),
+        UiMode::Workstation1993 => Layout::bars(106, 98),
         UiMode::Toolbar1996 => Layout::bars(118, 22),
         UiMode::Desktop1996 => Layout::bars(104, 22),
         UiMode::Applet1997 => Layout::bars(102, 22),
         UiMode::Terminal1999 => Layout::bars(40, 40),
+        UiMode::Terminal1992 => Layout::bars(20, 80),
+        UiMode::Pc1993 => Layout::bars(52, 22),
+        UiMode::Toolbar1995 => Layout::bars(114, 22),
+        UiMode::Desktop1995 => Layout::bars(80, 22),
     }
 }
 
@@ -108,6 +112,19 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Terminal1999 => Some((
             include_str!("../../ui/chrome/terminal-1999/pages.css"),
             "#000000",
+        )),
+        UiMode::Terminal1992 => Some((
+            include_str!("../../ui/chrome/terminal-1992/pages.css"),
+            "#000000",
+        )),
+        UiMode::Pc1993 => Some((include_str!("../../ui/chrome/pc-1993/pages.css"), "#ffffff")),
+        UiMode::Toolbar1995 => Some((
+            include_str!("../../ui/chrome/toolbar-1995/pages.css"),
+            "#c0c0c0",
+        )),
+        UiMode::Desktop1995 => Some((
+            include_str!("../../ui/chrome/desktop-1995/pages.css"),
+            "#c0c0c0",
         )),
     }
 }
@@ -298,8 +315,13 @@ mod tests {
     #[test]
     fn every_mode_has_room_for_its_chrome() {
         for mode in UiMode::ALL {
-            let (toolbar, status) = heights(mode);
-            assert!(toolbar >= 24 && status >= 20, "{mode:?}");
+            // A view is hidden or at least one text line tall; the status
+            // view always shows (the status text and meter).
+            let layout = layout(mode);
+            for size in [layout.toolbar, layout.side, layout.frame] {
+                assert!(size == 0 || size >= 20, "{mode:?}");
+            }
+            assert!(layout.status >= 20, "{mode:?}");
         }
         assert_eq!(heights(UiMode::Lantern), (112, 24));
     }
