@@ -24,8 +24,8 @@ Update the tables below in the same commit as the work they describe.
 | 4. Switching | `--ui=`, runtime switch and relayout, the lockdown change, native menus (`menu` command), Browser UI submenu, Ctrl+Shift+M | Done |
 | 5. First mode | `workstation-1993`, with contract tests and goldens | Done |
 | 5b. Page styles | Each mode's browser defaults under pages, and its era look on request (`mode_pages`) | Done |
-| 6. Settings page | A Browser UI section; needs the maintainer to approve new settings goldens | Not started |
-| 7. Layout extras | Hidden views, chrome below the page, inset border, content zoom (the TV modes) | Not started |
+| 6. Settings page | A Browser UI section (mode, page styles) and every retro look; new settings goldens (approved by the maintainer) | Done |
+| 7. Layout extras | `ui_mode::Layout`: hidden views, a side view, a frame view over the page, an inset border, the status view's expanding panel; menu bars from `menus.txt` | Done |
 | 8. More modes | See below. Each mode's pages and icons are drafted by a subagent from the brief in the session, then wired in and tested | In progress |
 
 ## Modes

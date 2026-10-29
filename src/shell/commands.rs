@@ -293,10 +293,14 @@ pub fn show_settings(saved: bool) {
 
 /// Apply settings submitted from the settings page and remember them.
 fn save_settings(params: &[(String, String)]) {
-    let (updated, content) = with_shell(|shell| {
+    let (before, updated, content) = with_shell(|shell| {
+        let before = shell.settings.ui_mode;
         shell.settings.apply_query(params);
-        (shell.settings, shell.content.clone())
+        (before, shell.settings, shell.content.clone())
     });
+    if updated.ui_mode != before {
+        ui_mode::apply();
+    }
     settings::save(&updated);
     if let Some(content) = content {
         dialup::apply_network(&content, &updated);

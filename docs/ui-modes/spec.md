@@ -23,9 +23,10 @@ A mode decides:
 - the toolbar's markup, CSS and pixel-art icons;
 - the status bar's markup and CSS (it can also hold buttons, for browsers
   whose buttons sat under the page);
-- the heights of the toolbar and status views;
-- later, for some modes: chrome below the page, an inset border around the
-  content view (the TV modes), content zoom and arrow-key link navigation.
+- its menu bar's menus and items (`menus.txt`);
+- the window layout (`ui_mode::Layout`): view sizes, a side view, a frame
+  view over the page, an inset border around the page, an expanding panel;
+- how plain pages look (browser defaults, era look).
 
 A mode does **not** replace the native window frame: the OS still draws
 the title bar. Faking System 7 or NeXT title bars would mean reimplementing
@@ -92,17 +93,51 @@ Lantern pages use (`ICON_*`, `LANTERN_IDLE`, `LANTERN_LIT`, `CHROME_JS`).
 
 Menus are native (`Window::show_menu`), as the Retro menu already is,
 because an HTML drop-down would be clipped to its view. A page only *names*
-a menu: it sends `menu` with `<menu>,<x>,<y>` (`file`, `navigate`,
-`options`, `help`). The items live in a fixed Rust table (`menus.rs`) and
-map to existing commands, so the title channel never carries labels or
-actions. The Retro menu and every mode's Options menu hold a **Browser UI**
-submenu with one radio item per mode.
+a menu: it sends `menu` with `<menu>,<x>,<y>`. Which menus a mode has, and
+what's in them, is `ui/chrome/<mode>/menus.txt`, the original browser's menu
+bar with its own names and items:
+
+```
+menu File                  a menu; its key is the label lower-cased, spaces as dashes
+open-url Open Location...  an item that runs an action from menus.rs's ACTIONS table
+- Mail Document...         an item the original had that Lantern can't do: shown greyed
+---                        a separator
+retro Retro                the Retro looks submenu
+browser-ui Browser UI      the Browser UI submenu (one radio item per mode, page styles)
+```
+
+The actions are a fixed Rust table (`back forward reload stop home search
+bookmarks add-bookmark open-url settings about splash print view-source
+zoom-in zoom-out zoom-reset fullscreen close-window`), so the title channel
+never carries labels or actions, and `menus.txt` is compiled in and parsed by
+a unit test. A mode without a `menus.txt` gets the generic `file`,
+`navigate`, `options` and `help` menus. Every mode's menus hold a Browser UI
+submenu somewhere (the contract test checks a page can reach it).
+### Window layout
+
+The window is a column: the toolbar view, a middle row, the status view.
+The middle row holds the **side view** and an **inset panel**; the inset
+panel holds the **frame view** over the **content view**, inside a border.
+`ui_mode::Layout` says, per mode, how big each piece is (0 hides it):
+
+| Field | What |
+|---|---|
+| `toolbar`, `status` | Heights of the top and bottom views. |
+| `status_open` | The status view's height while the mode's panel is open (`data-cmd="panel"` toggles it, chrome.js sets `html.panel-open`): the TV Options panel. |
+| `side`, `side_left` | The side view's width and side: DOS graphics' button column, the Workspace hotlist. |
+| `frame` | A view right over the page, inside the inset: a document window's title bar. |
+| `inset`, `inset_color` | A border around frame and page (top, left, bottom, right): the TV's screen margin, a document window on a desktop. |
+
+The side and frame views are chrome views like the toolbar and status bar
+(`side.html`, `frame.html` in the mode's folder; same controller, same
+lockdown, the toolbar's commands). Views' sizes are read from a
+thread-local, not shell state, because CEF asks during layout.
 
 ### Switching at runtime
 
 `ui_mode::set(mode)` saves the setting and calls `ui_mode::apply()`, which:
 
-1. marks the toolbar and status views not ready;
+1. marks the chrome views (toolbar, status, side, frame) not ready;
 2. loads the mode's `data:` pages into them (each page sends `ready`, which
    brings the full state push);
 3. re-lays out the window: the views' `preferred_size` and `minimum_size`
@@ -155,12 +190,6 @@ menus):
 - **Modes that need their look.** A text terminal can't show a modern page,
   so for modes where `UiMode::needs_era_look()` is true the default
   `defaults` setting gives the era look too; `as-is` still turns it off.
-- **New looks and the settings page.** `RetroStyle::ON_SETTINGS_PAGE` lists
-  the looks the settings page offers. A look added for a mode (Text
-  terminal) appears in the Retro menu and as the mode's era look, but not
-  on the settings page until the maintainer approves that page's new
-  golden screenshots.
-
 ### Shortcut
 
 **Ctrl+Shift+M** (Cmd+Shift+M on macOS) opens the Browser UI menu at the top
@@ -168,10 +197,10 @@ left of the window, so no mode can strand the user.
 
 ### The settings page
 
-The settings page doesn't list UI modes yet: adding a section changes its
-existing golden screenshots, which only the maintainer may approve (steward
-skill, "Oracle rules"). Until then, modes are picked from the menus, the
-shortcut or `--ui=`.
+The settings page has a **Browser UI** section: a radio per mode (with its
+"modelled on" description and the trademark notice) and the three page
+styles. Its Retro looks section lists every look, including the ones modes
+added (Text terminal).
 
 ## What every mode must offer
 
@@ -192,9 +221,9 @@ every mode.
   every browser-defaults rule is zero-specificity; `chrome_navigation_allowed`'s truth
   table; menu keys and command ids round-trip; every mode's templates fill
   without unknown placeholders.
-- **Playwright**: `dump-pages` writes every mode's toolbar and status page
-  (`toolbar-<key>.html`, `status-<key>.html`) and `ui-modes.json` (keys and
-  view heights). `ui-modes.spec.js` checks every mode's contract, that its
+- **Playwright**: `dump-pages` writes every mode's chrome pages
+  (`toolbar-<key>.html`, `status-<key>.html`, `side-`, `frame-`) and
+  `ui-modes.json` (keys, view sizes, menu keys). `ui-modes.spec.js` checks every mode's contract, that its
   buttons send the right title-channel messages, that `lantern.update`
   shows the state, and adds golden screenshots for each mode. The Lantern
   mode's existing goldens must keep passing unchanged.

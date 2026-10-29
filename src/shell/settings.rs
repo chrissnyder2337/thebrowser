@@ -118,12 +118,6 @@ impl RetroStyle {
         Self::Terminal,
     ];
 
-    /// The looks the settings page lists. Adding one changes that page's
-    /// golden screenshots, which only the maintainer may approve (steward
-    /// skill, "Oracle rules"), so newer looks are in the menus until then.
-    pub const ON_SETTINGS_PAGE: [Self; 4] =
-        [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
-
     pub fn key(self) -> &'static str {
         match self {
             Self::Off => "off",
@@ -366,6 +360,16 @@ impl Settings {
                     }
                 }
                 "splash" => self.splash_intro = parse_bool(value),
+                "ui" => {
+                    if let Some(mode) = UiMode::from_key(value) {
+                        self.ui_mode = mode;
+                    }
+                }
+                "pages" => {
+                    if let Some(pages) = ModePages::from_key(value) {
+                        self.mode_pages = pages;
+                    }
+                }
                 _ => {}
             }
         }
@@ -516,7 +520,6 @@ mod tests {
         settings.mode_pages = ModePages::Defaults;
         settings.retro_style = RetroStyle::GeoCities;
         assert_eq!(settings.page_look(), RetroStyle::GeoCities);
-        assert!(!RetroStyle::ON_SETTINGS_PAGE.contains(&RetroStyle::Terminal));
         assert_eq!(RetroStyle::from_key("terminal"), Some(RetroStyle::Terminal));
     }
 

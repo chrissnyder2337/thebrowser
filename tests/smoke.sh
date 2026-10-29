@@ -44,23 +44,43 @@ fi
 url="http://127.0.0.1:$port/tables.html"
 title="Fixture: tables"
 failed=0
-for look in off geocities early-web portal; do
-  report="$work/$look.txt"
+
+# run <name> <expected retro> <expected ui> <lantern args...>
+run() {
+  local name="$1" retro="$2" ui="$3"
+  shift 3
+  local report="$work/$name.txt"
   # A fresh profile each run, so nothing is read from or saved to the user's.
-  status=0
-  XDG_CONFIG_HOME="$work/profile-$look" timeout 90 \
+  local status=0
+  XDG_CONFIG_HOME="$work/profile-$name" timeout 90 \
     xvfb-run -a -s "-screen 0 1024x768x24" \
-    "$lantern" --no-sandbox --disable-gpu --url="$url" --retro="$look" --self-test="$report" \
-    > "$work/$look.log" 2>&1 || status=$?
-  want="$(printf 'url=%s\ntitle=%s\nstatus=ok 200\nretro=%s' "$url" "$title" "$look")"
+    "$lantern" --no-sandbox --disable-gpu --url="$url" "$@" --self-test="$report" \
+    > "$work/$name.log" 2>&1 || status=$?
+  local want got
+  want="$(printf 'url=%s\ntitle=%s\nstatus=ok 200\nretro=%s\nui=%s' "$url" "$title" "$retro" "$ui")"
   got="$(cat "$report" 2>/dev/null || true)"
   if [ "$status" -ne 0 ] || [ "$got" != "$want" ]; then
-    echo "smoke: FAIL --retro=$look (exit $status)" >&2
+    echo "smoke: FAIL $* (exit $status)" >&2
     echo "--- expected"; echo "$want"; echo "--- got"; echo "$got"
-    echo "--- log (last 20 lines)"; tail -20 "$work/$look.log"
+    echo "--- log (last 20 lines)"; tail -20 "$work/$name.log"
     failed=1
   else
-    echo "smoke: ok   --retro=$look: $(tr '\n' ' ' < "$report")"
+    echo "smoke: ok   $*: $(tr '\n' ' ' < "$report")"
   fi
+}
+
+# Every retro look, in Lantern's own UI.
+for look in off geocities early-web portal terminal; do
+  run "look-$look" "$look" lantern --retro="$look"
 done
+
+# Every UI mode (settings.rs UiMode::ALL; a unit test checks the list), as
+# <mode>:<the look its pages get by default>.
+for entry in \
+  lantern:off workstation-1993:off toolbar-1996:off desktop-1996:off \
+  applet-1997:off terminal-1999:terminal; do
+  mode="${entry%%:*}"
+  run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
+done
+
 exit "$failed"

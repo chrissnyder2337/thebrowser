@@ -4,7 +4,7 @@
 use super::{
     art::{with_icons, with_lantern},
     bookmarks::Bookmark,
-    settings::{DialupMode, ModemSpeed, RetroStyle, Settings, UiMode},
+    settings::{DialupMode, ModePages, ModemSpeed, RetroStyle, Settings, UiMode},
     state::Role,
     util::{encode_component, get_data_uri, html_escape, truncate},
 };
@@ -333,6 +333,34 @@ fn retro_description(style: RetroStyle) -> &'static str {
     }
 }
 
+/// What a UI mode is, for the settings page. Prose may say what a mode is
+/// modelled on; the page carries the trademark notice (steward skill).
+fn ui_mode_description(mode: UiMode) -> &'static str {
+    match mode {
+        UiMode::Lantern => "Lantern's own toolbar, with big buttons and quick links.",
+        UiMode::Workstation1993 => {
+            "A Motif menu bar, Document Title and URL fields and a row of text buttons \
+             under the page, modelled on NCSA Mosaic for X."
+        }
+        UiMode::Toolbar1996 => {
+            "Grouped icon buttons, a Location field and directory buttons holding your \
+             quick links, modelled on Netscape Navigator 2 and 3."
+        }
+        UiMode::Desktop1996 => {
+            "Bands of large buttons, grey until you point at them, with Address and Links \
+             bands, modelled on Internet Explorer 3."
+        }
+        UiMode::Applet1997 => {
+            "Flat icon buttons with small labels in a warm grey toolkit look, modelled on \
+             HotJava."
+        }
+        UiMode::Terminal1999 => {
+            "A menu bar and URL prompt over the page and a status line under it, all \
+             monospace on black, modelled on Links."
+        }
+    }
+}
+
 fn checked(on: bool) -> &'static str {
     if on { " checked" } else { "" }
 }
@@ -368,7 +396,7 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
         );
     }
     let mut retro = String::new();
-    for style in RetroStyle::ON_SETTINGS_PAGE {
+    for style in RetroStyle::ALL {
         let _ = write!(
             retro,
             concat!(
@@ -381,6 +409,30 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
             description = html_escape(retro_description(style)),
         );
     }
+    let mut ui_modes = String::new();
+    for mode in UiMode::ALL {
+        let _ = write!(
+            ui_modes,
+            concat!(
+                r#"<label class="opt"><input type="radio" name="ui" value="{key}"{checked}>"#,
+                r#"<span><b>{name}</b><br><small>{description}</small></span></label>"#
+            ),
+            key = mode.key(),
+            checked = checked(settings.ui_mode == mode),
+            name = html_escape(mode.name()),
+            description = html_escape(ui_mode_description(mode)),
+        );
+    }
+    let mut mode_pages = String::new();
+    for pages in ModePages::ALL {
+        let _ = write!(
+            mode_pages,
+            r#"<label class="opt"><input type="radio" name="pages" value="{key}"{checked}><span>{name}</span></label>"#,
+            key = pages.key(),
+            checked = checked(settings.mode_pages == pages),
+            name = html_escape(pages.name()),
+        );
+    }
     let saved = if saved {
         r#"<p class="saved sunken">Settings saved.</p>"#.to_owned()
     } else {
@@ -390,6 +442,8 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
     vars.push(("MODE_OPTIONS", modes));
     vars.push(("SPEED_OPTIONS", speeds));
     vars.push(("RETRO_OPTIONS", retro));
+    vars.push(("UI_OPTIONS", ui_modes));
+    vars.push(("PAGES_OPTIONS", mode_pages));
     vars.push(("SPLASH_CHECKED", checked(settings.splash_intro).to_owned()));
     vars.push(("SAVED", saved));
     vars.push((
@@ -468,6 +522,8 @@ mod tests {
             "MODE_OPTIONS",
             "SPEED_OPTIONS",
             "RETRO_OPTIONS",
+            "UI_OPTIONS",
+            "PAGES_OPTIONS",
             "SPLASH_CHECKED",
             "SAVED",
             "ACTION_URL",

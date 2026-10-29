@@ -54,8 +54,14 @@ test("bookmarks page links each row to its delete action", async ({ page }) => {
 test("settings form posts to lantern.invalid", async ({ page }) => {
   await page.goto(pageUrl("settings.html"));
   expect(await page.locator("form").getAttribute("action")).toBe("https://lantern.invalid/settings");
-  await expect(page.locator("input[name=retro]")).toHaveCount(4);
+  // Every retro look (settings.rs RetroStyle::ALL), Off checked.
+  await expect(page.locator("input[name=retro]")).toHaveCount(5);
   await expect(page.locator("input[name=retro][value=off]")).toBeChecked();
+  // Every UI mode, Lantern's own checked, and the three page styles.
+  const modes = JSON.parse(require("fs").readFileSync(require("url").fileURLToPath(pageUrl("ui-modes.json")), "utf8"));
+  await expect(page.locator("input[name=ui]")).toHaveCount(modes.length);
+  await expect(page.locator("input[name=ui][value=lantern]")).toBeChecked();
+  await expect(page.locator("input[name=pages]")).toHaveCount(3);
 });
 
 test("error page escapes the failed URL", async ({ page }) => {
