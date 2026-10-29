@@ -57,8 +57,14 @@ def render(cat):
             w(f"Credit: {s['author']} · [{s['license']}]({s['license_url'] or s['source_url']}) · "
               f"[source]({s['source_url']})")
             w("")
+        if b.get("to_copy"):
+            w("Freely licensed elsewhere, not copied here yet:")
+            w("")
+            for t in b["to_copy"]:
+                w(f"- [{t['title']}]({t['source_url']}) ({t['license']}, {t['author']}): {t['shows']}")
+            w("")
         if b["linked"]:
-            w("Fair-use screenshots on Wikipedia (linked, not copied):")
+            w("Copyrighted screenshots elsewhere (linked, not copied):")
             w("")
             for l in b["linked"]:
                 w(f"- [{l['title']}]({l['source_url']}): {l['shows']}")
@@ -87,6 +93,9 @@ def render(cat):
     w("   (CC0, CC BY, CC BY-SA, GPL, FAL and similar). Anything marked fair use or")
     w("   non-free goes in `linked` instead.")
     w("2. Add it to `catalog.json` with its author, licence, licence URL and source page.")
+    w("   A free file found (on Commons, or on Flickr under CC0, CC BY or CC BY-SA) but not")
+    w("   downloaded yet goes in `to_copy`; move it to")
+    w("   `screenshots` once it is in `images/` and you have checked it shows the browser itself.")
     w("3. Run `python3 render.py` to regenerate this file.")
     w("")
     return "\n".join(out)

@@ -2,9 +2,9 @@
   "about": "A reference catalog of the web browsers people used in the 1990s, version by version, with screenshots, for planning Lantern's retro looks. Dates and facts come from English Wikipedia (October 2026); each browser links to its article.",
   "rules": [
     "**Reference only.** Lantern's branding rule (see `.claude/skills/steward/SKILL.md`) still applies: don't copy these browsers' names, logos, icons, throbber animations, wording or layout signatures. Use them to understand the era (bevels, button sizes, toolbars, status bars, colours, fonts), then design something original.",
-    "**Images in `images/`** come from Wikimedia Commons, where each is marked public domain or freely licensed (CC0, CC BY-SA, GPL, Free Art License). Each one is credited below and in `catalog.json`. Reusing a CC BY-SA, GPL or FAL image means keeping its credit and licence.",
+    "**Images in `images/`** come from Wikimedia Commons or Flickr, where each is marked public domain or freely licensed (CC0, CC BY, CC BY-SA, GPL, Free Art License), or were made for this catalog by running free-software browsers on its own sample page (`fixtures/`, `tools/`). Each one is credited below and in `catalog.json`. Reusing a CC BY, CC BY-SA, GPL or FAL image means keeping its credit and licence.",
     "**A free licence covers the screenshot, not everything in it.** The interface shown (icons, logos, artwork) may still belong to the software's maker. Don't ship these images, or pieces of them, in Lantern.",
-    "**Fair-use screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia. Fair use covers Wikipedia's use of them, not redistribution from this repository."
+    "**Copyrighted screenshots are linked, not copied.** Most early Internet Explorer, Opera and other proprietary browser screenshots exist only as non-free files on Wikipedia or on galleries such as GUIdebook. Fair use covers Wikipedia's use of them, not redistribution from this repository."
   ],
   "browsers": [
     {
@@ -103,10 +103,25 @@
           "author": "Shah-al",
           "license": "CC0",
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        },
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/lynx-2.9.0.png",
+          "version": "2.9.0 (current Ubuntu build)",
+          "shows": "This catalog's sample page, with the page counter at the top and the key help lines at the bottom."
         }
       ],
       "linked": [],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: MacLynx 2, in emulation",
+          "https://oldweb.today/?browser=ml-mac"
+        ]
+      ]
     },
     {
       "id": "violawww",
@@ -283,7 +298,25 @@
           "shows": "NCSA Mosaic 1.0 for Macintosh."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: NCSA Mosaic 2 for Mac, in emulation",
+          "https://oldweb.today/?browser=nm2-mac"
+        ],
+        [
+          "oldweb.today: NCSA Mosaic 3 for Mac, in emulation",
+          "https://oldweb.today/?browser=nm3-mac"
+        ]
+      ],
+      "to_copy": [
+        {
+          "source_url": "https://commons.wikimedia.org/wiki/File:DEC_VAXstation_4000_96_OpenVMS_6.1.jpeg",
+          "license": "CC BY-SA 2.0",
+          "author": "Brian Pitts",
+          "shows": "Photo of a VAXstation running OpenVMS 6.1 with DECwindows, filed under Mosaic on Commons. Check the screen shows Mosaic before copying it.",
+          "title": "DEC VAXstation 4000 96 OpenVMS 6.1.jpeg"
+        }
+      ]
     },
     {
       "id": "cello",
@@ -342,6 +375,12 @@
           "source_url": "https://en.wikipedia.org/wiki/File:OS2_IBM_WebExplorer.png",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "WebExplorer on OS/2."
+        },
+        {
+          "title": "GUIdebook: Browser in OS/2 Warp 4",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#os2warp4",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "WebExplorer 1.2 on OS/2 Warp 4."
         }
       ],
       "try": []
@@ -486,6 +525,16 @@
           "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
         },
         {
+          "file": "images/netscape-2.01-mac-ja.jpg",
+          "version": "2.01 (Mac, Japanese)",
+          "shows": "Photo of a PowerBook Duo 230's screen: the classic Mac OS build with its button row, Location field and directory buttons, showing the about page.",
+          "commons_file": "",
+          "source_url": "https://www.flickr.com/photos/7940758@N07/3556469060",
+          "author": "MIKI Yoshihito",
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0/"
+        },
+        {
           "file": "images/netscape-2.02.png",
           "version": "2.02",
           "shows": "About page, Windows build.",
@@ -496,9 +545,9 @@
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
         },
         {
-          "file": "images/netscape-3.02-gold.png",
-          "version": "3.02 Gold",
-          "shows": "Windows build (run under Wine).",
+          "file": "images/netscape-3.04-gold.png",
+          "version": "3.04 Gold",
+          "shows": "About page, Windows build (run under Wine). The Commons description says 3.02; the page itself says 3.04 Gold.",
           "commons_file": "Netscape Navigator 3 Screenshot.png",
           "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Navigator_3_Screenshot.png",
           "author": "Indolering",
@@ -506,24 +555,14 @@
           "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
         },
         {
-          "file": "images/netscape-3.04-acid1.png",
-          "version": "3.04 Gold",
-          "shows": "Rendering the Acid1 CSS test.",
-          "commons_file": "Netscape 3 - Acid1.png",
-          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_3_-_Acid1.png",
-          "author": "Alessandro Antonelli",
-          "license": "Public domain",
-          "license_url": ""
-        },
-        {
-          "file": "images/netscape-4.03-acid1.png",
-          "version": "4.03",
-          "shows": "Rendering the Acid1 CSS test.",
-          "commons_file": "Netscape 4 - Acid1.png",
-          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_4_-_Acid1.png",
-          "author": "Alessandro Antonelli",
-          "license": "Public domain",
-          "license_url": ""
+          "file": "images/netscape-4-debian-2.1.png",
+          "version": "4.x (Linux)",
+          "shows": "Communicator-era window on a Debian 2.1 (1999) desktop: toolbar, Location bar with What's Related, personal toolbar and status bar.",
+          "commons_file": "Debian-Slink.png",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Debian-Slink.png",
+          "author": "2204happy",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
         },
         {
           "file": "images/netscape-4.51-irix.png",
@@ -560,9 +599,37 @@
           "source_url": "https://en.wikipedia.org/wiki/File:Apple_Unix_with_Netscape.png",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "Apple Unix with Finder, CommandShell and Netscape 3.01."
+        },
+        {
+          "title": "GUIdebook: Browser in IRIX 5.3",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#irix53",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Netscape 4.08 on IRIX 5.3."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: Navigator 4 on Windows, in emulation",
+          "https://oldweb.today/?browser=ns4-win"
+        ],
+        [
+          "oldweb.today: Navigator 3 for Mac, in emulation",
+          "https://oldweb.today/?browser=ns3-mac"
+        ],
+        [
+          "oldweb.today: Navigator 4 for Mac, in emulation",
+          "https://oldweb.today/?browser=ns4-mac"
+        ]
+      ],
+      "to_copy": [
+        {
+          "source_url": "https://commons.wikimedia.org/wiki/File:Netscape_Communicator_4.8_Screenshot.png",
+          "license": "CC0",
+          "author": "Indolering",
+          "shows": "Communicator 4.8 (2002), the last 4.x release, with the same toolbars as the 1990s 4.x builds.",
+          "title": "Netscape Communicator 4.8 Screenshot.png"
+        }
+      ]
     },
     {
       "id": "arena",
@@ -623,6 +690,39 @@
         }
       ],
       "try": []
+    },
+    {
+      "id": "omniweb",
+      "name": "OmniWeb",
+      "maker": "Omni Group",
+      "platforms": [
+        "NeXTSTEP",
+        "OPENSTEP"
+      ],
+      "source": "https://en.wikipedia.org/wiki/OmniWeb",
+      "look": "A native NeXTSTEP application: commands live in the vertical NeXT menu, with the system's own window frames and controls.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1995-03-17",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "file": "images/omniweb-3-next.jpg",
+          "version": "3 (OPENSTEP)",
+          "shows": "Photo of a NeXT Cube's screen: the OmniWeb window with its icon toolbar and address field, the NeXT menu at the left and the Dock at the right.",
+          "commons_file": "",
+          "source_url": "https://www.flickr.com/photos/45480083@N03/4230174099",
+          "author": "Gerben Wierda (gctwnl on Flickr)",
+          "license": "CC BY-SA 2.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/2.0/"
+        }
+      ],
+      "linked": [],
+      "try": [],
+      "to_copy": []
     },
     {
       "id": "opera",
@@ -794,9 +894,48 @@
           "source_url": "https://en.wikipedia.org/wiki/File:Oe-Ie5-unix.jpg",
           "license": "Non-free (fair use on English Wikipedia)",
           "shows": "Internet Explorer 5 and Outlook Express for UNIX."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows NT 4.0",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#winnt40serv",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 2 on Windows NT 4.0."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 95B",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win95osr2",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 3 on Windows 95 OSR2."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 98",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win98",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 4 on Windows 98."
+        },
+        {
+          "title": "GUIdebook: Browser in Windows 98 SE",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#win98se",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 5 on Windows 98 SE."
+        },
+        {
+          "title": "GUIdebook: Browser in Mac OS 9.0",
+          "source_url": "https://guidebookgallery.org/screenshots/browser#macos90",
+          "license": "Copyrighted (GUIdebook)",
+          "shows": "Internet Explorer 4.5 for Mac."
         }
       ],
-      "try": []
+      "try": [
+        [
+          "oldweb.today: Internet Explorer 5 on Windows, in emulation",
+          "https://oldweb.today/?browser=ie5"
+        ],
+        [
+          "oldweb.today: Internet Explorer 4 for Mac, in emulation",
+          "https://oldweb.today/?browser=ie4-mac"
+        ]
+      ]
     },
     {
       "id": "grail",
@@ -831,6 +970,38 @@
         }
       ],
       "try": []
+    },
+    {
+      "id": "w3m",
+      "name": "w3m",
+      "maker": "Akinori Ito",
+      "platforms": [
+        "Unix-like"
+      ],
+      "source": "https://en.wikipedia.org/wiki/W3m",
+      "look": "A text pager that grew into a browser. It lays out tables and frames in the terminal.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1995",
+          "notes": ""
+        }
+      ],
+      "screenshots": [
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/w3m-0.5.3.png",
+          "version": "0.5.3 (current Ubuntu build)",
+          "shows": "This catalog's sample page: an ASCII-ruled table, links in colour and the status line at the bottom."
+        }
+      ],
+      "linked": [],
+      "try": [],
+      "to_copy": []
     },
     {
       "id": "oracle-powerbrowser",
@@ -889,6 +1060,43 @@
         }
       ],
       "try": []
+    },
+    {
+      "id": "amaya",
+      "name": "Amaya",
+      "maker": "W3C (later with INRIA)",
+      "platforms": [
+        "Unix (X11)",
+        "Windows"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Amaya_(web_editor)",
+      "look": "W3C's test-bed browser, which is also a WYSIWYG editor: you edit a page in the same window you browse it in.",
+      "versions": [
+        {
+          "version": "first release",
+          "date": "1996-07",
+          "notes": ""
+        }
+      ],
+      "screenshots": [],
+      "linked": [],
+      "try": [],
+      "to_copy": [
+        {
+          "source_url": "https://commons.wikimedia.org/wiki/File:1998-amaya-ui.gif",
+          "license": "CC BY-SA 3.0",
+          "author": "Amaya",
+          "shows": "The interface, version 1.1 or earlier, as published on the Amaya site in 1998.",
+          "title": "1998-amaya-ui.gif"
+        },
+        {
+          "source_url": "https://commons.wikimedia.org/wiki/File:1999-v-2-1-amaya-ui.gif",
+          "license": "CC BY-SA 3.0",
+          "author": "Amaya",
+          "shows": "The interface of version 2.1 (1999).",
+          "title": "1999-v-2-1-amaya-ui.gif"
+        }
+      ]
     },
     {
       "id": "webtv",
@@ -1025,6 +1233,16 @@
           "author": "Gürkan Sengün",
           "license": "Public domain",
           "license_url": ""
+        },
+        {
+          "author": "Lantern contributors (made for this catalog)",
+          "license": "Apache-2.0 OR MIT, like this repository",
+          "license_url": "../../../LICENSE-MIT",
+          "source_url": "tools/shoot-text-browser.sh",
+          "commons_file": "",
+          "file": "images/links-2.29-menu.png",
+          "version": "2.29 (current Ubuntu build)",
+          "shows": "The File pull-down menu open over this catalog's sample page."
         }
       ],
       "linked": [],
@@ -1063,24 +1281,9 @@
       "source": "https://en.wikipedia.org/wiki/MacWeb"
     },
     {
-      "name": "OmniWeb",
-      "date": "1995-03-17",
-      "source": "https://en.wikipedia.org/wiki/OmniWeb"
-    },
-    {
-      "name": "w3m",
-      "date": "1995",
-      "source": "https://en.wikipedia.org/wiki/W3m"
-    },
-    {
       "name": "Cyberdog",
       "date": "1996-02 (beta)",
       "source": "https://en.wikipedia.org/wiki/Cyberdog"
-    },
-    {
-      "name": "Amaya",
-      "date": "1996-07",
-      "source": "https://en.wikipedia.org/wiki/Amaya_(web_editor)"
     },
     {
       "name": "AWeb",
@@ -1113,6 +1316,10 @@
     {
       "label": "Wikimedia Commons: Screenshots of web browsers",
       "url": "https://commons.wikimedia.org/wiki/Category:Screenshots_of_web_browsers"
+    },
+    {
+      "label": "GUIdebook: browser screenshots from each operating system",
+      "url": "https://guidebookgallery.org/screenshots/browser"
     }
   ]
 }
