@@ -28,8 +28,8 @@ with an argument) call `send("<command>", arg)`: it sets
 sequence number makes a repeated command a new title. Status-bar commands use
 the same `send` in `ui/chrome/lantern/status.html`.
 
-Labels follow the branding rule in the steward skill: describe the era, never
-name a real browser.
+Labels follow the branding rule in the steward skill: ordinary interface
+wording is fine, product names and copied artwork are not.
 
 ## 2. The icon (`ui/icons.txt`, `src/shell/pages.rs`)
 

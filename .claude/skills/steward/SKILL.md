@@ -30,17 +30,39 @@ description: Lantern's conventions for getting a pull request merged — the che
 
 ## Branding rule
 
-Lantern's look is the general late-1990s era, never a copy of a real product.
-**Don't name things after real browsers or companies' products**: no
-"Netscape", "Navigator", "Internet Explorer", "Mosaic", "Opera" and the like.
-That covers user-facing labels, option keys and command-line values
-(`--retro=<key>`), saved settings, file names, screenshots and badges.
-Also avoid their logos, icons, throbber animations, and wording or layout
-signatures (a "<browser> Now!" button, an "N" or "e" logo).
-Describe the era instead: "Early web (1995)", "Web portal (1997)".
-Fonts named in CSS font stacks are fine.
-Research notes under `docs/research/` are the exception: they name real
-browsers in order to describe them, and they never ship in the app.
+Lantern recreates the look of 1990s browsers, but it never presents itself
+as one of them or ships their artwork. The line is between a browser's
+*layout* (free to follow) and its *name and art* (never copied).
+
+**Allowed:**
+- Following a real browser's layout faithfully: which rows and bands it has,
+  which buttons and in what order, where the menus, fields, activity box and
+  status bar sit, its bevels, colours and fonts (fonts in CSS font stacks
+  are fine).
+- Ordinary interface wording, even when a real browser used it: Back,
+  Refresh, Favorites, Location:, Document URL:, What's New?, Clone.
+- Naming a real browser in **descriptive prose** to say what a mode or look
+  is modelled on: "Desktop (1996), modelled on Internet Explorer 3" in the
+  README, docs, the settings page's descriptions or the About page. Wherever
+  that appears in the app or the README, add the trademark notice: "Product
+  names are trademarks of their owners. Lantern isn't affiliated with or
+  endorsed by them."
+
+**Not allowed:**
+- **Names as identifiers.** No real browser or product name in a mode's or
+  look's name, menu label, button label, option key, command-line value
+  (`--retro=`, `--ui=`), saved setting, file name or badge. Name them by
+  era and kind of machine: "Desktop (1996)", `workstation-1993`. The
+  `ui_modes_avoid_product_names` test checks mode names and keys.
+- **Artwork.** No logos, icons, throbber animations or screenshots of the
+  originals, traced or redrawn: an "N" or "e" logo, a spinning globe, a
+  steaming cup. Every icon is original pixel art and every activity box
+  shows the Lantern lantern.
+- **Slogans and self-promotion.** No product slogans, or buttons that
+  advertise a product or company ("<browser> Now!", "Get <product>").
+
+Research notes under `docs/research/` name real browsers freely and may
+hold freely licensed screenshots of them; they never ship in the app.
 
 ## Risk tiers
 
