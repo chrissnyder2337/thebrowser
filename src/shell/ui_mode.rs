@@ -104,7 +104,7 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Toolbar1995 => Layout::bars(114, 22),
         UiMode::Desktop1995 => Layout::bars(80, 22).inset([0, 2, 2, 2], 0xFFC0C0C0),
         UiMode::Suite1997 => Layout::bars(130, 24),
-        UiMode::Desktop1997 => Layout::bars(102, 22),
+        UiMode::Desktop1997 => Layout::bars(102, 22).well(2, 0xFF808080),
         UiMode::Desktop1999 => Layout::bars(94, 22),
     }
 }
