@@ -327,18 +327,25 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
     html_uri(&fill(SETTINGS_HTML, &vars))
 }
 
-pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String {
-    let retryable = ["http://", "https://", "file://"]
-        .iter()
-        .any(|scheme| failed_url.starts_with(scheme));
-    let retry = if retryable {
+/// The error page's Retry button, for addresses a retry could load.
+fn retry_link(failed_url: &str, error_code: i32) -> String {
+    // Retrying an address Chromium can't parse would do nothing.
+    let retryable = error_code != cef::sys::cef_errorcode_t::ERR_INVALID_URL as i32
+        && ["http://", "https://", "file://"]
+            .iter()
+            .any(|scheme| failed_url.starts_with(scheme));
+    if retryable {
         format!(
             r#"<a class="btn" href="{}">Retry</a>"#,
             html_escape(failed_url)
         )
     } else {
         String::new()
-    };
+    }
+}
+
+pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String {
+    let retry = retry_link(failed_url, error_code);
     let error_text = if error_text.is_empty() {
         "UNKNOWN_ERROR"
     } else {
@@ -421,6 +428,14 @@ mod tests {
             action_url("delete", "https://a/?q=1&r=2"),
             "https://lantern.invalid/delete?url=https%3A%2F%2Fa%2F%3Fq%3D1%26r%3D2"
         );
+    }
+
+    #[test]
+    fn invalid_urls_get_no_retry() {
+        assert!(retry_link("http://a.b/", -105).contains(">Retry</a>"));
+        assert_eq!(retry_link("about:blank", -105), "");
+        let invalid = cef::sys::cef_errorcode_t::ERR_INVALID_URL as i32;
+        assert_eq!(retry_link("http://[::1", invalid), "");
     }
 
     #[test]
