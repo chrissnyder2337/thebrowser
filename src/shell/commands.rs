@@ -100,6 +100,12 @@ fn run_chrome_command(role: Role, name: &str, arg: &str) {
         "panel" => ui_mode::toggle_panel(),
         // The modem pane in the status bar.
         "settings" => show_settings(false),
+        // The originals' toolbar buttons for what's otherwise in the menus.
+        "print" => print(),
+        "view-source" => view_source(),
+        "zoom-in" => zoom(0.5),
+        "zoom-out" => zoom(-0.5),
+        "fullscreen" => toggle_fullscreen(),
         _ => eprintln!("lantern: unknown chrome command {name:?}"),
     }
 }

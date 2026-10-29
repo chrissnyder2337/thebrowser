@@ -137,6 +137,9 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Pc1993 => mode_files!("pc-1993", menus),
         UiMode::Toolbar1995 => mode_files!("toolbar-1995", menus),
         UiMode::Desktop1995 => mode_files!("desktop-1995", menus),
+        UiMode::Suite1997 => mode_files!("suite-1997", menus),
+        UiMode::Desktop1997 => mode_files!("desktop-1997", menus),
+        UiMode::Desktop1999 => mode_files!("desktop-1999", menus),
     }
 }
 
@@ -391,6 +394,18 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Desktop1995 => {
             "One row of small icon buttons and an Address row beside the activity box, \
              modelled on Internet Explorer 2."
+        }
+        UiMode::Suite1997 => {
+            "Three toolbars with collapse tabs, a personal toolbar of your quick links and \
+             a component bar, modelled on Netscape Communicator 4."
+        }
+        UiMode::Desktop1997 => {
+            "The menu bar as a band, flat labelled buttons and Address and Links bands, \
+             modelled on Internet Explorer 4."
+        }
+        UiMode::Desktop1999 => {
+            "A menu band with a small activity box, flat labelled buttons and an Address \
+             band with a Go button, modelled on Internet Explorer 5."
         }
     }
 }

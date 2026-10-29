@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Desktop (1997): the menu bar is a band with the activity box at its right
+     end, then flat bands with grips: standard buttons (icons over labels),
+     Address and Links (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #c0c0c0;
+    --thin: inset 1px 1px #fff, inset -1px -1px #808080;
+    --thin-down: inset 1px 1px #808080, inset -1px -1px #fff;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+    --raised: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px Tahoma, "MS Sans Serif", Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; padding: 1px 0 0; }
+  button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; outline: none; }
+  .row { display: flex; align-items: center; min-width: 0; flex: none; margin-bottom: 1px; }
+  .band { display: flex; align-items: center; min-width: 0; height: 100%; padding: 0 3px 0 2px; box-shadow: var(--thin); }
+  .grip { width: 3px; height: calc(100% - 4px); flex: none; margin: 0 5px 0 1px; box-shadow: var(--thin); }
+
+  /* ---- Menu band ---- */
+  #r1 { height: 24px; }
+  #menuband { flex: 1; }
+  .menu { height: 18px; padding: 0 6px; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--thin); }
+  .menu:active { box-shadow: var(--thin-down); }
+  #actband { width: 40px; flex: none; justify-content: center; padding: 0; }
+  #throbber {
+    width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+    background: #000; box-shadow: var(--thin-down); overflow: hidden;
+  }
+  #throbber svg.idle { width: 14px; height: 21px; }
+  #throbber .lit-box { width: 14px; height: 21px; overflow: hidden; display: none; }
+  #throbber svg.lit { display: block; width: 56px; height: 21px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-56px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  /* ---- Standard buttons: flat until hovered ---- */
+  #r2 { height: 46px; }
+  #std { flex: 1; }
+  .big {
+    min-width: 46px; height: 38px; flex: none; padding: 0 3px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    position: relative;
+  }
+  .big svg { display: block; flex: none; }
+  .big svg.off { display: none; }
+  .big:hover:not(.disabled), .big:focus-visible:not(.disabled) { box-shadow: var(--thin); }
+  .big:active:not(.disabled) { box-shadow: var(--thin-down); }
+  .big:active:not(.disabled) > * { transform: translate(1px, 1px); }
+  .big.disabled { color: #808080; text-shadow: 1px 1px #fff; }
+  .big.disabled svg.on { display: none; }
+  .big.disabled svg.off { display: block; }
+  .arr { position: absolute; right: 1px; top: 9px; border: 3px solid transparent; border-top: 3px solid #000; border-bottom: 0; }
+  .big.disabled .arr { border-top-color: #808080; }
+  .sep { width: 2px; height: 34px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
+
+  /* ---- Address and Links bands ---- */
+  #r3 { height: 26px; }
+  #address { flex: 1; }
+  #address > label { flex: none; padding-right: 6px; }
+  #field {
+    flex: 1; min-width: 0; height: 21px; padding: 2px; position: relative; display: flex;
+    background: #fff; box-shadow: var(--sunken);
+  }
+  #url {
+    flex: 1; min-width: 0; height: 17px; border: 0; margin: 0; padding: 1px 3px; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+  #field svg.lock { display: none; flex: none; margin: 2px 4px 0 0; }
+  #field.secure svg.lock { display: block; }
+  #drop {
+    width: 16px; height: 17px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: var(--face); box-shadow: var(--raised);
+  }
+  #drop::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+  #drop:active { box-shadow: var(--sunken); }
+  #linksband { width: 34%; flex: none; max-width: 340px; }
+  #linksband > label { flex: none; padding-right: 6px; }
+  #links { display: flex; gap: 2px; min-width: 0; overflow: hidden; }
+  .ql {
+    height: 18px; max-width: 120px; flex: none; padding: 0 5px 0 3px;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .ql:hover { box-shadow: var(--thin); }
+  .ql:active { box-shadow: var(--thin-down); }
+  .ql:active > * { transform: translate(1px, 1px); }
+  .ql:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .ql svg { flex: none; }
+  .ql span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #linksband .none { color: #808080; text-shadow: 1px 1px #fff; }
+</style>
+</head>
+<body>
+  <div class="row" id="r1">
+    <div class="band" id="menuband">
+      <div class="grip"></div>
+      <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+      <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
+      <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu"><u>V</u>iew</button>
+      <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu"><u>G</u>o</button>
+      <button class="menu" data-cmd="menu" data-arg="favorites" data-anchor aria-haspopup="menu">F<u>a</u>vorites</button>
+      <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+    </div>
+    <div class="band" id="actband">
+      <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+        {{LANTERN_IDLE}}
+        <div class="lit-box">{{LANTERN_LIT}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row" id="r2">
+    <div class="band" id="std">
+      <div class="grip"></div>
+        <button class="big disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_D97_BACK}}<span>Back</span><i class="arr"></i></button>
+        <button class="big disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_D97_FORWARD}}<span>Forward</span><i class="arr"></i></button>
+        <button class="big disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_D97_STOP}}<span>Stop</span></button>
+        <button class="big" id="reload" data-cmd="reload" title="Refresh (F5)">{{ICON_D97_REFRESH}}<span>Refresh</span></button>
+        <button class="big" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_D97_HOME}}<span>Home</span></button>
+        <div class="sep"></div>
+        <button class="big" id="search" data-cmd="search" title="Search">{{ICON_D97_SEARCH}}<span>Search</span></button>
+        <button class="big" id="favorites" data-cmd="bookmarks" title="Favorites">{{ICON_D97_FAVORITES}}<span>Favorites</span></button>
+        <button class="big" id="history" title="History">{{ICON_D97_HISTORY}}<span>History</span></button>
+        <button class="big" id="channels" title="Channels">{{ICON_D97_CHANNELS}}<span>Channels</span></button>
+        <button class="big" id="fullscreen" data-cmd="fullscreen" title="Full Screen">{{ICON_D97_FULLSCREEN}}<span>Fullscreen</span></button>
+        <div class="sep"></div>
+        <button class="big" id="mail" title="Mail">{{ICON_D97_MAIL}}<span>Mail</span><i class="arr"></i></button>
+        <button class="big" id="print" data-cmd="print" title="Print">{{ICON_D97_PRINT}}<span>Print</span></button>
+        <button class="big" id="edit" title="Edit">{{ICON_D97_EDIT}}<span>Edit</span></button>
+    </div>
+  </div>
+  <div class="row" id="r3">
+    <div class="band" id="address">
+      <div class="grip"></div>
+      <label for="url">Address</label>
+      <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
+    </div>
+    <div class="band" id="linksband">
+      <div class="grip"></div>
+      <label>Links</label>
+      <div id="links"></div>
+    </div>
+  </div>
+  <template id="page-icon">{{ICON_PAGE}}</template>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

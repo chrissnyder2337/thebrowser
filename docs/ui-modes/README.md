@@ -38,11 +38,11 @@ Update the tables below in the same commit as the work they describe.
 | `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Planned |
 | `desktop-1995` | Desktop (1995) | Internet Explorer 2 | icons | Built (not yet merged) |
 | `desktop-1996` | Desktop (1996) | Internet Explorer 3 | icons, hover colour | Built (not yet merged) |
-| `desktop-1997` | Desktop (1997) | Internet Explorer 4 | icons | Planned |
-| `desktop-1999` | Desktop (1999) | Internet Explorer 5 | icons | Planned |
+| `desktop-1997` | Desktop (1997) | Internet Explorer 4 | icons | Built (not yet merged) |
+| `desktop-1999` | Desktop (1999) | Internet Explorer 5 | icons | Built (not yet merged) |
 | `toolbar-1995` | Toolbar (1995) | Netscape 1.1–1.22 | icons | Built (not yet merged) |
 | `toolbar-1996` | Toolbar (1996) | Netscape 2–3 | icons | Built (not yet merged) |
-| `suite-1997` | Suite (1997) | Netscape Communicator 4 | icons | Planned |
+| `suite-1997` | Suite (1997) | Netscape Communicator 4 | icons | Built (not yet merged) |
 | `classic-1992` | Classic desktop (1992) | MacWWW | menus, research | Planned |
 | `classic-1994` | Classic desktop (1994) | NCSA Mosaic for the Mac | icons, research | Planned |
 | `classic-1999` | Classic desktop (1999) | iCab | icons | Planned |

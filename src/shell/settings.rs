@@ -179,10 +179,19 @@ pub enum UiMode {
     /// An early desktop browser: one row of small icon buttons, an Address
     /// row, and the activity box beside both.
     Desktop1995,
+    /// A late-90s browser suite: three toolbars with collapse tabs (navigation,
+    /// location, personal) and a component bar in the status bar.
+    Suite1997,
+    /// A late-90s desktop browser: the menu bar as a band, flat buttons with
+    /// labels, Address and Links bands, and a zone pane.
+    Desktop1997,
+    /// A desktop browser at the end of the decade: a menu band with a small
+    /// activity box, flat buttons, and an Address band with Go.
+    Desktop1999,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 10] = [
+    pub const ALL: [Self; 13] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -193,6 +202,9 @@ impl UiMode {
         Self::Pc1993,
         Self::Toolbar1995,
         Self::Desktop1995,
+        Self::Suite1997,
+        Self::Desktop1997,
+        Self::Desktop1999,
     ];
 
     pub fn key(self) -> &'static str {
@@ -207,6 +219,9 @@ impl UiMode {
             Self::Pc1993 => "pc-1993",
             Self::Toolbar1995 => "toolbar-1995",
             Self::Desktop1995 => "desktop-1995",
+            Self::Suite1997 => "suite-1997",
+            Self::Desktop1997 => "desktop-1997",
+            Self::Desktop1999 => "desktop-1999",
         }
     }
 
@@ -227,6 +242,9 @@ impl UiMode {
             Self::Pc1993 => "Early PC (1993)",
             Self::Toolbar1995 => "Toolbar (1995)",
             Self::Desktop1995 => "Desktop (1995)",
+            Self::Suite1997 => "Suite (1997)",
+            Self::Desktop1997 => "Desktop (1997)",
+            Self::Desktop1999 => "Desktop (1999)",
         }
     }
 
@@ -249,6 +267,9 @@ impl UiMode {
             Self::Pc1993 => RetroStyle::EarlyWeb,
             Self::Toolbar1995 => RetroStyle::EarlyWeb,
             Self::Desktop1995 => RetroStyle::Off,
+            Self::Suite1997 => RetroStyle::Portal,
+            Self::Desktop1997 => RetroStyle::Off,
+            Self::Desktop1999 => RetroStyle::Off,
         }
     }
 }

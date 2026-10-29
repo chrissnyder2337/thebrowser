@@ -1,0 +1,92 @@
+# The menu bar of a 1997 browser suite.
+menu File
+- New Browser Window
+- New Message
+- New Blank Page
+- New Page From Template...
+- New Page From Wizard...
+---
+open-url Open Page...
+- Save As...
+- Save Frame As...
+- Send Page...
+- Edit Page
+- Edit Frame
+- Upload File...
+---
+- Offline
+---
+- Print Preview
+- Page Setup...
+print Print...
+---
+close-window Close
+close-window Exit
+menu Edit
+- Undo
+- Redo
+---
+- Cut
+- Copy
+- Paste
+---
+- Select All
+---
+- Find in Page...
+- Find Again
+---
+search Search Internet...
+- Search Directory...
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu View
+- Hide Navigation Toolbar
+- Hide Location Toolbar
+- Hide Personal Toolbar
+---
+zoom-in Increase Font
+zoom-out Decrease Font
+---
+reload Reload
+- Show Images
+- Refresh
+stop Stop Page Loading
+- Stop Animations
+---
+view-source Page Source
+- Page Info
+- Character Set
+menu Go
+back Back
+forward Forward
+home Home
+---
+- History
+menu Window
+- Browser
+- Mailbox
+- Discussions
+- Page Editor
+---
+bookmarks Bookmarks
+add-bookmark Add Bookmark
+- Edit Bookmarks
+---
+- History
+- Security Info
+menu Help
+- Help Contents
+- Release Notes
+- Product Information and Support
+- Software Updates
+- Register Now
+- Member Services
+- International Users
+- Security
+- Net Etiquette
+---
+- About Plug-ins
+- About Font Displayers
+about About...

@@ -103,6 +103,9 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Pc1993 => Layout::bars(54, 22),
         UiMode::Toolbar1995 => Layout::bars(114, 22),
         UiMode::Desktop1995 => Layout::bars(80, 22).inset([0, 2, 2, 2], 0xFFC0C0C0),
+        UiMode::Suite1997 => Layout::bars(130, 24),
+        UiMode::Desktop1997 => Layout::bars(102, 22),
+        UiMode::Desktop1999 => Layout::bars(94, 22),
     }
 }
 
@@ -151,6 +154,18 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Desktop1995 => Some((
             include_str!("../../ui/chrome/desktop-1995/pages.css"),
             "#c0c0c0",
+        )),
+        UiMode::Suite1997 => Some((
+            include_str!("../../ui/chrome/suite-1997/pages.css"),
+            "#c0c0c0",
+        )),
+        UiMode::Desktop1997 => Some((
+            include_str!("../../ui/chrome/desktop-1997/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Desktop1999 => Some((
+            include_str!("../../ui/chrome/desktop-1999/pages.css"),
+            "#ffffff",
         )),
     }
 }

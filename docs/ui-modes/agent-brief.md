@@ -92,7 +92,9 @@ them across all of them.
   own (the TV modes) still needs one way to the Browser UI menu: a button sending
   `data-cmd="menu"` for a menus.txt menu holding `browser-ui`.
 - Other commands you may use on buttons: `search`, `bookmarks`, `bookmark-add`,
-  `focus-url`, `settings`, `panel` (the status bar may send only: back forward reload stop
+  `focus-url`, `settings`, `panel`, `print`, `view-source`, `zoom-in`, `zoom-out` (larger and
+  smaller text), `fullscreen`. A button with no matching command is inert (no data-cmd,
+  greyed if the original greyed it); never wire it to an unrelated command (the status bar may send only: back forward reload stop
   home search bookmarks bookmark-add focus-url settings panel go).
 - `#throbber` (activity box) holds the lantern; clicking it opens About (chrome.js does it);
   class `loading` while a page loads: show the lit strip then.

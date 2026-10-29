@@ -82,7 +82,10 @@ for entry in \
   terminal-1992:terminal \
   pc-1993:off \
   toolbar-1995:off \
-  desktop-1995:off; do
+  desktop-1995:off \
+  suite-1997:off \
+  desktop-1997:off \
+  desktop-1999:off; do
   mode="${entry%%:*}"
   run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
 done

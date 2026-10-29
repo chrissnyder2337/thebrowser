@@ -1,0 +1,74 @@
+# The menu bar of a late-90s desktop browser, 1997.
+menu File
+- New Window
+open-url Open...
+- Edit
+- Save
+- Save As...
+---
+- Page Setup...
+print Print...
+---
+- Send
+- Import and Export...
+---
+- Properties
+- Work Offline
+close-window Close
+menu Edit
+- Cut
+- Copy
+- Paste
+---
+- Select All
+---
+search Find (on This Page)...
+menu View
+- Toolbars
+- Status Bar
+- Explorer Bar
+---
+- Go To
+---
+stop Stop
+reload Refresh
+---
+zoom-in Fonts: Larger
+zoom-out Fonts: Smaller
+zoom-reset Fonts: Medium
+view-source Source
+fullscreen Full Screen
+---
+settings Internet Options...
+retro Retro looks
+browser-ui Browser UI
+menu Go
+back Back
+forward Forward
+home Home Page
+---
+- Channel Guide
+search Search the Web
+- Best of the Web
+---
+- Read Mail
+- New Message
+- Open History Folder
+menu Favorites
+add-bookmark Add to Favorites...
+bookmarks Organize Favorites...
+---
+- Channels
+- Software Updates
+- Links
+menu Help
+- Contents and Index
+- Tip of the Day
+---
+- Frequently Asked Questions
+- Product Updates
+- Web Tutorial
+- Online Support
+- Send Feedback
+---
+about About...

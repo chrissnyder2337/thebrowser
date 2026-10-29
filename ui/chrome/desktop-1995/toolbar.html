@@ -100,7 +100,7 @@
     <div id="stack">
       <div id="tools">
         <button class="tb" id="open" data-cmd="focus-url" title="Open an address (Ctrl+L)" aria-label="Open">{{ICON_D95_OPEN}}</button>
-        <button class="tb disabled" id="print" title="Print" aria-label="Print">{{ICON_D95_PRINT}}</button>
+        <button class="tb" id="print" data-cmd="print" title="Print (Ctrl+P)" aria-label="Print">{{ICON_D95_PRINT}}</button>
         <button class="tb disabled" id="send" title="Send" aria-label="Send">{{ICON_D95_SEND}}</button>
         <div class="sep"></div>
         <button class="tb disabled" id="back" data-cmd="back" title="Go back (Alt+Left)" aria-label="Back">{{ICON_D95_BACK}}</button>
@@ -117,8 +117,8 @@
         <button class="tb" id="favorites" data-cmd="bookmarks" title="Open your favorites" aria-label="Open Favorites">{{ICON_D95_FAVORITES}}</button>
         <button class="tb" id="add" data-cmd="bookmark-add" title="Add this page to your favorites (Ctrl+D)" aria-label="Add To Favorites">{{ICON_D95_ADD}}</button>
         <div class="sep"></div>
-        <button class="tb disabled" id="font-up" title="Larger Font" aria-label="Larger Font">{{ICON_D95_FONT_UP}}</button>
-        <button class="tb disabled" id="font-down" title="Smaller Font" aria-label="Smaller Font">{{ICON_D95_FONT_DOWN}}</button>
+        <button class="tb" data-cmd="zoom-in" id="font-up" title="Larger Font" aria-label="Larger Font">{{ICON_D95_FONT_UP}}</button>
+        <button class="tb" data-cmd="zoom-out" id="font-down" title="Smaller Font" aria-label="Smaller Font">{{ICON_D95_FONT_DOWN}}</button>
         <div class="sep"></div>
         <button class="tb disabled" id="cut" title="Cut" aria-label="Cut">{{ICON_D95_CUT}}</button>
         <button class="tb disabled" id="copy" title="Copy" aria-label="Copy">{{ICON_D95_COPY}}</button>
