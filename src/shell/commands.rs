@@ -51,8 +51,8 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
             run_chrome_command(role, name, &command.arg)
         }
         // Some UI modes put navigation buttons under the page
-        // (ui/chrome/<mode>/status.html), but the status bar can't navigate
-        // to an address or open menus.
+        // (ui/chrome/<mode>/status.html), but the status bar can't open
+        // bookmarks' URLs or menus.
         (Role::Status, name) if STATUS_COMMANDS.contains(&name) => {
             run_chrome_command(role, name, &command.arg)
         }
@@ -62,7 +62,7 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
 }
 
 /// The commands the status bar may send.
-const STATUS_COMMANDS: [&str; 11] = [
+const STATUS_COMMANDS: [&str; 12] = [
     "back",
     "forward",
     "reload",
@@ -74,6 +74,8 @@ const STATUS_COMMANDS: [&str; 11] = [
     "focus-url",
     "settings",
     "panel",
+    // A typed address: the TV modes' Go to box is in their bottom panel.
+    "go",
 ];
 
 fn run_chrome_command(role: Role, name: &str, arg: &str) {
@@ -127,6 +129,50 @@ pub fn reload() {
 
 pub fn stop() {
     with_content(|b| b.stop_load());
+}
+
+/// Print the page (the menus' Print item).
+pub fn print() {
+    with_content(|b| {
+        if let Some(host) = b.host() {
+            host.print();
+        }
+    });
+}
+
+/// Show the page's source (the menus' View Source item).
+pub fn view_source() {
+    // Not for Lantern's own data: pages, whose source is the generated page.
+    if with_shell(|shell| shell.internal_label.is_some()) {
+        return;
+    }
+    with_content(|b| {
+        if let Some(frame) = b.main_frame() {
+            frame.view_source();
+        }
+    });
+}
+
+/// Zoom the page by `step` levels; 0 resets it.
+pub fn zoom(step: f64) {
+    with_content(|b| {
+        if let Some(host) = b.host() {
+            let level = if step == 0.0 {
+                0.0
+            } else {
+                host.zoom_level() + step
+            };
+            host.set_zoom_level(level.clamp(-4.0, 6.0));
+        }
+    });
+}
+
+/// Fill the screen with the window, or come back (the menus' Full Screen).
+pub fn toggle_fullscreen() {
+    if let Some(window) = with_shell(|shell| shell.window.clone()) {
+        let on = window.is_fullscreen() == 0;
+        window.set_fullscreen(on.into());
+    }
 }
 
 pub fn focus_content() {

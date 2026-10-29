@@ -22,8 +22,9 @@ mod mac;
 
 use shell::{
     bookmarks::Bookmark,
-    pages, retro,
+    menus, pages, retro,
     settings::{RetroStyle, Settings, UiMode},
+    state::Role,
     ui_mode,
     util::{Json, percent_decode},
 };
@@ -98,14 +99,42 @@ fn main() -> ExitCode {
     let mut modes = vec![];
     for mode in UiMode::ALL {
         let key = mode.key();
-        pages.push((format!("toolbar-{key}"), pages::toolbar_uri(mode)));
-        pages.push((format!("status-{key}"), pages::status_uri(mode)));
-        let (toolbar, status) = ui_mode::heights(mode);
+        let views = pages::chrome_views(mode);
+        for role in &views {
+            let view = match role {
+                Role::Toolbar => "toolbar",
+                Role::Status => "status",
+                Role::Side => "side",
+                _ => "frame",
+            };
+            pages.push((format!("{view}-{key}"), pages::chrome_uri(*role, mode)));
+        }
+        let layout = ui_mode::layout(mode);
+        let keys = |list: Vec<String>| Json::Arr(list.into_iter().map(Json::str).collect());
         modes.push(Json::Obj(vec![
             ("key", Json::str(key)),
             ("name", Json::str(mode.name())),
-            ("toolbarHeight", Json::Num(f64::from(toolbar))),
-            ("statusHeight", Json::Num(f64::from(status))),
+            ("toolbarHeight", Json::Num(f64::from(layout.toolbar))),
+            ("statusHeight", Json::Num(f64::from(layout.status))),
+            ("statusOpen", Json::Num(f64::from(layout.status_open))),
+            (
+                "sideWidth",
+                Json::Num(f64::from(if views.contains(&Role::Side) {
+                    layout.side
+                } else {
+                    0
+                })),
+            ),
+            (
+                "frameHeight",
+                Json::Num(f64::from(if views.contains(&Role::Frame) {
+                    layout.frame
+                } else {
+                    0
+                })),
+            ),
+            ("menus", keys(menus::bar_keys(mode))),
+            ("uiMenus", keys(menus::browser_ui_keys(mode))),
         ]));
     }
     let (cef, chromium) = pages::cef_versions();

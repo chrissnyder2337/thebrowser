@@ -112,6 +112,11 @@ fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
     }
 }
 
+/// A UI mode's menu bar (`ui/chrome/<mode>/menus.txt`), if it has its own.
+pub fn menus_text(_mode: UiMode) -> Option<&'static str> {
+    None
+}
+
 /// A UI mode's side view template, if it has a side view.
 fn side_template(_mode: UiMode) -> Option<&'static str> {
     None
@@ -181,6 +186,18 @@ pub fn toolbar_uri(mode: UiMode) -> String {
 
 pub fn status_uri(mode: UiMode) -> String {
     fill_chrome(chrome_templates(mode).1)
+}
+
+/// The chrome views `mode` has a page of its own for.
+pub fn chrome_views(mode: UiMode) -> Vec<Role> {
+    let mut views = vec![Role::Toolbar, Role::Status];
+    if side_template(mode).is_some() {
+        views.push(Role::Side);
+    }
+    if frame_template(mode).is_some() {
+        views.push(Role::Frame);
+    }
+    views
 }
 
 /// The page a chrome view shows in `mode` (a blank one if the mode doesn't

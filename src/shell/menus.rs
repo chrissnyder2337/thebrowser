@@ -16,24 +16,112 @@ pub enum Menu {
     Retro,
     /// Just the Browser UI items (the keyboard shortcut).
     BrowserUi,
-    File,
-    Navigate,
-    Options,
-    Help,
+    /// One of the current UI mode's menu-bar menus (`ui/chrome/<mode>/menus.txt`).
+    Bar(UiMode, usize),
 }
 
-impl Menu {
-    /// Menus a page may open with the `menu` command.
-    fn from_key(key: &str) -> Option<Self> {
-        match key {
-            "file" => Some(Self::File),
-            "navigate" => Some(Self::Navigate),
-            "options" => Some(Self::Options),
-            "help" => Some(Self::Help),
-            _ => None,
-        }
-    }
+/// One entry of a mode's menu-bar menu.
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Entry {
+    Item(Item, String),
+    /// A label the original had with no matching feature: shown, disabled.
+    Inert(String),
+    Separator,
+    RetroLooks(String),
+    BrowserUi(String),
 }
+
+/// A menu-bar menu: the key a page names it by, and its entries.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct BarMenu {
+    key: String,
+    entries: Vec<Entry>,
+}
+
+/// Parse a mode's `menus.txt`:
+///
+/// ```text
+/// menu File            a menu; pages name it by its lowercase label, spaces
+///                      as dashes ("file")
+/// back Back            an action, then its label
+/// - Open Local...      a label with no matching feature (disabled)
+/// ---                  a separator
+/// retro Retro looks    the retro looks submenu
+/// browser-ui Browser UI  the Browser UI submenu
+/// ```
+///
+/// Blank lines and lines starting with `#` are skipped. Unknown actions are an
+/// error, so a typo fails the unit test instead of shipping a dead item.
+fn parse_bar(text: &str) -> Result<Vec<BarMenu>, String> {
+    let mut menus: Vec<BarMenu> = Vec::new();
+    for line in text.lines().map(str::trim) {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let (word, label) = line.split_once(' ').unwrap_or((line, ""));
+        let label = label.trim().to_owned();
+        if word == "menu" {
+            let key = label.to_ascii_lowercase().replace(' ', "-");
+            menus.push(BarMenu {
+                key,
+                entries: Vec::new(),
+            });
+            continue;
+        }
+        let Some(menu) = menus.last_mut() else {
+            return Err(format!("{line:?} comes before any menu"));
+        };
+        let entry = match word {
+            "---" => Entry::Separator,
+            "-" => Entry::Inert(label),
+            "retro" => Entry::RetroLooks(label),
+            "browser-ui" => Entry::BrowserUi(label),
+            action => match Item::from_action(action) {
+                Some(item) => Entry::Item(item, label),
+                None => return Err(format!("unknown menu action {action:?}")),
+            },
+        };
+        menu.entries.push(entry);
+    }
+    Ok(menus)
+}
+
+/// The menus.txt of each mode that has a menu bar of its own.
+fn bar_text(mode: UiMode) -> Option<&'static str> {
+    super::pages::menus_text(mode)
+}
+
+/// A mode's menu bar; modes without one get the generic File, Navigate,
+/// Options and Help menus.
+fn bar(mode: UiMode) -> Vec<BarMenu> {
+    bar_text(mode)
+        .and_then(|text| parse_bar(text).ok())
+        .unwrap_or_else(|| parse_bar(GENERIC_MENUS).unwrap_or_default())
+}
+
+const GENERIC_MENUS: &str = "\
+menu File
+open-url Open URL\u{2026}
+add-bookmark Add Bookmark
+---
+settings Settings\u{2026}
+menu Navigate
+back Back
+forward Forward
+reload Reload
+stop Stop
+home Home
+---
+search Search
+bookmarks Bookmarks
+menu Options
+retro Retro looks
+browser-ui Browser UI
+---
+settings Settings\u{2026}
+menu Help
+about About Lantern
+";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Item {
@@ -49,12 +137,42 @@ enum Item {
     Settings,
     About,
     Splash,
+    Print,
+    ViewSource,
+    ZoomIn,
+    ZoomOut,
+    ZoomReset,
+    Fullscreen,
+    CloseWindow,
     Style(RetroStyle),
     Mode(UiMode),
     Pages(ModePages),
 }
 
-const PLAIN: [Item; 12] = [
+/// Actions a menus.txt can name, and the items they run.
+const ACTIONS: [(&str, Item); 19] = [
+    ("back", Item::Back),
+    ("forward", Item::Forward),
+    ("reload", Item::Reload),
+    ("stop", Item::Stop),
+    ("home", Item::Home),
+    ("search", Item::Search),
+    ("bookmarks", Item::Bookmarks),
+    ("add-bookmark", Item::AddBookmark),
+    ("open-url", Item::OpenUrl),
+    ("settings", Item::Settings),
+    ("about", Item::About),
+    ("splash", Item::Splash),
+    ("print", Item::Print),
+    ("view-source", Item::ViewSource),
+    ("zoom-in", Item::ZoomIn),
+    ("zoom-out", Item::ZoomOut),
+    ("zoom-reset", Item::ZoomReset),
+    ("fullscreen", Item::Fullscreen),
+    ("close-window", Item::CloseWindow),
+];
+
+const PLAIN: [Item; 19] = [
     Item::Back,
     Item::Forward,
     Item::Reload,
@@ -67,15 +185,31 @@ const PLAIN: [Item; 12] = [
     Item::Settings,
     Item::About,
     Item::Splash,
+    Item::Print,
+    Item::ViewSource,
+    Item::ZoomIn,
+    Item::ZoomOut,
+    Item::ZoomReset,
+    Item::Fullscreen,
+    Item::CloseWindow,
 ];
 const STYLE_BASE: i32 = 100;
 const MODE_BASE: i32 = 300;
 const PAGES_BASE: i32 = 400;
+// Inert items get ids from here; they're disabled, so they never run.
+const INERT_BASE: i32 = 1000;
 // Submenus need ids too; they never reach execute_command.
 const RETRO_SUBMENU: i32 = 900;
 const UI_SUBMENU: i32 = 901;
 
 impl Item {
+    fn from_action(action: &str) -> Option<Self> {
+        ACTIONS
+            .iter()
+            .find(|(name, _)| *name == action)
+            .map(|(_, item)| *item)
+    }
+
     fn id(self) -> i32 {
         match self {
             Self::Style(style) => {
@@ -97,7 +231,9 @@ impl Item {
 
     fn from_id(id: i32) -> Option<Self> {
         let index = |base: i32| usize::try_from(id - base).ok();
-        if id >= PAGES_BASE {
+        if id >= INERT_BASE {
+            None
+        } else if id >= PAGES_BASE {
             index(PAGES_BASE)
                 .and_then(|i| ModePages::ALL.get(i))
                 .map(|p| Self::Pages(*p))
@@ -129,6 +265,13 @@ fn run(item: Item) {
         Item::Settings => commands::show_settings(false),
         Item::About => commands::show_about(),
         Item::Splash => retro::set_splash(!with_shell(|shell| shell.settings.splash_intro)),
+        Item::Print => commands::print(),
+        Item::ViewSource => commands::view_source(),
+        Item::ZoomIn => commands::zoom(0.5),
+        Item::ZoomOut => commands::zoom(-0.5),
+        Item::ZoomReset => commands::zoom(0.0),
+        Item::Fullscreen => commands::toggle_fullscreen(),
+        Item::CloseWindow => super::state::close_all_browsers(false),
         Item::Style(style) => retro::set_style(style),
         Item::Mode(mode) => ui_mode::set_mode(mode),
         Item::Pages(pages) => ui_mode::set_pages(pages),
@@ -209,36 +352,51 @@ fn build(menu: Menu, model: &MenuModel, ctx: &Context) {
             add(model, Item::Settings, "Retro settings\u{2026}");
         }
         Menu::BrowserUi => add_modes(model, ctx),
-        Menu::File => {
-            add(model, Item::OpenUrl, "Open URL\u{2026}");
-            add(model, Item::AddBookmark, "Add Bookmark");
-            model.add_separator();
-            add(model, Item::Settings, "Settings\u{2026}");
-        }
-        Menu::Navigate => {
-            add(model, Item::Back, "Back");
-            add(model, Item::Forward, "Forward");
-            add(model, Item::Reload, "Reload");
-            add(model, Item::Stop, "Stop");
-            add(model, Item::Home, "Home");
-            model.add_separator();
-            add(model, Item::Search, "Search");
-            add(model, Item::Bookmarks, "Bookmarks");
-            model.set_enabled(Item::Back.id(), ctx.can_back.into());
-            model.set_enabled(Item::Forward.id(), ctx.can_fwd.into());
-            model.set_enabled(Item::Stop.id(), ctx.loading.into());
-        }
-        Menu::Options => {
-            if let Some(sub) =
-                model.add_sub_menu(RETRO_SUBMENU, Some(&CefString::from("Retro looks")))
-            {
-                add_styles(&sub, ctx);
+        Menu::Bar(mode, index) => {
+            if let Some(menu) = bar(mode).get(index) {
+                add_entries(model, &menu.entries, ctx);
             }
-            add_modes_submenu(model, ctx);
-            model.add_separator();
-            add(model, Item::Settings, "Settings\u{2026}");
         }
-        Menu::Help => add(model, Item::About, "About Lantern"),
+    }
+}
+
+fn add_entries(model: &MenuModel, entries: &[Entry], ctx: &Context) {
+    let mut inert = INERT_BASE;
+    for entry in entries {
+        match entry {
+            Entry::Item(item, label) => {
+                add(model, *item, label);
+                let enabled = match item {
+                    Item::Back => ctx.can_back,
+                    Item::Forward => ctx.can_fwd,
+                    Item::Stop => ctx.loading,
+                    _ => true,
+                };
+                model.set_enabled(item.id(), enabled.into());
+            }
+            Entry::Inert(label) => {
+                model.add_item(inert, Some(&CefString::from(label.as_str())));
+                model.set_enabled(inert, 0);
+                inert += 1;
+            }
+            Entry::Separator => {
+                model.add_separator();
+            }
+            Entry::RetroLooks(label) => {
+                if let Some(sub) =
+                    model.add_sub_menu(RETRO_SUBMENU, Some(&CefString::from(label.as_str())))
+                {
+                    add_styles(&sub, ctx);
+                }
+            }
+            Entry::BrowserUi(label) => {
+                if let Some(sub) =
+                    model.add_sub_menu(UI_SUBMENU, Some(&CefString::from(label.as_str())))
+                {
+                    add_modes(&sub, ctx);
+                }
+            }
+        }
     }
 }
 
@@ -280,12 +438,36 @@ fn show_at(menu: Menu, role: Option<Role>, mut point: Point) {
 }
 
 /// The `menu` command: `arg` is "<menu>,x,y", the anchor in `role`'s view.
+/// `<menu>` names one of the current mode's menu-bar menus.
 pub fn show(role: Role, arg: &str) {
     let (key, anchor) = arg.split_once(',').unwrap_or((arg, ""));
-    match Menu::from_key(key) {
-        Some(menu) => show_at(menu, Some(role), retro::parse_point(anchor)),
+    let mode = with_shell(|shell| shell.settings.ui_mode);
+    match bar(mode).iter().position(|menu| menu.key == key) {
+        Some(index) => show_at(
+            Menu::Bar(mode, index),
+            Some(role),
+            retro::parse_point(anchor),
+        ),
         None => eprintln!("lantern: unknown menu {key:?}"),
     }
+}
+
+/// The keys of a mode's menus that hold the Browser UI submenu.
+pub fn browser_ui_keys(mode: UiMode) -> Vec<String> {
+    bar(mode)
+        .into_iter()
+        .filter(|menu| {
+            menu.entries
+                .iter()
+                .any(|e| matches!(e, Entry::BrowserUi(_)))
+        })
+        .map(|menu| menu.key)
+        .collect()
+}
+
+/// The menu keys a mode's pages may name (for tests and dump-pages).
+pub fn bar_keys(mode: UiMode) -> Vec<String> {
+    bar(mode).into_iter().map(|menu| menu.key).collect()
 }
 
 /// The Retro button's menu: `arg` is "x,y" in the toolbar.
@@ -323,10 +505,41 @@ mod tests {
 
     #[test]
     fn pages_can_only_name_their_menus() {
-        assert_eq!(Menu::from_key("file"), Some(Menu::File));
-        assert_eq!(Menu::from_key("options"), Some(Menu::Options));
+        let generic = bar_keys(UiMode::Lantern);
+        assert_eq!(generic, ["file", "navigate", "options", "help"]);
         for key in ["", "retro", "File", "browser-ui", "file,1,2"] {
-            assert_eq!(Menu::from_key(key), None, "{key}");
+            assert!(!generic.iter().any(|k| k == key), "{key}");
+        }
+    }
+
+    #[test]
+    fn menus_files_parse() {
+        let menus =
+            parse_bar("# c\nmenu Go Places\nback Back\n- Open Local...\n---\nbrowser-ui UI\n")
+                .unwrap();
+        assert_eq!(menus[0].key, "go-places");
+        assert_eq!(
+            menus[0].entries,
+            [
+                Entry::Item(Item::Back, "Back".into()),
+                Entry::Inert("Open Local...".into()),
+                Entry::Separator,
+                Entry::BrowserUi("UI".into()),
+            ]
+        );
+        assert!(parse_bar("back Back\n").is_err());
+        assert!(parse_bar("menu File\nlaunch-missiles Go\n").is_err());
+        // Every mode's menus.txt parses, and every mode can reach the
+        // Browser UI menu from its menus or its Retro button.
+        for mode in UiMode::ALL {
+            if let Some(text) = bar_text(mode) {
+                let menus = parse_bar(text).unwrap_or_else(|e| panic!("{mode:?}: {e}"));
+                assert!(!menus.is_empty(), "{mode:?}");
+                assert!(
+                    menus.iter().all(|m| !m.entries.is_empty()),
+                    "{mode:?} has an empty menu"
+                );
+            }
         }
     }
 }

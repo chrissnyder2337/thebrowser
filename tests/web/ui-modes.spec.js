@@ -32,15 +32,37 @@ const STATUS_STATE = {
   canFwd: true,
 };
 
-/** Open a mode's toolbar or status page at its real view size, with state. */
-async function open(browser, mode, view, state) {
-  const height = view === "toolbar" ? mode.toolbarHeight : mode.statusHeight;
-  const page = await browser.newPage({ viewport: { width: 800, height } });
+/** The chrome views a mode shows, with their real sizes (window.rs). */
+function viewsOf(mode) {
+  return [
+    ["toolbar", 800, mode.toolbarHeight],
+    ["status", 800, mode.statusHeight],
+    ["side", mode.sideWidth, 600],
+    ["frame", 800, mode.frameHeight],
+  ].filter(([, w, h]) => w > 0 && h > 0);
+}
+
+/** Commands the status view may send (commands.rs STATUS_COMMANDS). */
+const STATUS_COMMANDS = ["back", "forward", "reload", "stop", "home", "search", "bookmarks",
+  "bookmark-add", "focus-url", "settings", "panel", "go"];
+
+/**
+ * Open a mode's chrome view at its real size. Rust pushes every view both
+ * the toolbar and the status state, so the test does too.
+ */
+async function open(browser, mode, [view, width, height], states = [TOOLBAR_STATE, STATUS_STATE]) {
+  const page = await browser.newPage({ viewport: { width, height } });
   const errors = trackErrors(page);
   await page.goto(pageUrl(`${view}-${mode.key}.html`));
   await expect(page).toHaveTitle("lantern|1|ready|");
-  await page.evaluate((s) => window.lantern.update(s), state);
-  return { page, errors };
+  for (const state of states) await page.evaluate((s) => window.lantern.update(s), state);
+  return { view, page, errors };
+}
+
+async function openAll(browser, mode) {
+  const opened = [];
+  for (const view of viewsOf(mode)) opened.push(await open(browser, mode, view));
+  return opened;
 }
 
 /** The commands a page's elements send, as [selector, command, arg]. */
@@ -57,39 +79,57 @@ async function commandsOf(page) {
     }));
 }
 
+async function count(opened, selector) {
+  let total = 0;
+  for (const { page } of opened) total += await page.locator(selector).count();
+  return total;
+}
+
 for (const mode of MODES) {
   test.describe(`UI mode ${mode.key}`, () => {
     test("offers what every mode must", async ({ browser }) => {
-      const toolbar = await open(browser, mode, "toolbar", TOOLBAR_STATE);
-      const status = await open(browser, mode, "status", STATUS_STATE);
-      const sent = [...(await commandsOf(toolbar.page)), ...(await commandsOf(status.page))];
+      const opened = await openAll(browser, mode);
+      const sent = [];
+      for (const { view, page } of opened) {
+        const commands = await commandsOf(page);
+        if (view === "status") {
+          for (const [, command] of commands) {
+            expect(STATUS_COMMANDS, `${mode.key} status sends ${command}`).toContain(command);
+          }
+        }
+        sent.push(...commands);
+      }
       const commands = new Set(sent.map(([, command]) => command));
       for (const command of ["back", "forward", "reload", "stop", "home"]) {
         expect(commands, `${mode.key} has ${command}`).toContain(command);
       }
-      await expect(toolbar.page.locator("#url")).toHaveCount(1);
-      // The way to the Browser UI menu: Lantern's Retro menu or an Options menu.
+      expect(await count(opened, "#url"), `${mode.key} has one address field`).toBe(1);
+      // Menu buttons name menus the mode has (ui/chrome/<mode>/menus.txt).
+      for (const [, command, arg] of sent) {
+        if (command === "menu") expect(mode.menus, `${mode.key}`).toContain(arg.split(",")[0]);
+      }
+      // The way to the Browser UI menu: Lantern's Retro menu or a menu holding it.
       const toUiMenu = sent.some(([, command, arg]) =>
-        command === "retro-menu" || (command === "menu" && arg.startsWith("options,")));
+        command === "retro-menu" || (command === "menu" && mode.uiMenus.includes(arg.split(",")[0])));
       expect(toUiMenu, `${mode.key} reaches the Browser UI menu`).toBe(true);
+      if (mode.statusOpen > 0) expect(commands, `${mode.key} opens its panel`).toContain("panel");
       // Status text and a progress meter, somewhere.
-      const both = [toolbar.page, status.page];
-      const count = async (sel) => (await Promise.all(both.map((p) => p.locator(sel).count()))).reduce((a, b) => a + b);
-      expect(await count("#msg")).toBe(1);
-      expect(await count("#meter")).toBe(1);
-      expect([...toolbar.errors, ...status.errors]).toEqual([]);
+      expect(await count(opened, "#msg")).toBe(1);
+      expect(await count(opened, "#meter")).toBe(1);
+      expect(opened.flatMap(({ errors }) => errors)).toEqual([]);
     });
 
     test("each control sends its command", async ({ browser }) => {
-      for (const [view, state] of [["toolbar", TOOLBAR_STATE], ["status", STATUS_STATE]]) {
-        const { page, errors } = await open(browser, mode, view, state);
+      for (const view of viewsOf(mode)) {
+        const { page, errors } = await open(browser, mode, view);
         let seq = 1;
         for (const [selector, command, arg] of await commandsOf(page)) {
+          if (!(await page.locator(selector).isVisible())) continue;
           await page.click(selector);
           seq += 1;
           await expect(page).toHaveTitle(`lantern|${seq}|${command}|${encodeURIComponent(arg)}`);
         }
-        if ((await page.locator("#url").count()) > 0) {
+        if ((await page.locator("#url").count()) > 0 && (await page.locator("#url").isVisible())) {
           await page.fill("#url", "rust lang|x");
           await page.press("#url", "Enter");
           seq += 1;
@@ -99,7 +139,8 @@ for (const mode of MODES) {
         await page.evaluate(() => window.lantern.update({ canBack: false, canFwd: false, loading: false }));
         const before = await page.title();
         for (const id of ["back", "forward", "stop"]) {
-          if ((await page.locator(`#${id}`).count()) > 0) await page.click(`#${id}`);
+          const el = page.locator(`#${id}`);
+          if ((await el.count()) > 0 && (await el.isVisible())) await el.click();
         }
         expect(await page.title()).toBe(before);
         expect(errors).toEqual([]);
@@ -107,15 +148,16 @@ for (const mode of MODES) {
     });
 
     test("state from lantern.update shows", async ({ browser }) => {
-      const toolbar = await open(browser, mode, "toolbar", TOOLBAR_STATE);
-      await expect(toolbar.page.locator("#url")).toHaveValue(TOOLBAR_STATE.url);
-      if ((await toolbar.page.locator("#title").count()) > 0) {
-        // Titles are text, never markup.
-        await expect(toolbar.page.locator("#title")).toHaveText(TOOLBAR_STATE.title);
-        await expect(toolbar.page.locator("#title b")).toHaveCount(0);
-      }
-      const status = await open(browser, mode, "status", STATUS_STATE);
-      for (const page of [toolbar.page, status.page]) {
+      const opened = await openAll(browser, mode);
+      for (const { page } of opened) {
+        if ((await page.locator("#url").count()) > 0) {
+          await expect(page.locator("#url")).toHaveValue(TOOLBAR_STATE.url);
+        }
+        if ((await page.locator("#title").count()) > 0) {
+          // Titles are text, never markup.
+          await expect(page.locator("#title")).toHaveText(TOOLBAR_STATE.title);
+          await expect(page.locator("#title b")).toHaveCount(0);
+        }
         if ((await page.locator("#msg").count()) > 0) {
           await expect(page.locator("#msg")).toHaveText(STATUS_STATE.text);
         }
@@ -126,15 +168,17 @@ for (const mode of MODES) {
         }
       }
       if (mode.key === "lantern") return;
-      for (const page of [toolbar.page, status.page]) await page.mouse.move(0, 0);
-      await expect(toolbar.page).toHaveScreenshot(`toolbar-${mode.key}.png`);
-      await expect(status.page).toHaveScreenshot(`status-${mode.key}.png`);
-      await toolbar.page.evaluate(() =>
-        window.lantern.update({ url: "", title: "", canBack: false, canFwd: false, loading: false, secure: false }));
-      await status.page.evaluate(() =>
-        window.lantern.update({ text: "Done.", progress: 1, loading: false, modem: "", secure: false, canBack: false, canFwd: false }));
-      await expect(toolbar.page).toHaveScreenshot(`toolbar-${mode.key}-idle.png`);
-      await expect(status.page).toHaveScreenshot(`status-${mode.key}-idle.png`);
+      for (const { view, page } of opened) {
+        await page.mouse.move(0, 0);
+        await expect(page).toHaveScreenshot(`${view}-${mode.key}.png`);
+      }
+      for (const { view, page } of opened) {
+        await page.evaluate(() => {
+          window.lantern.update({ url: "", title: "", canBack: false, canFwd: false, loading: false, secure: false });
+          window.lantern.update({ text: "Done.", progress: 1, loading: false, modem: "", secure: false, canBack: false, canFwd: false });
+        });
+        await expect(page).toHaveScreenshot(`${view}-${mode.key}-idle.png`);
+      }
     });
   });
 }
