@@ -1,12 +1,12 @@
 //! Retro looks: restyle every page in the content view like a 1990s site (a
 //! GeoCities homepage, the early web of 1995, a '97 web portal), plus an optional
 //! Flash-style splash intro, by running `ui/retro/*.js` in its frames. The
-//! toolbar's Retro button opens a native menu to pick them.
+//! toolbar's Retro button opens a native menu to pick them (`menus.rs`).
 
 use super::{
-    commands, settings,
+    settings,
     settings::RetroStyle,
-    state::{content_browser, defer, push_toolbar, set_notice, with_shell},
+    state::{content_browser, push_toolbar, set_notice, with_shell},
     util::{js_string, url_host},
 };
 use cef::*;
@@ -170,42 +170,8 @@ pub fn set_splash(on: bool) {
     });
 }
 
-// Menu command ids: one per style, then the extras.
-const STYLE_COMMAND: i32 = 100;
-const SPLASH_COMMAND: i32 = 200;
-const SETTINGS_COMMAND: i32 = 201;
-
-fn run_menu_command(id: i32) {
-    if let Some(style) = usize::try_from(id - STYLE_COMMAND)
-        .ok()
-        .and_then(|i| RetroStyle::ALL.get(i))
-    {
-        set_style(*style);
-    } else if id == SPLASH_COMMAND {
-        set_splash(!with_shell(|shell| shell.settings.splash_intro));
-    } else if id == SETTINGS_COMMAND {
-        commands::show_settings(false);
-    }
-}
-
-wrap_menu_model_delegate! {
-    struct RetroMenuDelegate;
-
-    impl MenuModelDelegate {
-        fn execute_command(
-            &self,
-            _menu_model: Option<&mut MenuModel>,
-            command_id: ::std::os::raw::c_int,
-            _event_flags: EventFlags,
-        ) {
-            // Run after the menu has closed, outside its callback.
-            defer(move || run_menu_command(command_id));
-        }
-    }
-}
-
-/// Parse the toolbar's "x,y" anchor (CSS pixels in the toolbar view).
-fn parse_point(arg: &str) -> Point {
+/// Parse a chrome page's "x,y" menu anchor (CSS pixels in its view).
+pub(super) fn parse_point(arg: &str) -> Point {
     let mut parts = arg
         .split(',')
         .map(|n| n.trim().parse::<f64>().unwrap_or(0.0) as i32);
@@ -213,43 +179,6 @@ fn parse_point(arg: &str) -> Point {
         x: parts.next().unwrap_or(0),
         y: parts.next().unwrap_or(0),
     }
-}
-
-/// Show the Retro menu under the toolbar button. `arg` is the button's
-/// bottom-left corner, "x,y", in toolbar coordinates. A native menu, because
-/// an HTML one would be clipped to the toolbar view's height.
-pub fn show_menu(arg: &str) {
-    let (window, toolbar, current) =
-        with_shell(|shell| (shell.window.clone(), shell.toolbar.clone(), shell.settings));
-    let (Some(window), Some(mut toolbar)) = (window, toolbar) else {
-        return;
-    };
-    let mut delegate = RetroMenuDelegate::new();
-    let Some(mut menu) = menu_model_create(Some(&mut delegate)) else {
-        return;
-    };
-    for (i, style) in RetroStyle::ALL.into_iter().enumerate() {
-        let id = STYLE_COMMAND + i as i32;
-        menu.add_radio_item(id, Some(&CefString::from(style.name())), 1);
-        menu.set_checked(id, (current.retro_style == style).into());
-    }
-    menu.add_separator();
-    menu.add_check_item(
-        SPLASH_COMMAND,
-        Some(&CefString::from("Flash-style splash intro")),
-    );
-    menu.set_checked(SPLASH_COMMAND, current.splash_intro.into());
-    menu.add_separator();
-    menu.add_item(
-        SETTINGS_COMMAND,
-        Some(&CefString::from("Retro settings\u{2026}")),
-    );
-
-    let mut point = parse_point(arg);
-    if let Some(view) = browser_view_get_for_browser(Some(&mut toolbar)) {
-        view.convert_point_to_screen(Some(&mut point));
-    }
-    window.show_menu(Some(&mut menu), Some(&point), MenuAnchorPosition::TOPLEFT);
 }
 
 #[cfg(test)]

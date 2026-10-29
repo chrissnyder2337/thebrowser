@@ -93,6 +93,24 @@ The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `lantern:bookmarks`, `lantern:settings` and `lantern:about` open the internal pages. Clicking the
 lantern opens the About page.
 
+### Browser UI modes
+
+The toolbar and status bar can take on the layout of other 1990s browsers.
+Pick one from **Retro ▾ → Browser UI**, from a mode's **Options** menu, or
+press **Ctrl+Shift+M** (**Cmd+Shift+M** on a Mac) in any mode. `--ui=<mode>`
+picks one for a single run. More modes are on the way: see
+[docs/ui-modes/](docs/ui-modes/).
+
+- **Lantern (default)**: Lantern's own toolbar.
+- **Workstation (1993)**: a Motif menu bar, Document Title and Document URL
+  fields, and a row of text buttons under the page, modelled on NCSA Mosaic
+  for X.
+
+![Workstation (1993) mode showing a Wikipedia article](docs/ui-workstation-1993.png)
+
+Product names are trademarks of their owners. Lantern isn't affiliated with
+or endorsed by them; its icons and artwork are its own.
+
 ### Dial-up simulator
 
 Lantern can make the Web feel like 1998 again. Open **Settings** by clicking the

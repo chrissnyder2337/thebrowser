@@ -1,13 +1,14 @@
 //! The top-level window and the three browser view delegates.
 
-use super::state::{Role, with_shell};
+use super::{
+    state::{Role, with_shell},
+    ui_mode,
+};
 use cef::*;
 use std::cell::RefCell;
 
 /// Window face gray (ARGB).
 pub const FACE_GRAY: u32 = 0xFFC0C0C0;
-pub const TOOLBAR_HEIGHT: i32 = 112;
-pub const STATUS_HEIGHT: i32 = 24;
 
 wrap_window_delegate! {
     pub struct LanternWindowDelegate {
@@ -20,7 +21,8 @@ wrap_window_delegate! {
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
-            Size { width: 520, height: TOOLBAR_HEIGHT + STATUS_HEIGHT + 120 }
+            let (toolbar, status) = ui_mode::current_heights();
+            Size { width: 520, height: toolbar + status + 120 }
         }
     }
 
@@ -131,18 +133,21 @@ wrap_browser_view_delegate! {
     }
 
     impl ViewDelegate {
+        // Chrome heights follow the UI mode (ui_mode::apply relayouts).
         fn preferred_size(&self, _view: Option<&mut View>) -> Size {
+            let (toolbar, status) = ui_mode::current_heights();
             match self.role {
-                Role::Toolbar => Size { width: 800, height: TOOLBAR_HEIGHT },
-                Role::Status => Size { width: 800, height: STATUS_HEIGHT },
+                Role::Toolbar => Size { width: 800, height: toolbar },
+                Role::Status => Size { width: 800, height: status },
                 Role::Content => Size { width: 800, height: 600 },
             }
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
+            let (toolbar, status) = ui_mode::current_heights();
             match self.role {
-                Role::Toolbar => Size { width: 0, height: TOOLBAR_HEIGHT },
-                Role::Status => Size { width: 0, height: STATUS_HEIGHT },
+                Role::Toolbar => Size { width: 0, height: toolbar },
+                Role::Status => Size { width: 0, height: status },
                 Role::Content => Size { width: 0, height: 0 },
             }
         }

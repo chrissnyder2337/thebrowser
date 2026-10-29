@@ -19,18 +19,18 @@ Update the tables below in the same commit as the work they describe.
 | 1. Shared controller | `ui/chrome/chrome.js`; Lantern's pages move to `ui/chrome/lantern/`, unchanged on screen | Done |
 | 2. Branding rule | Faithful layouts and ordinary wording allowed; names and artwork never (steward skill) | Done |
 | 3. Mode setting | `UiMode` in `settings.rs`, saved as `ui_mode` | Done |
-| 4. Switching | `--ui=`, runtime switch and relayout, the lockdown change, native menus (`menu` command), Browser UI submenu, Ctrl+Shift+U | In progress |
-| 5. First mode | `workstation-1993`, with contract tests and goldens | In progress |
+| 4. Switching | `--ui=`, runtime switch and relayout, the lockdown change, native menus (`menu` command), Browser UI submenu, Ctrl+Shift+M | Done |
+| 5. First mode | `workstation-1993`, with contract tests and goldens | Done |
 | 6. Settings page | A Browser UI section; needs the maintainer to approve new settings goldens | Not started |
 | 7. Layout extras | Hidden views, chrome below the page, inset border, content zoom (the TV modes) | Not started |
-| 8. More modes | See below | Not started |
+| 8. More modes | See below; next: `toolbar-1996`, `desktop-1996`, `applet-1997` | Not started |
 
 ## Modes
 
 | Key | Name | Modelled on | Needs | Status |
 |---|---|---|---|---|
 | `lantern` | Lantern (default) | — | — | Shipped |
-| `workstation-1993` | Workstation (1993) | NCSA Mosaic for X 1.x–2.6 | menus | In progress |
+| `workstation-1993` | Workstation (1993) | NCSA Mosaic for X 1.x–2.6 | menus | Built (not yet merged) |
 | `workstation-1996` | Workstation (1996) | NCSA Mosaic for X 2.7 | icons | Planned |
 | `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Planned |
 | `desktop-1995` | Desktop (1995) | Internet Explorer 2 | icons | Planned |

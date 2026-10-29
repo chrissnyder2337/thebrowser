@@ -1,7 +1,9 @@
 //! Writes Lantern's chrome pages (toolbar, status bar) and internal pages
 //! (home, bookmarks, about, settings, error) to `<dir>/*.html`, and the script
 //! Lantern runs for each retro look to `<dir>/retro-<look>.js`, so the
-//! Playwright suite in tests/web can use them without CEF.
+//! Playwright suite in tests/web can use them without CEF. Every UI mode's
+//! chrome pages go to `toolbar-<mode>.html` and `status-<mode>.html`, with
+//! the modes' keys and view heights in `ui-modes.json`.
 //!
 //! Usage: `LD_LIBRARY_PATH="$CEF_PATH" cargo run --example dump-pages -- <dir>`
 //!
@@ -20,8 +22,9 @@ mod mac;
 use shell::{
     bookmarks::Bookmark,
     pages, retro,
-    settings::{RetroStyle, Settings},
-    util::percent_decode,
+    settings::{RetroStyle, Settings, UiMode},
+    ui_mode,
+    util::{Json, percent_decode},
 };
 use std::{fs, path::PathBuf, process::ExitCode};
 
@@ -67,17 +70,23 @@ fn main() -> ExitCode {
         ),
     ];
     let settings = Settings::default();
-    let pages = [
-        ("toolbar", pages::toolbar_uri()),
-        ("status", pages::status_uri()),
-        ("home", pages::home_uri(&bookmarks)),
-        ("home-empty", pages::home_uri(&[])),
-        ("bookmarks", pages::bookmarks_uri(&bookmarks)),
-        ("about", pages::about_uri("/home/user/.config/lantern")),
-        ("settings", pages::settings_uri(&settings, false)),
-        ("settings-saved", pages::settings_uri(&settings, true)),
+    let mut pages = vec![
+        ("toolbar".to_owned(), pages::toolbar_uri(UiMode::Lantern)),
+        ("status".to_owned(), pages::status_uri(UiMode::Lantern)),
+        ("home".to_owned(), pages::home_uri(&bookmarks)),
+        ("home-empty".to_owned(), pages::home_uri(&[])),
+        ("bookmarks".to_owned(), pages::bookmarks_uri(&bookmarks)),
         (
-            "error",
+            "about".to_owned(),
+            pages::about_uri("/home/user/.config/lantern"),
+        ),
+        ("settings".to_owned(), pages::settings_uri(&settings, false)),
+        (
+            "settings-saved".to_owned(),
+            pages::settings_uri(&settings, true),
+        ),
+        (
+            "error".to_owned(),
             pages::error_uri(
                 "https://no-such-host.invalid/<x>",
                 -105,
@@ -85,6 +94,19 @@ fn main() -> ExitCode {
             ),
         ),
     ];
+    let mut modes = vec![];
+    for mode in UiMode::ALL {
+        let key = mode.key();
+        pages.push((format!("toolbar-{key}"), pages::toolbar_uri(mode)));
+        pages.push((format!("status-{key}"), pages::status_uri(mode)));
+        let (toolbar, status) = ui_mode::heights(mode);
+        modes.push(Json::Obj(vec![
+            ("key", Json::str(key)),
+            ("name", Json::str(mode.name())),
+            ("toolbarHeight", Json::Num(f64::from(toolbar))),
+            ("statusHeight", Json::Num(f64::from(status))),
+        ]));
+    }
     let (cef, chromium) = pages::cef_versions();
     let mut fixed = vec![
         (env!("CARGO_PKG_VERSION").to_owned(), "X.Y.Z"),
@@ -114,6 +136,12 @@ fn main() -> ExitCode {
         }
         println!("{}", path.display());
     }
+    let path = dir.join("ui-modes.json");
+    if let Err(err) = fs::write(&path, Json::Arr(modes).render()) {
+        eprintln!("dump-pages: {}: {err}", path.display());
+        return ExitCode::FAILURE;
+    }
+    println!("{}", path.display());
     for style in RetroStyle::ALL {
         let path = dir.join(format!("retro-{}.js", style.key()));
         if let Err(err) = fs::write(&path, retro::style_script(style)) {

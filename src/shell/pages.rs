@@ -4,7 +4,7 @@
 use super::{
     art::{with_icons, with_lantern},
     bookmarks::Bookmark,
-    settings::{DialupMode, ModemSpeed, RetroStyle, Settings},
+    settings::{DialupMode, ModemSpeed, RetroStyle, Settings, UiMode},
     util::{encode_component, get_data_uri, html_escape, truncate},
 };
 use std::fmt::Write;
@@ -19,6 +19,10 @@ pub const ACTION_HOST: &str = "lantern.invalid";
 
 const TOOLBAR_HTML: &str = include_str!("../../ui/chrome/lantern/toolbar.html");
 const STATUS_HTML: &str = include_str!("../../ui/chrome/lantern/status.html");
+const WORKSTATION_1993_TOOLBAR_HTML: &str =
+    include_str!("../../ui/chrome/workstation-1993/toolbar.html");
+const WORKSTATION_1993_STATUS_HTML: &str =
+    include_str!("../../ui/chrome/workstation-1993/status.html");
 /// The controller every chrome page shares (title channel, `lantern.update`).
 const CHROME_JS: &str = include_str!("../../ui/chrome/chrome.js");
 const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
@@ -89,7 +93,31 @@ fn common_vars() -> Vec<(&'static str, String)> {
     ]
 }
 
-pub fn toolbar_uri() -> String {
+/// A UI mode's toolbar and status bar templates (`ui/chrome/<mode>/`).
+fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
+    match mode {
+        UiMode::Lantern => (TOOLBAR_HTML, STATUS_HTML),
+        UiMode::Workstation1993 => (WORKSTATION_1993_TOOLBAR_HTML, WORKSTATION_1993_STATUS_HTML),
+    }
+}
+
+/// Whether a chrome view (toolbar or status bar) may navigate to `url`: only
+/// to an HTML `data:` page, and only its first page, a reload of the current
+/// one, or exactly the page Rust built for it in the current UI mode
+/// (`expected`, built only when needed). Web content can't produce that URI.
+pub fn chrome_navigation_allowed(
+    url: &str,
+    current: &str,
+    expected: impl FnOnce() -> String,
+) -> bool {
+    if !url.starts_with("data:text/html") {
+        return false;
+    }
+    let initial = current.is_empty() || current == "about:blank";
+    initial || url == current || url == expected()
+}
+
+pub fn toolbar_uri(mode: UiMode) -> String {
     let mut vars = vec![];
     with_icons(|sheet| {
         for name in [
@@ -123,10 +151,10 @@ pub fn toolbar_uri() -> String {
         ));
     });
     let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
-    html_uri(&fill(TOOLBAR_HTML, &vars))
+    html_uri(&fill(chrome_templates(mode).0, &vars))
 }
 
-pub fn status_uri() -> String {
+pub fn status_uri(mode: UiMode) -> String {
     let (lock, modem) = with_icons(|sheet| {
         (
             sheet.svg("lock", 1, "lock"),
@@ -138,7 +166,7 @@ pub fn status_uri() -> String {
         )
     });
     html_uri(&fill(
-        STATUS_HTML,
+        chrome_templates(mode).1,
         &[
             ("ICON_LOCK", lock),
             ("ICON_MODEM", modem),
@@ -428,6 +456,56 @@ mod tests {
             action_url("delete", "https://a/?q=1&r=2"),
             "https://lantern.invalid/delete?url=https%3A%2F%2Fa%2F%3Fq%3D1%26r%3D2"
         );
+    }
+
+    #[test]
+    fn every_ui_mode_has_its_chrome_pages() {
+        for mode in UiMode::ALL {
+            for uri in [toolbar_uri(mode), status_uri(mode)] {
+                assert!(uri.starts_with("data:text/html;base64,"), "{mode:?}");
+            }
+            let (toolbar, status) = chrome_templates(mode);
+            for template in [toolbar, status] {
+                assert!(template.contains("{{CHROME_JS}}"), "{mode:?}");
+            }
+        }
+        assert_ne!(
+            toolbar_uri(UiMode::Lantern),
+            toolbar_uri(UiMode::Workstation1993)
+        );
+    }
+
+    #[test]
+    fn chrome_views_only_load_their_own_page() {
+        let page = "data:text/html;base64,AAAA";
+        let other = "data:text/html;base64,BBBB";
+        let expected = || other.to_owned();
+        // The first page, a reload, and the current mode's page.
+        assert!(chrome_navigation_allowed(page, "", expected));
+        assert!(chrome_navigation_allowed(page, "about:blank", expected));
+        assert!(chrome_navigation_allowed(page, page, expected));
+        assert!(chrome_navigation_allowed(other, page, expected));
+        // Anything else, including another data: page or a web page.
+        assert!(!chrome_navigation_allowed(
+            "data:text/html;base64,CCCC",
+            page,
+            expected
+        ));
+        assert!(!chrome_navigation_allowed(
+            "https://example.com/",
+            "",
+            expected
+        ));
+        assert!(!chrome_navigation_allowed(
+            "data:image/svg+xml;base64,AAAA",
+            "",
+            expected
+        ));
+        assert!(!chrome_navigation_allowed(
+            "https://lantern.invalid/home",
+            page,
+            expected
+        ));
     }
 
     #[test]

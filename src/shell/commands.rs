@@ -2,7 +2,7 @@
 //! the navigation helpers they share.
 
 use super::{
-    bookmarks, dialup,
+    bookmarks, dialup, menus,
     pages::{self, ACTION_HOST},
     retro, settings,
     state::{
@@ -49,15 +49,34 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
             with_shell(|shell| shell.status_ready = true);
             push_status();
         }
-        (Role::Toolbar, name) => run_toolbar_command(name, &command.arg),
-        // Clicking the modem pane in the status bar.
-        (Role::Status, "settings") => show_settings(false),
+        (Role::Toolbar, name) => run_chrome_command(role, name, &command.arg),
+        // Some UI modes put navigation buttons under the page
+        // (ui/chrome/<mode>/status.html), but the status bar can't navigate
+        // to an address or open menus.
+        (Role::Status, name) if STATUS_COMMANDS.contains(&name) => {
+            run_chrome_command(role, name, &command.arg)
+        }
+        (Role::Status, name) => eprintln!("lantern: not a status bar command {name:?}"),
         _ => {}
     }
     true
 }
 
-fn run_toolbar_command(name: &str, arg: &str) {
+/// The commands the status bar may send.
+const STATUS_COMMANDS: [&str; 10] = [
+    "back",
+    "forward",
+    "reload",
+    "stop",
+    "home",
+    "search",
+    "bookmarks",
+    "bookmark-add",
+    "focus-url",
+    "settings",
+];
+
+fn run_chrome_command(role: Role, name: &str, arg: &str) {
     match name {
         "back" => go_back(),
         "forward" => go_forward(),
@@ -70,8 +89,12 @@ fn run_toolbar_command(name: &str, arg: &str) {
         "bookmark-add" => add_bookmark(),
         "bookmarks" => show_bookmarks(),
         "about" => show_about(),
-        "retro-menu" => retro::show_menu(arg),
-        _ => eprintln!("lantern: unknown toolbar command {name:?}"),
+        "retro-menu" => menus::show_retro(arg),
+        "menu" => menus::show(role, arg),
+        "focus-url" => focus_url_bar(),
+        // The modem pane in the status bar.
+        "settings" => show_settings(false),
+        _ => eprintln!("lantern: unknown chrome command {name:?}"),
     }
 }
 

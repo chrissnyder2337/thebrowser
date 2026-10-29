@@ -74,6 +74,8 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
   [Retro looks](../README.md#retro-looks)):
   `geocities`, `early-web`, `portal` or `off`. `--geocities` is short for
   `--retro=geocities`.
+- `--ui=<mode>`: use a browser UI mode for this run without saving it (see
+  [docs/ui-modes/](ui-modes/)): `lantern` or `workstation-1993`.
 - `--self-test=<file>`: once the first page has loaded (or failed), write its
   URL, title and load status to `<file>` as `key=value` lines and quit. For
   `tests/smoke.sh`.

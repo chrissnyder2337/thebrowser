@@ -152,12 +152,16 @@ impl Shell {
             ("bookmarks", Json::Arr(quick)),
             ("retro", Json::str(self.settings.retro_style.key())),
             ("retroName", Json::str(self.settings.retro_style.name())),
+            ("title", Json::str(self.page_title())),
         ])
         .render()
     }
 
     fn status_json(&self) -> String {
         Json::Obj(vec![
+            // For UI modes with navigation buttons under the page.
+            ("canBack", Json::Bool(self.can_back)),
+            ("canFwd", Json::Bool(self.can_fwd)),
             ("text", Json::str(self.status_text())),
             ("progress", Json::Num(self.progress.clamp(0.0, 1.0))),
             ("loading", Json::Bool(self.is_loading)),
@@ -189,13 +193,21 @@ impl Shell {
         }
     }
 
+    /// The content page's title, for modes that show it in a field.
+    fn page_title(&self) -> &str {
+        let title = self.current_title.trim();
+        if title.starts_with("data:") {
+            ""
+        } else {
+            title
+        }
+    }
+
     /// Window title for the current content title.
     pub fn window_title(&self) -> String {
-        let title = self.current_title.trim();
-        if title.is_empty() || title.starts_with("data:") {
-            "Lantern".to_owned()
-        } else {
-            format!("{title} - Lantern")
+        match self.page_title() {
+            "" => "Lantern".to_owned(),
+            title => format!("{title} - Lantern"),
         }
     }
 }
@@ -214,6 +226,18 @@ pub fn push_toolbar() {
     let target = with_shell(|shell| {
         let browser = shell.toolbar.clone()?;
         shell.toolbar_ready.then(|| (browser, shell.toolbar_json()))
+    });
+    if let Some((browser, json)) = target {
+        exec_js(&browser, &format!("window.lantern&&lantern.update({json})"));
+    }
+}
+
+/// Push just the content page's title to the toolbar (modes that show it).
+pub fn push_title() {
+    let target = with_shell(|shell| {
+        let browser = shell.toolbar.clone()?;
+        let json = Json::Obj(vec![("title", Json::str(shell.page_title()))]).render();
+        shell.toolbar_ready.then_some((browser, json))
     });
     if let Some((browser, json)) = target {
         exec_js(&browser, &format!("window.lantern&&lantern.update({json})"));

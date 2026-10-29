@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Workstation (1993): a Motif menu bar over Document Title and Document URL
+     fields, with the activity box to their right (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #b3b3b3;
+    --up: inset 2px 2px #e4e4e4, inset -2px -2px #5a5a5a;
+    --down: inset 2px 2px #5a5a5a, inset -2px -2px #e4e4e4;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: bold 13px Helvetica, "Helvetica Neue", Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; box-shadow: inset 2px 2px #e4e4e4, inset -2px 0 #5a5a5a; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar {
+    height: 30px; flex: none; display: flex; align-items: center; padding: 0 6px;
+    border-bottom: 2px solid #5a5a5a; box-shadow: 0 1px #e4e4e4;
+  }
+  .menu { height: 24px; padding: 0 9px; font-style: italic; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--up); }
+  .menu:active { box-shadow: var(--down); }
+  #help { margin-left: auto; }
+
+  /* ---- Title and URL fields ---- */
+  #rows { flex: 1; display: flex; align-items: center; gap: 12px; padding: 0 8px; min-height: 0; }
+  #fields { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .lab { width: 124px; flex: none; text-align: right; color: #191970; white-space: nowrap; }
+  .fld {
+    flex: 1; min-width: 0; height: 26px; padding: 4px 8px; position: relative;
+    background: var(--face); box-shadow: var(--down);
+    font: 14px Courier, "Courier New", monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #url {
+    width: 100%; height: 18px; border: 0; padding: 0; margin: 0; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #191970; color: #fff; }
+  .fld svg.lock { display: none; position: absolute; right: 6px; top: 5px; }
+  #field.secure { padding-right: 26px; }
+  #field.secure svg.lock { display: block; }
+
+  /* ---- Activity box ---- */
+  #throbber { width: 64px; height: 64px; flex: none; display: flex; align-items: center; justify-content: center; }
+  #throbber:active { box-shadow: var(--down); }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+    <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu"><u>N</u>avigate</button>
+    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings"><u>O</u>ptions</button>
+    <button class="menu" id="help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+  </div>
+  <div id="rows">
+    <div id="fields">
+      <div class="row"><span class="lab">Document Title:</span><div class="fld" id="title"></div></div>
+      <div class="row">
+        <label class="lab" for="url">Document URL:</label>
+        <div class="fld" id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}</div>
+      </div>
+    </div>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

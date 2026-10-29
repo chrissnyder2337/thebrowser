@@ -118,7 +118,7 @@ that URI, and the views still never open popups. This is a tier-2 change.
 
 ### Shortcut
 
-**Ctrl+Shift+U** (Cmd+Shift+U on macOS) opens the Browser UI menu at the top
+**Ctrl+Shift+M** (Cmd+Shift+M on macOS) opens the Browser UI menu at the top
 left of the window, so no mode can strand the user.
 
 ### The settings page

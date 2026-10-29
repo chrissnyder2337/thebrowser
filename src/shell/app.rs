@@ -2,7 +2,7 @@
 
 use super::{
     bookmarks, client, commands, pages, selftest,
-    settings::{self, RetroStyle},
+    settings::{self, RetroStyle, UiMode},
     state::{Role, with_shell},
     util::normalize_url_input,
     window::{FACE_GRAY, LanternBrowserViewDelegate, LanternWindowDelegate},
@@ -78,6 +78,10 @@ wrap_browser_process_handler! {
                 if let Some(style) = style {
                     user_settings.retro_style = style;
                 }
+                // --ui=<mode> picks a UI mode for this run the same way.
+                if let Some(mode) = switch_value(command_line, "ui").and_then(|key| UiMode::from_key(&key)) {
+                    user_settings.ui_mode = mode;
+                }
                 // --self-test=<file> reports the first load to <file> and quits.
                 if let Some(path) = switch_value(command_line, "self-test") {
                     selftest::enable(path.into());
@@ -87,6 +91,7 @@ wrap_browser_process_handler! {
                 shell.bookmarks = list.clone();
                 shell.settings = user_settings;
             });
+            super::ui_mode::use_heights(user_settings.ui_mode);
 
             // The content view starts on the home page unless --url= was given.
             let start = command_line.as_ref().and_then(url_switch);
@@ -105,9 +110,9 @@ wrap_browser_process_handler! {
             };
 
             let views: Vec<(Role, BrowserView)> = [
-                (Role::Toolbar, pages::toolbar_uri()),
+                (Role::Toolbar, pages::toolbar_uri(user_settings.ui_mode)),
                 (Role::Content, content_url),
-                (Role::Status, pages::status_uri()),
+                (Role::Status, pages::status_uri(user_settings.ui_mode)),
             ]
             .into_iter()
             .filter_map(|(role, url)| create_browser_view(role, &url).map(|view| (role, view)))
