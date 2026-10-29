@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Frame</title>
+<!-- Classic desktop (1992): the document window's title bar, black
+     pinstripes with a close box and the page title in a white box. -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #fff; color: #000;
+    font: bold 13px/1 Chicago, ChicagoFLF, Charcoal, Geneva, sans-serif; letter-spacing: .5px;
+    cursor: default;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center; position: relative;
+    border-bottom: 1px solid #000;
+  }
+  body::before {
+    content: ""; position: absolute; inset: 4px 0;
+    background: repeating-linear-gradient(#000 0 1px, #fff 1px 2px);
+  }
+  #close {
+    position: absolute; left: 8px; top: 4px; width: 13px; height: 11px;
+    background: #fff; border: solid #000; border-width: 1px 2px 2px 1px; box-shadow: 0 0 0 1px #fff;
+  }
+  #close:active { background: #000; }
+  #title {
+    max-width: 70%; height: 16px; line-height: 16px; padding: 0 6px; margin-bottom: 1px; position: relative;
+    background: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+</style>
+</head>
+<body>
+  <button id="close" data-cmd="close-window" title="Close window" aria-label="Close window"></button>
+  <div id="title"></div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+# The menu bar of a Macintosh browser, 1994.
+menu File
+- New Window
+open-url Open URL...
+- Open Local...
+---
+close-window Close
+- Save As...
+---
+- Page Setup...
+print Print...
+---
+- Quit
+menu Edit
+- Undo
+---
+- Cut
+- Copy
+- Paste
+- Clear
+---
+- Select All
+---
+- Find...
+menu Options
+- Load Images
+- Show Status Messages
+- Show Link URLs
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu Navigate
+back Back
+forward Forward
+home Home
+reload Reload
+---
+- History...
+menu Annotate
+- Annotate...
+---
+- Edit This Annotation...
+- Delete This Annotation...
+menu Hotlist
+add-bookmark Add This Document
+bookmarks Edit Hotlist...
+---
+- Open Hotlist...

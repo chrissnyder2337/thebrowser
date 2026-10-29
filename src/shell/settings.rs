@@ -188,10 +188,16 @@ pub enum UiMode {
     /// A desktop browser at the end of the decade: a menu band with a small
     /// activity box, flat buttons, and an Address band with Go.
     Desktop1999,
+    /// A one-bit desktop browser: the menu bar across the top, a document
+    /// window with a striped title bar, navigation in the menus.
+    Classic1992,
+    /// A desktop browser in a document window: the menu bar across the top,
+    /// and the activity box, buttons and Link field inside the window.
+    Classic1994,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 13] = [
+    pub const ALL: [Self; 15] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -205,6 +211,8 @@ impl UiMode {
         Self::Suite1997,
         Self::Desktop1997,
         Self::Desktop1999,
+        Self::Classic1992,
+        Self::Classic1994,
     ];
 
     pub fn key(self) -> &'static str {
@@ -222,6 +230,8 @@ impl UiMode {
             Self::Suite1997 => "suite-1997",
             Self::Desktop1997 => "desktop-1997",
             Self::Desktop1999 => "desktop-1999",
+            Self::Classic1992 => "classic-1992",
+            Self::Classic1994 => "classic-1994",
         }
     }
 
@@ -245,6 +255,8 @@ impl UiMode {
             Self::Suite1997 => "Suite (1997)",
             Self::Desktop1997 => "Desktop (1997)",
             Self::Desktop1999 => "Desktop (1999)",
+            Self::Classic1992 => "Classic desktop (1992)",
+            Self::Classic1994 => "Classic desktop (1994)",
         }
     }
 
@@ -270,6 +282,8 @@ impl UiMode {
             Self::Suite1997 => RetroStyle::Portal,
             Self::Desktop1997 => RetroStyle::Off,
             Self::Desktop1999 => RetroStyle::Off,
+            Self::Classic1992 => RetroStyle::EarlyWeb,
+            Self::Classic1994 => RetroStyle::EarlyWeb,
         }
     }
 }

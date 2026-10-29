@@ -106,6 +106,8 @@ fn run_chrome_command(role: Role, name: &str, arg: &str) {
         "zoom-in" => zoom(0.5),
         "zoom-out" => zoom(-0.5),
         "fullscreen" => toggle_fullscreen(),
+        // A document window's close box (the Classic desktop modes).
+        "close-window" => super::state::close_all_browsers(false),
         _ => eprintln!("lantern: unknown chrome command {name:?}"),
     }
 }

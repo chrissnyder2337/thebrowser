@@ -38,24 +38,24 @@
 
   /* ---- Activity box: the lantern, scaled down ---- */
   #throbber {
-    width: 40px; height: 24px; flex: none; margin-right: 2px;
-    display: flex; align-items: center; justify-content: center; background: #000; box-shadow: var(--sunken);
+    width: 40px; height: 22px; flex: none; margin-right: 1px;
+    display: flex; align-items: center; justify-content: center; background: #000; box-shadow: var(--thin-down);
   }
-  #throbber svg.idle { width: 14px; height: 21px; }
-  #throbber .lit-box { width: 14px; height: 21px; overflow: hidden; display: none; }
-  #throbber svg.lit { width: 56px; height: 21px; animation: flicker 0.6s steps(4) infinite; }
+  #throbber svg.idle { width: 14px; height: 20px; }
+  #throbber .lit-box { width: 14px; height: 20px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 56px; height: 20px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-56px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
 
   /* ---- Bands ---- */
   .band { display: flex; align-items: center; min-width: 0; padding: 0 3px 0 0; border-bottom: 1px solid #808080; box-shadow: 0 1px #fff; }
-  #std { height: 42px; flex: none; }
-  #addrband { height: 26px; flex: none; position: relative; }
+  #std { height: 46px; flex: none; }
+  #addrband { height: 28px; flex: none; position: relative; }
 
   /* ---- Flat buttons with labels ---- */
   .fb {
-    height: 38px; min-width: 40px; flex: none; padding: 0 4px; margin: 0 1px;
+    height: 42px; min-width: 40px; position: relative; flex: none; padding: 0 4px; margin: 0 1px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid var(--face);
   }
   .fb svg { display: block; flex: none; }
@@ -67,29 +67,28 @@
   .fb.disabled { color: #808080; text-shadow: 1px 1px #fff; }
   .fb.disabled svg.on { display: none; }
   .fb.disabled svg.off { display: block; }
-  .dd::after { content: ""; border: 3px solid transparent; border-top: 3px solid currentColor; border-bottom: 0; margin-left: 1px; }
-  .sep { width: 2px; height: 32px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
+  .dd::after { content: ""; position: absolute; left: calc(50% + 12px); top: 17px; border: 3px solid transparent; border-top: 3px solid currentColor; border-bottom: 0; }
+  .sep { width: 2px; height: 36px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
 
   /* ---- Address band ---- */
   #addrband > label { flex: none; padding-right: 5px; }
   #field {
-    flex: 1; min-width: 0; height: 21px; padding: 2px; position: relative; display: flex; align-items: center;
+    flex: 1; min-width: 0; height: 22px; padding: 2px; position: relative; display: flex; align-items: center;
     background: #fff; box-shadow: var(--sunken);
   }
   #url {
-    flex: 1; min-width: 0; height: 17px; border: 0; margin: 0; padding: 1px 3px; outline: none;
+    flex: 1; min-width: 0; height: 18px; border: 0; margin: 0; padding: 1px 3px; outline: none;
     background: transparent; color: #000; font: inherit; user-select: text;
   }
   #url::selection { background: #000080; color: #fff; }
-  #field svg.lock { display: none; flex: none; margin: 0 4px 0 0; }
-  #field.secure svg.lock { display: block; }
+  #field > svg { flex: none; margin: 0 2px 0 1px; }
   #drop {
     width: 16px; height: 17px; flex: none; display: flex; align-items: center; justify-content: center;
     box-shadow: var(--raised);
   }
   #drop::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
   #drop:active { box-shadow: var(--sunken); }
-  #go { height: 21px; margin: 0 4px 0 5px; padding: 0 6px 0 4px; flex: none; display: flex; align-items: center; gap: 3px; border: 1px solid var(--face); }
+  #go { height: 22px; margin: 0 4px 0 5px; padding: 0 6px 0 4px; flex: none; display: flex; align-items: center; gap: 3px; border: 1px solid var(--face); }
   #go:hover { border-color: #fff #808080 #808080 #fff; }
   #go:active { border-color: #808080 #fff #fff #808080; }
   #go svg { display: block; }
@@ -100,7 +99,7 @@
   #linksband > label { padding: 0 2px 0 0; }
   #linksband .grip { margin-left: 4px; }
   #links {
-    display: none; position: absolute; right: 0; top: 0; height: 26px; width: 360px; max-width: 70vw; z-index: 2;
+    display: none; position: absolute; right: 0; top: 0; height: 28px; width: 360px; max-width: 70vw; z-index: 2;
     align-items: center; gap: 2px; padding: 0 4px; overflow: hidden; background: var(--face); box-shadow: var(--thin);
   }
   #linksband:hover #links, #linksband:focus-within #links { display: flex; }
@@ -147,13 +146,11 @@
     <div class="sep"></div>
     <button class="fb" id="mail" title="Mail and news">{{ICON_D99_MAIL}}<span class="dd">Mail</span></button>
     <button class="fb" id="print" data-cmd="print" title="Print this page (Ctrl+P)">{{ICON_D99_PRINT}}<span>Print</span></button>
-    <button class="fb" id="edit" title="Edit this page">{{ICON_D99_EDIT}}<span>Edit</span></button>
-    <button class="fb" id="discuss" title="Discuss this page">{{ICON_D99_DISCUSS}}<span>Discuss</span></button>
   </div>
   <div class="band" id="addrband">
     <div class="grip"></div>
     <label for="url">Address</label>
-    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
+    <div id="field">{{ICON_PAGE}}<input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)"><button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
     <button id="go" title="Go to this address (Enter)">{{ICON_D99_GO}}<span>Go</span></button>
     <div id="linksband">
       <div class="grip"></div>

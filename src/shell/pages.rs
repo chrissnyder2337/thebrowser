@@ -140,6 +140,8 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Suite1997 => mode_files!("suite-1997", menus),
         UiMode::Desktop1997 => mode_files!("desktop-1997", menus),
         UiMode::Desktop1999 => mode_files!("desktop-1999", menus),
+        UiMode::Classic1992 => mode_files!("classic-1992", menus, frame),
+        UiMode::Classic1994 => mode_files!("classic-1994", menus, frame),
     }
 }
 
@@ -406,6 +408,14 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Desktop1999 => {
             "A menu band with a small activity box, flat labelled buttons and an Address \
              band with a Go button, modelled on Internet Explorer 5."
+        }
+        UiMode::Classic1992 => {
+            "A one-bit menu bar and a document window with a striped title bar on a grey \
+             desktop, modelled on MacWWW."
+        }
+        UiMode::Classic1994 => {
+            "A menu bar over a document window holding the activity box, icon buttons and \
+             a Link field, modelled on NCSA Mosaic for the Macintosh."
         }
     }
 }

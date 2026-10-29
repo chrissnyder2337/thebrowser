@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Frame</title>
+<!-- Classic desktop (1994): the top of the document window: a pinstriped
+     title bar, the toolbar row (activity box, Back, Forward, Home, document
+     popup, Search and keyword field) and the Link row (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #ddd;
+    --up: inset 1px 1px #fff, inset -1px -1px #888;
+    --down: inset 1px 1px #888, inset -1px -1px #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Title bar ---- */
+  #tbar { height: 20px; flex: none; position: relative; background: #fff; border-bottom: 1px solid #000; }
+  #tbar::before {
+    content: ""; position: absolute; left: 4px; right: 4px; top: 3px; bottom: 3px;
+    background: repeating-linear-gradient(#000 0 1px, #fff 1px 2px);
+  }
+  #tbar .box { position: absolute; top: 4px; width: 11px; height: 11px; background: #fff; border: 1px solid #000; box-shadow: 0 0 0 2px #fff; }
+  #close { left: 9px; }
+  #zoom { right: 9px; }
+  #zoom::after { content: ""; position: absolute; left: 1px; top: 1px; width: 5px; height: 5px; border: 1px solid #000; }
+  #tcap {
+    position: absolute; left: 50%; top: 1px; height: 16px; transform: translateX(-50%);
+    max-width: calc(100% - 100px); padding: 0 10px; background: #fff;
+    font: bold 12px/16px Chicago, ChicagoFLF, Charcoal, Geneva, sans-serif;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #title { display: inline; }
+
+  /* ---- Toolbar row ---- */
+  #tools { height: 26px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 6px; }
+  #throbber { width: 24px; height: 22px; flex: none; display: flex; align-items: center; justify-content: center; margin-right: 2px; background: #fff; border: 1px solid #000; overflow: hidden; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 0.42; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  .pb {
+    flex: none; height: 22px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid #000; border-radius: 4px; box-shadow: var(--up); white-space: nowrap;
+  }
+  .pb:active:not(.disabled) { background: #aaa; box-shadow: var(--down); }
+  .pb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .ib { width: 26px; }
+  .ib svg.off, .ib.disabled svg.on { display: none; }
+  .ib.disabled svg.off { display: block; }
+  .tx { padding: 0 9px; }
+  .tx.disabled { color: #888; border-color: #888; }
+
+  #popup {
+    flex: 1; min-width: 0; height: 20px; margin: 0 4px 0 2px; position: relative; text-align: left;
+    padding: 0 22px 0 6px; background: #fff; border: 1px solid #000; box-shadow: 1px 1px #000;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #888;
+  }
+  #popup::after { content: ""; position: absolute; right: 5px; top: 7px; border: 5px solid transparent; border-top: 6px solid #000; border-bottom: 0; }
+  #search { margin-left: 4px; }
+  #kw {
+    flex: none; width: 140px; height: 20px; padding: 0 5px; text-align: left; color: #666;
+    background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #888;
+    white-space: nowrap; overflow: hidden;
+  }
+
+  /* ---- Link row ---- */
+  #linkrow { height: 18px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; border-bottom: 1px solid #000; font-size: 10px; }
+  #linkrow label { flex: none; }
+  #field { flex: 1; min-width: 0; height: 14px; display: flex; align-items: center; gap: 4px; padding: 0 3px; border: 1px solid transparent; }
+  #field:focus-within { background: #fff; border-color: #000; }
+  #url {
+    flex: 1; min-width: 0; height: 12px; border: 0; padding: 0; margin: 0; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000; color: #fff; }
+  #field svg { display: none; flex: none; }
+  #field.secure svg { display: block; }
+</style>
+</head>
+<body>
+  <div id="tbar">
+    <span class="box" id="close" title="Close"></span>
+    <span id="tcap"><span id="title"></span></span>
+    <span class="box" id="zoom"></span>
+  </div>
+  <div id="tools">
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+    <button class="pb ib disabled" id="back" data-cmd="back" title="Go back (Alt+Left)" aria-label="Back">{{ICON_C94_BACK}}</button>
+    <button class="pb ib disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)" aria-label="Forward">{{ICON_C94_FORWARD}}</button>
+    <button class="pb ib" id="home" data-cmd="home" title="Go to the start page (Alt+Home)" aria-label="Home">{{ICON_C94_HOME}}</button>
+    <button id="popup" title="Not available">History</button>
+    <button class="pb tx" id="search" data-cmd="search" title="Search the web">Search</button>
+    <button id="kw" data-cmd="search" title="Search the web">keyword</button>
+  </div>
+  <div id="linkrow">
+    <label for="url">Link:</label>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}</div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

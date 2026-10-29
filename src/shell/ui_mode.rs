@@ -63,6 +63,14 @@ impl Layout {
         }
     }
 
+    /// The same, with a frame view `height` tall right above the page.
+    const fn frame(self, height: i32) -> Self {
+        Self {
+            frame: height,
+            ..self
+        }
+    }
+
     /// The same, with a `width` line of `color` right around the page.
     const fn well(self, width: i32, color: u32) -> Self {
         Self {
@@ -103,9 +111,17 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Pc1993 => Layout::bars(54, 22),
         UiMode::Toolbar1995 => Layout::bars(114, 22),
         UiMode::Desktop1995 => Layout::bars(80, 22).inset([0, 2, 2, 2], 0xFFC0C0C0),
-        UiMode::Suite1997 => Layout::bars(130, 24),
+        UiMode::Suite1997 => Layout::bars(127, 24),
         UiMode::Desktop1997 => Layout::bars(102, 22).well(2, 0xFF808080),
-        UiMode::Desktop1999 => Layout::bars(94, 22),
+        UiMode::Desktop1999 => Layout::bars(100, 22),
+        UiMode::Classic1992 => Layout::bars(20, 20)
+            .frame(20)
+            .inset([8, 8, 8, 8], 0xFF808080)
+            .well(1, 0xFF000000),
+        UiMode::Classic1994 => Layout::bars(20, 20)
+            .frame(64)
+            .inset([6, 10, 0, 10], 0xFF848484)
+            .well(1, 0xFF000000),
     }
 }
 
@@ -165,6 +181,14 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         )),
         UiMode::Desktop1999 => Some((
             include_str!("../../ui/chrome/desktop-1999/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Classic1992 => Some((
+            include_str!("../../ui/chrome/classic-1992/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Classic1994 => Some((
+            include_str!("../../ui/chrome/classic-1994/pages.css"),
             "#ffffff",
         )),
     }

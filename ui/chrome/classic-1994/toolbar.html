@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Classic desktop (1994): the Macintosh menu bar across the top of the
+     screen. The document window under it is the frame view
+     (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #fff; color: #000;
+    font: bold 12px Chicago, ChicagoFLF, Charcoal, Geneva, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; align-items: stretch; padding-left: 8px; border-bottom: 1px solid #000; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; border-radius: 0;
+  }
+  #mark { width: 20px; flex: none; display: flex; align-items: center; justify-content: center; margin-right: 4px; }
+  #mark svg { display: block; }
+  .menu { height: 19px; padding: 0 9px; white-space: nowrap; line-height: 19px; }
+  .menu:hover, .menu:active, .menu:focus-visible { background: #000; color: #fff; }
+</style>
+</head>
+<body>
+  <span id="mark"><svg width="11" height="13" viewBox="0 0 11 13" shape-rendering="crispEdges"><path d="M5.5 0 L11 6.5 L5.5 13 L0 6.5 Z" fill="#000"/><path d="M5.5 3 L8 6.5 L5.5 10 L3 6.5 Z" fill="#fff"/></svg></span>
+  <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+  <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
+  <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings">Options</button>
+  <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate</button>
+  <button class="menu" data-cmd="menu" data-arg="annotate" data-anchor aria-haspopup="menu">Annotate</button>
+  <button class="menu" data-cmd="menu" data-arg="hotlist" data-anchor aria-haspopup="menu">Hotlist</button>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

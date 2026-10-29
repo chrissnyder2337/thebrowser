@@ -85,7 +85,9 @@ for entry in \
   desktop-1995:off \
   suite-1997:off \
   desktop-1997:off \
-  desktop-1999:off; do
+  desktop-1999:off \
+  classic-1992:off \
+  classic-1994:off; do
   mode="${entry%%:*}"
   run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
 done

@@ -1,0 +1,44 @@
+# The menu bar of a one-bit desktop browser, 1992.
+menu File
+open-url Open...
+- Open Local...
+---
+- Save As...
+view-source View Source
+---
+close-window Close
+---
+print Print...
+---
+- Quit
+menu Edit
+- Undo
+---
+- Cut
+- Copy
+- Paste
+- Clear
+---
+- Select All
+- Find...
+menu Navigate
+back Back
+forward Next
+- Previous
+home Home
+---
+reload Reload
+stop Stop
+---
+- Window History...
+menu Bookmarks
+add-bookmark Add Bookmark
+bookmarks View Bookmarks
+- Edit Bookmarks...
+menu Options
+- Style...
+- Load Images
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI

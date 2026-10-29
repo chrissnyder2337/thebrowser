@@ -8,7 +8,7 @@
 <style>
   :root {
     --face: #c0c0c0;
-    --sunk: inset 1px 1px #808080, inset -1px -1px #fff;
+    --sunk: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
     --raised: inset 1px 1px #fff, inset -1px -1px #808080;
   }
   * { box-sizing: border-box; }
@@ -21,41 +21,33 @@
   body { display: flex; align-items: center; gap: 3px; padding: 0 4px 0 3px; border-top: 1px solid #fff; }
   svg { display: block; }
   button { font: inherit; color: inherit; background: var(--face); border: 0; margin: 0; padding: 0; outline: none; }
-  .pane { height: 20px; flex: none; display: flex; align-items: center; padding: 0 4px; box-shadow: var(--sunk); }
+  .pane { height: 22px; flex: none; display: flex; align-items: center; padding: 0 4px; box-shadow: var(--sunk); }
   #lock-pane { width: 24px; justify-content: center; padding: 0; }
-  #lock-pane svg.lock { display: none; }
-  #lock-pane.secure svg.lock { display: block; }
+  #lock-pane .shut { display: none; }
+  #lock-pane.secure .shut { display: block; }
   #lock-pane.secure .open { display: none; }
+  #lock-pane .shut svg.off { display: none; }
   #lock-pane .open svg.off { display: none; }
   #text { flex: 1; min-width: 0; }
   #msg { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  #meter-pane { width: 130px; padding: 3px; }
-  #meter { width: 100%; height: 12px; display: flex; gap: 1px; visibility: hidden; }
+  #meter-pane { width: 100px; padding: 4px; }
+  #meter { width: 100%; height: 10px; display: flex; gap: 1px; visibility: hidden; }
   #meter.on { visibility: visible; }
-  #meter i { flex: none; width: 8px; height: 12px; background: #000080; }
+  #meter i { flex: none; width: 7px; height: 10px; background: #000080; }
   #modem-pane { gap: 4px; min-width: 48px; }
   #modem-pane:active { box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; }
   #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
   #modem-pane.dialup svg.on { display: block; }
   #modem-label { white-space: nowrap; }
-  #components { display: flex; gap: 2px; padding: 0 2px; margin-left: 2px; box-shadow: var(--raised); height: 22px; align-items: center; }
-  #components span { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
-  #components svg.off { display: none; }
 </style>
 </head>
 <body>
   <div class="pane" id="lock-pane" title="">
-    <span class="open">{{ICON_S97_UNLOCKED}}</span>{{ICON_LOCK}}
+    <span class="open">{{ICON_S97_UNLOCKED}}</span><span class="shut">{{ICON_S97_LOCKED}}</span>
   </div>
+  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="11"></div></div>
   <div class="pane" id="text"><span id="msg">Ready.</span></div>
-  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="14"></div></div>
   <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
-  <div id="components" aria-hidden="true">
-    <span title="Navigator">{{ICON_S97_C_NAV}}</span>
-    <span title="Mailbox">{{ICON_S97_C_MAIL}}</span>
-    <span title="Discussions">{{ICON_S97_C_NEWS}}</span>
-    <span title="Composer">{{ICON_S97_C_COMP}}</span>
-  </div>
 <script>
 {{CHROME_JS}}
 </script>

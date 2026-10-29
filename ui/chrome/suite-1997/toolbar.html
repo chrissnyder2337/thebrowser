@@ -40,24 +40,23 @@
   /* ---- A toolbar row: collapse tab, then its contents ---- */
   .bar { display: flex; align-items: stretch; flex: none; border-top: 1px solid #fff; border-bottom: 1px solid #808080; }
   .tab {
-    width: 9px; flex: none; margin: 1px 2px 1px 1px; position: relative;
+    width: 7px; flex: none; margin: 1px 2px 1px 1px; position: relative;
     box-shadow: var(--thin-raised);
-    background: repeating-linear-gradient(0deg, #c0c0c0 0 1px, #808080 1px 2px);
-    background-size: 3px 100%; background-repeat: no-repeat; background-position: 3px 0;
+    background: radial-gradient(#808080 0.6px, transparent 0.8px) 0 0 / 2px 2px;
   }
   .tab::before {
-    content: ""; position: absolute; left: 1px; top: 1px;
-    border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0;
+    content: ""; position: absolute; left: 0; top: 1px;
+    border: 2.5px solid transparent; border-top: 3px solid #000; border-bottom: 0;
   }
   .tab:hover { background-color: #d4d4d4; }
   .tab:active { box-shadow: var(--thin-pressed); }
 
   /* ---- Navigation toolbar ---- */
-  #nav { height: 54px; }
-  #buttons { flex: 1; display: flex; align-items: center; min-width: 0; overflow: hidden; }
+  #nav { height: 50px; }
+  #buttons { flex: 1; /* groups separated by .gap */ display: flex; align-items: center; min-width: 0; overflow: hidden; }
   .big {
-    min-width: 58px; height: 48px; flex: none; padding: 0 3px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-width: 58px; height: 44px; flex: none; padding: 0 3px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   }
   .big svg { width: 24px; height: 24px; }
   .big svg.off { display: none; }
@@ -68,12 +67,13 @@
   .big.disabled svg.on { display: none; }
   .big.disabled svg.off { display: block; }
   .big.disabled span { color: #808080; text-shadow: 1px 1px #fff; }
-  .gap { flex: 1; min-width: 0; }
+  .gap { width: 20px; flex: none; }
   #throbber {
-    width: 52px; height: 48px; flex: none; margin: 0 4px 0 6px;
+    width: 32px; height: 32px; flex: none; margin: 6px; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
     background: #101010; box-shadow: var(--thin-pressed);
   }
+  #throbber svg.idle, #throbber .lit-box { zoom: 0.667; }
   #throbber:active { transform: translate(1px, 1px); }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
@@ -82,30 +82,27 @@
   #throbber.loading .lit-box { display: block; }
 
   /* ---- Location toolbar ---- */
-  #loc { height: 28px; }
+  #loc { height: 27px; }
   #locrow { flex: 1; display: flex; align-items: center; gap: 4px; padding: 0 4px 0 2px; min-width: 0; }
-  .tbtn { height: 22px; flex: none; padding: 0 4px; display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+  .tbtn { height: 22px; flex: none; padding: 0 4px; display: flex; align-items: center; gap: 2px; white-space: nowrap; }
   .tbtn:hover { box-shadow: var(--thin-raised); }
   .tbtn:active { box-shadow: var(--thin-pressed); }
   .tbtn:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
   .drop { width: 0; height: 0; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; flex: none; }
   #locicon { flex: none; }
   .lab { flex: none; }
-  #field { flex: 1; min-width: 0; height: 22px; position: relative; display: flex; background: #fff; box-shadow: var(--sunken); padding: 2px; }
-  #field svg.lock { position: absolute; left: 5px; top: 5px; display: none; }
-  #field.secure svg.lock { display: block; }
+  #field { flex: 1; min-width: 0; height: 23px; position: relative; display: flex; background: #fff; box-shadow: var(--sunken); padding: 2px; }
   #url {
     flex: 1; min-width: 0; height: 18px; border: 0; outline: none; padding: 1px 3px;
-    font: 12px "Courier New", Courier, "Liberation Mono", monospace; color: #000; background: transparent; user-select: text;
+    font: normal 12px "Liberation Mono", "Courier New", Courier, monospace; color: #000; background: transparent; user-select: text;
   }
-  #field.secure #url { padding-left: 17px; }
   #url::selection { background: #000080; color: #fff; }
   #urldrop { width: 17px; height: 18px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--thin-raised); }
   #urldrop .drop { border-top-width: 5px; border-left-width: 4px; border-right-width: 4px; border-top-color: #808080; }
   #urldrop:active { box-shadow: var(--thin-pressed); }
 
   /* ---- Personal toolbar ---- */
-  #personal { height: 24px; border-bottom: 0; }
+  #personal { height: 26px; border-bottom: 0; }
   #links { flex: 1; display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; padding-left: 2px; }
   .ql {
     height: 20px; max-width: 140px; flex: none; padding: 0 4px 0 3px;
@@ -123,12 +120,12 @@
 </head>
 <body>
   <div id="menubar">
-    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
-    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
-    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu"><u>V</u>iew</button>
-    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu"><u>G</u>o</button>
-    <button class="menu" data-cmd="menu" data-arg="window" data-anchor aria-haspopup="menu"><u>W</u>indow</button>
-    <button class="menu" id="help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
+    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu">Go</button>
+    <button class="menu" data-cmd="menu" data-arg="window" data-anchor aria-haspopup="menu">Window</button>
+    <button class="menu" id="help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
   </div>
   <div class="bar" id="nav">
     <div class="tab" title="Show or hide the Navigation Toolbar"></div>
@@ -136,11 +133,14 @@
       <button class="big disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_S97_BACK}}<span>Back</span></button>
       <button class="big disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_S97_FORWARD}}<span>Forward</span></button>
       <button class="big" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_S97_RELOAD}}<span>Reload</span></button>
+      <div class="gap"></div>
       <button class="big" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_S97_HOME}}<span>Home</span></button>
       <button class="big" id="search" data-cmd="search" title="Search the web">{{ICON_S97_SEARCH}}<span>Search</span></button>
       <button class="big" id="guide" title="Guide">{{ICON_S97_GUIDE}}<span>Guide</span></button>
+      <div class="gap"></div>
       <button class="big" id="print" data-cmd="print" title="Print this page">{{ICON_S97_PRINT}}<span>Print</span></button>
       <button class="big" id="security" title="Security and settings">{{ICON_S97_SECURITY}}<span>Security</span></button>
+      <div class="gap"></div>
       <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_S97_STOP}}<span>Stop</span></button>
     </div>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
@@ -155,7 +155,6 @@
       <span id="locicon">{{ICON_S97_LOC}}</span>
       <label class="lab" for="url">Location:</label>
       <div id="field">
-        {{ICON_LOCK}}
         <input id="url" type="text" spellcheck="false" autocomplete="off" aria-label="Location">
         <button id="urldrop" data-cmd="focus-url" title="Type an address (Ctrl+L)"><span class="drop"></span></button>
       </div>

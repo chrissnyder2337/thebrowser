@@ -7,7 +7,7 @@
 //                   element's bottom-left corner ("x,y") for a menu to open at.
 //   #url, #go       the address field and its Go button.
 //   #field          gets "secure" on https pages.
-//   #title          shows the page title.
+//   #title          shows the page title; so do any [data-title] elements.
 //   #throbber       activity indicator ("loading" class); opens About.
 //   #back, #forward, #stop   disabled to match the navigation state.
 //   #retro          latched while a retro look is on.
@@ -28,6 +28,7 @@
   var url = $("url");
   var field = $("field");
   var title = $("title");
+  var titleCopies = document.querySelectorAll("[data-title]");
   var throbber = $("throbber");
   var links = $("links");
   var iconTemplate = $("page-icon");
@@ -127,6 +128,7 @@
         if (!editing || document.activeElement !== url) { editing = false; url.value = s.url; }
       }
       if ("title" in s && title) { title.textContent = s.title; title.title = s.title; }
+      if ("title" in s) Array.prototype.forEach.call(titleCopies, function (el) { el.textContent = s.title; });
       if ("canBack" in s) setDisabled(buttons.back, !s.canBack);
       if ("canFwd" in s) setDisabled(buttons.forward, !s.canFwd);
       if ("loading" in s) {
