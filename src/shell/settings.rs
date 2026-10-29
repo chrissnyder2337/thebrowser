@@ -144,15 +144,33 @@ pub enum UiMode {
     /// A Motif workstation browser: menu bar, Title and URL fields, and a row
     /// of text buttons under the page.
     Workstation1993,
+    /// A mid-90s browser's grouped icon-and-label buttons, Location field and
+    /// a row of directory buttons (here, the quick links).
+    Toolbar1996,
+    /// A mid-90s desktop browser: bands of large labelled buttons whose
+    /// icons are grey until hovered, Address and Links bands.
+    Desktop1996,
+    /// A browser written for the Java platform: flat icon buttons with small
+    /// labels and an Address row, in the toolkit's warm grey.
+    Applet1997,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 2] = [Self::Lantern, Self::Workstation1993];
+    pub const ALL: [Self; 5] = [
+        Self::Lantern,
+        Self::Workstation1993,
+        Self::Toolbar1996,
+        Self::Desktop1996,
+        Self::Applet1997,
+    ];
 
     pub fn key(self) -> &'static str {
         match self {
             Self::Lantern => "lantern",
             Self::Workstation1993 => "workstation-1993",
+            Self::Toolbar1996 => "toolbar-1996",
+            Self::Desktop1996 => "desktop-1996",
+            Self::Applet1997 => "applet-1997",
         }
     }
 
@@ -165,14 +183,17 @@ impl UiMode {
         match self {
             Self::Lantern => "Lantern (default)",
             Self::Workstation1993 => "Workstation (1993)",
+            Self::Toolbar1996 => "Toolbar (1996)",
+            Self::Desktop1996 => "Desktop (1996)",
+            Self::Applet1997 => "Applet browser (1997)",
         }
     }
 
     /// The retro look that renders pages the way this mode's browsers did.
     pub fn era_look(self) -> RetroStyle {
         match self {
-            Self::Lantern => RetroStyle::Off,
-            Self::Workstation1993 => RetroStyle::EarlyWeb,
+            Self::Lantern | Self::Desktop1996 | Self::Applet1997 => RetroStyle::Off,
+            Self::Workstation1993 | Self::Toolbar1996 => RetroStyle::EarlyWeb,
         }
     }
 }

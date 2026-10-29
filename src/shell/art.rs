@@ -55,6 +55,11 @@ impl Sheet {
             .unwrap_or_else(|| panic!("pixel art frame {name:?} missing"))
     }
 
+    /// Every frame's name, in file order.
+    pub fn names(&self) -> impl Iterator<Item = &str> {
+        self.frames.iter().map(|(name, _)| name.as_str())
+    }
+
     pub fn size(&self, name: &str) -> (usize, usize) {
         let rows = self.frame(name);
         (rows.iter().map(Vec::len).max().unwrap_or(0), rows.len())

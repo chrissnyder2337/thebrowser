@@ -24,7 +24,7 @@ Update the tables below in the same commit as the work they describe.
 | 5b. Page styles | Each mode's browser defaults under pages, and its era look on request (`mode_pages`) | Done |
 | 6. Settings page | A Browser UI section; needs the maintainer to approve new settings goldens | Not started |
 | 7. Layout extras | Hidden views, chrome below the page, inset border, content zoom (the TV modes) | Not started |
-| 8. More modes | See below; next: `toolbar-1996`, `desktop-1996`, `applet-1997` | Not started |
+| 8. More modes | See below. Each mode's pages and icons are drafted by a subagent from the brief in the session, then wired in and tested | In progress |
 
 ## Modes
 
@@ -35,17 +35,17 @@ Update the tables below in the same commit as the work they describe.
 | `workstation-1996` | Workstation (1996) | NCSA Mosaic for X 2.7 | icons | Planned |
 | `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Planned |
 | `desktop-1995` | Desktop (1995) | Internet Explorer 2 | icons | Planned |
-| `desktop-1996` | Desktop (1996) | Internet Explorer 3 | icons, hover colour | Planned |
+| `desktop-1996` | Desktop (1996) | Internet Explorer 3 | icons, hover colour | Built (not yet merged) |
 | `desktop-1997` | Desktop (1997) | Internet Explorer 4 | icons | Planned |
 | `desktop-1999` | Desktop (1999) | Internet Explorer 5 | icons | Planned |
 | `toolbar-1995` | Toolbar (1995) | Netscape 1.1–1.22 | icons | Planned |
-| `toolbar-1996` | Toolbar (1996) | Netscape 2–3 | icons | Planned |
+| `toolbar-1996` | Toolbar (1996) | Netscape 2–3 | icons | Built (not yet merged) |
 | `suite-1997` | Suite (1997) | Netscape Communicator 4 | icons | Planned |
 | `classic-1992` | Classic desktop (1992) | MacWWW | menus, research | Planned |
 | `classic-1994` | Classic desktop (1994) | NCSA Mosaic for the Mac | icons, research | Planned |
 | `classic-1999` | Classic desktop (1999) | iCab | icons | Planned |
 | `applet-1995` | Applet browser (1995) | HotJava alpha | icons, research | Planned |
-| `applet-1997` | Applet browser (1997) | HotJava 1.x–3 | icons | Planned |
+| `applet-1997` | Applet browser (1997) | HotJava 1.x–3 | icons | Built (not yet merged) |
 | `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Planned |
 | `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Planned |
 | `pc-1993` | Early PC (1993) | Cello | menus | Planned |

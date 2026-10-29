@@ -105,6 +105,14 @@ picks one for a single run. More modes are on the way: see
 - **Workstation (1993)**: a Motif menu bar, Document Title and Document URL
   fields, and a row of text buttons under the page, modelled on NCSA Mosaic
   for X.
+- **Toolbar (1996)**: grouped icon-and-label buttons, a Location field and a
+  row of directory buttons holding your quick links, modelled on Netscape
+  Navigator 2–3.
+- **Desktop (1996)**: bands of large labelled buttons whose icons stay grey
+  until you point at them, with Address and Links bands, modelled on
+  Internet Explorer 3.
+- **Applet browser (1997)**: flat icon buttons with small labels in a warm
+  grey toolkit look, modelled on HotJava.
 
 Pages can follow the mode too, picked under **Browser UI**: as their sites
 made them, with the mode's browser defaults (a grey page and Times on plain

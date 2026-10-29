@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Desktop (1996): a menu bar over bands with grip handles: large labelled
+     buttons that stay grey until hovered, then the Address and Links bands,
+     with a tall activity box at the right (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #c0c0c0;
+    --thin: inset 1px 1px #fff, inset -1px -1px #808080;
+    --thin-down: inset 1px 1px #808080, inset -1px -1px #fff;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+    --raised: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px Tahoma, "MS Sans Serif", Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar { height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px; }
+  .menu { height: 18px; padding: 0 6px; background: none; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--thin); }
+  .menu:active { box-shadow: var(--thin-down); }
+
+  /* ---- Bands ---- */
+  #bands { height: 84px; flex: none; display: flex; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
+  #stack { flex: 1; min-width: 0; display: flex; flex-direction: column; border-top: 1px solid #fff; }
+  .band { display: flex; align-items: center; min-width: 0; padding: 2px 4px 2px 2px; box-shadow: var(--thin); }
+  .grip { width: 3px; align-self: stretch; flex: none; margin: 2px 6px 2px 2px; box-shadow: var(--thin); }
+  #big { height: 54px; flex: none; }
+  #lower { height: 27px; flex: none; display: flex; }
+
+  /* ---- Large buttons: grey until hovered ---- */
+  .big {
+    min-width: 50px; height: 46px; flex: none; padding: 0 3px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  }
+  .big svg { display: block; flex: none; }
+  .big svg.off { display: none; }
+  .big svg.on { filter: grayscale(1); }
+  .big:hover:not(.disabled) svg.on, .big:focus-visible:not(.disabled) svg.on { filter: none; }
+  .big:hover:not(.disabled), .big:focus-visible:not(.disabled) { box-shadow: var(--thin); }
+  .big:active:not(.disabled) { box-shadow: var(--thin-down); }
+  .big:active:not(.disabled) > * { transform: translate(1px, 1px); }
+  .big.disabled { color: #808080; text-shadow: 1px 1px #fff; }
+  .big.disabled svg.on { display: none; }
+  .big.disabled svg.off { display: block; }
+  .sep { width: 2px; height: 40px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
+
+  /* ---- Address band ---- */
+  #address { flex: 1; }
+  #address > label { flex: none; padding-right: 6px; }
+  #field {
+    flex: 1; min-width: 0; height: 21px; padding: 2px; position: relative; display: flex;
+    background: #fff; box-shadow: var(--sunken);
+  }
+  #url {
+    flex: 1; min-width: 0; height: 17px; border: 0; margin: 0; padding: 1px 3px; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+  #field svg.lock { display: none; flex: none; margin: 2px 4px 0 0; }
+  #field.secure svg.lock { display: block; }
+  #drop {
+    width: 16px; height: 17px; flex: none; display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--raised);
+  }
+  #drop::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+  #drop:active { box-shadow: var(--sunken); }
+
+  /* ---- Links band ---- */
+  #linksband { width: 38%; flex: none; max-width: 380px; }
+  #linksband > label { flex: none; padding-right: 6px; }
+  #links { display: flex; gap: 2px; min-width: 0; overflow: hidden; }
+  .ql {
+    height: 18px; max-width: 120px; flex: none; padding: 0 5px 0 3px;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .ql:hover { box-shadow: var(--thin); }
+  .ql:active { box-shadow: var(--thin-down); }
+  .ql:active > * { transform: translate(1px, 1px); }
+  .ql:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .ql svg { flex: none; }
+  .ql span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #linksband .none { color: #808080; text-shadow: 1px 1px #fff; }
+
+  /* ---- Activity box ---- */
+  #act { width: 84px; flex: none; display: flex; padding: 2px; border-top: 1px solid #fff; }
+  #throbber {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    background: #000; box-shadow: var(--sunken);
+  }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings"><u>V</u>iew</button>
+    <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu"><u>G</u>o</button>
+    <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+  </div>
+  <div id="bands">
+    <div id="stack">
+      <div class="band" id="big">
+        <div class="grip"></div>
+        <button class="big disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_D96_BACK}}<span>Back</span></button>
+        <button class="big disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_D96_FORWARD}}<span>Forward</span></button>
+        <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_D96_STOP}}<span>Stop</span></button>
+        <button class="big" id="reload" data-cmd="reload" title="Refresh this page (F5)">{{ICON_D96_RELOAD}}<span>Refresh</span></button>
+        <button class="big" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_D96_HOME}}<span>Home</span></button>
+        <div class="sep"></div>
+        <button class="big" id="search" data-cmd="search" title="Search the web">{{ICON_D96_SEARCH}}<span>Search</span></button>
+        <button class="big" id="favorites" data-cmd="bookmarks" title="Show your favorites">{{ICON_D96_FAVORITES}}<span>Favorites</span></button>
+        <button class="big" id="add" data-cmd="bookmark-add" title="Add this page to your favorites (Ctrl+D)">{{ICON_D96_ADD}}<span>Add</span></button>
+      </div>
+      <div id="lower">
+        <div class="band" id="address">
+          <div class="grip"></div>
+          <label for="url">Address</label>
+          <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
+        </div>
+        <div class="band" id="linksband">
+          <div class="grip"></div>
+          <label>Links</label>
+          <div id="links"></div>
+        </div>
+      </div>
+    </div>
+    <div id="act">
+      <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+        {{LANTERN_IDLE}}
+        <div class="lit-box">{{LANTERN_LIT}}</div>
+      </div>
+    </div>
+  </div>
+  <template id="page-icon">{{ICON_PAGE}}</template>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

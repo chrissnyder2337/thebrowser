@@ -21,6 +21,9 @@ pub fn heights(mode: UiMode) -> (i32, i32) {
     match mode {
         UiMode::Lantern => (112, 24),
         UiMode::Workstation1993 => (104, 72),
+        UiMode::Toolbar1996 => (118, 22),
+        UiMode::Desktop1996 => (104, 22),
+        UiMode::Applet1997 => (102, 22),
     }
 }
 
@@ -34,6 +37,18 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Workstation1993 => Some((
             include_str!("../../ui/chrome/workstation-1993/pages.css"),
             "#bfbfbf",
+        )),
+        UiMode::Toolbar1996 => Some((
+            include_str!("../../ui/chrome/toolbar-1996/pages.css"),
+            "#c0c0c0",
+        )),
+        UiMode::Desktop1996 => Some((
+            include_str!("../../ui/chrome/desktop-1996/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Applet1997 => Some((
+            include_str!("../../ui/chrome/applet-1997/pages.css"),
+            "#ffffff",
         )),
     }
 }

@@ -23,6 +23,12 @@ const WORKSTATION_1993_TOOLBAR_HTML: &str =
     include_str!("../../ui/chrome/workstation-1993/toolbar.html");
 const WORKSTATION_1993_STATUS_HTML: &str =
     include_str!("../../ui/chrome/workstation-1993/status.html");
+const TOOLBAR_1996_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/toolbar-1996/toolbar.html");
+const TOOLBAR_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/toolbar-1996/status.html");
+const DESKTOP_1996_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/desktop-1996/toolbar.html");
+const DESKTOP_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/desktop-1996/status.html");
+const APPLET_1997_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/applet-1997/toolbar.html");
+const APPLET_1997_STATUS_HTML: &str = include_str!("../../ui/chrome/applet-1997/status.html");
 /// The controller every chrome page shares (title channel, `lantern.update`).
 const CHROME_JS: &str = include_str!("../../ui/chrome/chrome.js");
 const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
@@ -98,6 +104,9 @@ fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
     match mode {
         UiMode::Lantern => (TOOLBAR_HTML, STATUS_HTML),
         UiMode::Workstation1993 => (WORKSTATION_1993_TOOLBAR_HTML, WORKSTATION_1993_STATUS_HTML),
+        UiMode::Toolbar1996 => (TOOLBAR_1996_TOOLBAR_HTML, TOOLBAR_1996_STATUS_HTML),
+        UiMode::Desktop1996 => (DESKTOP_1996_TOOLBAR_HTML, DESKTOP_1996_STATUS_HTML),
+        UiMode::Applet1997 => (APPLET_1997_TOOLBAR_HTML, APPLET_1997_STATUS_HTML),
     }
 }
 
@@ -117,32 +126,26 @@ pub fn chrome_navigation_allowed(
     initial || url == current || url == expected()
 }
 
-pub fn toolbar_uri(mode: UiMode) -> String {
+/// Placeholders every chrome page may use: each icon frame as `ICON_<NAME>`
+/// (normal and disabled svgs; `-` becomes `_`), the lock, page and modem
+/// icons, the lantern for activity boxes, and the shared controller.
+fn chrome_vars() -> Vec<(String, String)> {
     let mut vars = vec![];
     with_icons(|sheet| {
-        for name in [
-            "back",
-            "forward",
-            "reload",
-            "home",
-            "search",
-            "bookmarks",
-            "mark",
-            "stop",
-            "retro",
-        ] {
-            let key = format!("ICON_{}", name.to_ascii_uppercase());
-            let html = format!(
-                "{}{}",
-                sheet.svg(name, 1, "on"),
-                sheet.embossed_svg(name, 1, "off")
-            );
+        for name in sheet.names() {
+            let html = match name {
+                "lock" => sheet.svg(name, 1, "lock"),
+                "page" => sheet.svg(name, 1, "pg"),
+                _ => format!(
+                    "{}{}",
+                    sheet.svg(name, 1, "on"),
+                    sheet.embossed_svg(name, 1, "off")
+                ),
+            };
+            let key = format!("ICON_{}", name.to_ascii_uppercase().replace('-', "_"));
             vars.push((key, html));
         }
-        vars.push(("ICON_LOCK".to_owned(), sheet.svg("lock", 1, "lock")));
-        vars.push(("ICON_PAGE".to_owned(), sheet.svg("page", 1, "pg")));
     });
-    vars.push(("CHROME_JS".to_owned(), CHROME_JS.trim_end().to_owned()));
     with_lantern(|sheet| {
         vars.push(("LANTERN_IDLE".to_owned(), sheet.svg("idle", 2, "idle")));
         vars.push((
@@ -150,29 +153,22 @@ pub fn toolbar_uri(mode: UiMode) -> String {
             sheet.strip_svg(&["lit0", "lit1", "lit2", "lit3"], 2, "lit"),
         ));
     });
+    vars.push(("CHROME_JS".to_owned(), CHROME_JS.trim_end().to_owned()));
+    vars
+}
+
+fn chrome_uri(template: &str) -> String {
+    let vars = chrome_vars();
     let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
-    html_uri(&fill(chrome_templates(mode).0, &vars))
+    html_uri(&fill(template, &vars))
+}
+
+pub fn toolbar_uri(mode: UiMode) -> String {
+    chrome_uri(chrome_templates(mode).0)
 }
 
 pub fn status_uri(mode: UiMode) -> String {
-    let (lock, modem) = with_icons(|sheet| {
-        (
-            sheet.svg("lock", 1, "lock"),
-            format!(
-                "{}{}",
-                sheet.svg("modem", 1, "on"),
-                sheet.embossed_svg("modem", 1, "off")
-            ),
-        )
-    });
-    html_uri(&fill(
-        chrome_templates(mode).1,
-        &[
-            ("ICON_LOCK", lock),
-            ("ICON_MODEM", modem),
-            ("CHROME_JS", CHROME_JS.trim_end().to_owned()),
-        ],
-    ))
+    chrome_uri(chrome_templates(mode).1)
 }
 
 fn action_url(action: &str, url: &str) -> String {
