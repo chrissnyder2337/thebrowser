@@ -23,20 +23,21 @@
   /* ---- Menu bar ---- */
   #menubar {
     height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px;
-    background: #fff; border-bottom: 1px solid #000;
+    background: #f0f0f0;
   }
-  .menu { height: 19px; padding: 0 8px; }
+  .menu { height: 19px; padding: 0 8px; font-size: 11px; font-weight: normal; }
   .menu:hover, .menu:focus-visible { background: #000; color: #fff; }
 
   /* ---- Title strip ---- */
   #strip {
-    height: 32px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 2px;
-    background: #ffffe8; border-bottom: 2px solid #808080; box-shadow: 0 -1px #fff inset;
+    height: 34px; flex: none; display: flex; align-items: flex-start; gap: 0; padding: 0;
+    background: #ffffe8; box-shadow: inset 0 -1px #8f8f89, inset 0 -2px #686868;
   }
+  #strip > * { height: 32px; }
   #throbber {
-    width: 28px; height: 28px; flex: none; margin-right: 2px;
+    width: 32px; height: 32px; flex: none;
     display: flex; align-items: center; justify-content: center;
-    border: 1px solid #000; background: #fff;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff; background: #c0c0c0;
   }
   #throbber > svg, #throbber .lit-box { zoom: 0.5; }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
@@ -44,22 +45,21 @@
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
-  #throbber:active { background: #c0c0c0; }
+  #throbber:active { border-color: #808080 #fff #fff #808080; }
 
   .ic {
-    width: 26px; height: 26px; flex: none; display: flex; align-items: center; justify-content: center;
-    border: 1px solid transparent;
+    width: 32px; height: 32px; flex: none; display: flex; align-items: center; justify-content: center;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff; background: #c0c0c0;
   }
-  .ic svg { width: 20px; height: 20px; }
+  .ic svg { width: 24px; height: 24px; }
   .ic svg.off { display: none; }
   .ic.disabled svg.on { display: none; }
   .ic.disabled svg.off { display: block; }
-  .ic:hover:not(.disabled) { border-color: #000; background: #c0c0c0; }
-  .ic:active:not(.disabled) { background: #808080; }
-  .ic:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .ic:active:not(.disabled) { border-color: #808080 #fff #fff #808080; }
+  .ic:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
 
   #title {
-    flex: 1; min-width: 0; text-align: center; padding: 0 6px;
+    flex: 1; min-width: 0; text-align: center; padding: 0 6px; align-self: center; height: auto;
     font: 18px "Times New Roman", Times, serif; color: #1c1c9c;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }

@@ -20,7 +20,7 @@
   }
 
   /* ---- Status bar (blue, bold white) ---- */
-  #line { height: 20px; flex: none; display: flex; background: #0000c8; color: #fff; font-weight: bold; white-space: pre; }
+  #line { height: 20px; flex: none; display: flex; background: #0000aa; color: #ffff55; font-weight: bold; white-space: pre; }
   .pane { height: 20px; flex: none; display: flex; align-items: center; }
   #text { flex: 1; min-width: 0; }
   #msg { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -39,10 +39,10 @@
   .help { height: 20px; flex: none; display: flex; white-space: pre; color: #c0c0c0; }
   .k { height: 20px; }
   button.k:hover:not(.disabled), button.k:focus-visible { background: #c0c0c0; color: #000; }
-  button.k.disabled { color: #707070; }
+  button.k.disabled { color: inherit; }
   /* ---- URL prompt ---- */
   #prompt { height: 20px; flex: none; display: flex; align-items: center; }
-  #keys { flex: none; white-space: pre; }
+  #keys { flex: none; white-space: pre; margin-left: 2ch; }
   #prompt label { flex: none; white-space: pre; padding-left: 1ch; }
   #field { flex: 1; min-width: 0; height: 20px; display: flex; align-items: center; }
   #url {

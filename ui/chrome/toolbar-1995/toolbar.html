@@ -39,9 +39,10 @@
     height: 42px; flex: none; display: flex; align-items: center; padding: 0 6px;
     border-top: 1px solid #808080; box-shadow: inset 0 1px #fff;
   }
-  .grp { display: flex; gap: 2px; margin-right: 10px; }
+  .grp { display: flex; margin-right: 16px; }
+  .tb + .tb { margin-left: -1px; }
   .tb {
-    width: 38px; height: 36px; flex: none; display: flex; flex-direction: column;
+    width: 46px; height: 38px; flex: none; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 1px;
     font-size: 9px; line-height: 10px; box-shadow: var(--raised);
   }
@@ -54,9 +55,9 @@
   .tb.disabled svg.off { display: block; }
 
   /* ---- Location and directory rows ---- */
-  #rows { height: 52px; flex: none; display: flex; padding: 0 4px 0 0; border-top: 1px solid #fff; border-bottom: 2px solid #808080; box-shadow: 0 1px #fff; }
+  #rows { height: 52px; flex: none; display: flex; padding: 0 8px 0 0; border-top: 1px solid #fff; border-bottom: 2px solid #808080; box-shadow: 0 1px #fff; }
   #left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding-top: 2px; }
-  #loc { height: 24px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 3px 0 14px; }
+  #loc { height: 24px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 3px 0 14px; }
   #loc label { flex: none; }
   #field { flex: 1; min-width: 0; height: 22px; position: relative; display: flex; align-items: center; background: #fff; box-shadow: var(--sunken); padding-right: 18px; }
   #url {
@@ -72,7 +73,7 @@
   #field.secure svg.lock { display: block; }
 
   /* ---- Directory buttons ---- */
-  #dirs { height: 24px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 6px 1px 4px; overflow: hidden; }
+  #dirs { height: 24px; flex: none; display: flex; align-items: center; gap: 0; padding: 0 6px 1px 4px; overflow: hidden; }
   .dir {
     height: 20px; flex: none; padding: 0 9px; white-space: nowrap;
     display: flex; align-items: center; box-shadow: var(--raised);
@@ -97,14 +98,14 @@
 </head>
 <body>
   <div id="menubar">
-    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
-    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
-    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu"><u>V</u>iew</button>
-    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu"><u>G</u>o</button>
-    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu"><u>B</u>ookmarks</button>
-    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings"><u>O</u>ptions</button>
-    <button class="menu" data-cmd="menu" data-arg="directory" data-anchor aria-haspopup="menu"><u>D</u>irectory</button>
-    <button class="menu help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
+    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu">Go</button>
+    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu">Bookmarks</button>
+    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings">Options</button>
+    <button class="menu" data-cmd="menu" data-arg="directory" data-anchor aria-haspopup="menu">Directory</button>
+    <button class="menu help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
   </div>
   <div id="buttons">
     <div class="grp">
@@ -132,10 +133,11 @@
       <div id="dirs">
         <button class="dir" title="What's new">What's New!</button>
         <button class="dir" title="What's cool">What's Cool!</button>
-        <button class="dir" title="Handbook">Handbook</button>
+        <button class="dir" title="Upgrades">Upgrades</button>
         <button class="dir" data-cmd="search" title="Search the web">Net Search</button>
         <button class="dir" title="Net directory">Net Directory</button>
         <button class="dir" title="Newsgroups">Newsgroups</button>
+        <button class="dir" title="Handbook">Handbook</button>
       </div>
     </div>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">

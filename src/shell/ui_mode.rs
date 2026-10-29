@@ -31,6 +31,10 @@ pub struct Layout {
     pub inset: [i32; 4],
     /// The border's color (ARGB).
     pub inset_color: u32,
+    /// A line drawn right around the frame and page, inside the inset (a
+    /// sunken page edge): its width and color.
+    pub well: i32,
+    pub well_color: u32,
 }
 
 impl Layout {
@@ -45,6 +49,8 @@ impl Layout {
             frame: 0,
             inset: [0; 4],
             inset_color: 0xFFC0C0C0,
+            well: 0,
+            well_color: 0xFF808080,
         }
     }
 
@@ -53,6 +59,15 @@ impl Layout {
         Self {
             inset,
             inset_color: color,
+            ..self
+        }
+    }
+
+    /// The same, with a `width` line of `color` right around the page.
+    const fn well(self, width: i32, color: u32) -> Self {
+        Self {
+            well: width,
+            well_color: color,
             ..self
         }
     }
@@ -77,13 +92,15 @@ thread_local! {
 pub fn layout(mode: UiMode) -> Layout {
     match mode {
         UiMode::Lantern => Layout::bars(112, 24),
-        UiMode::Workstation1993 => Layout::bars(106, 98).inset([6, 8, 8, 8], 0xFFBFBFBF),
+        UiMode::Workstation1993 => Layout::bars(106, 98)
+            .inset([4, 6, 6, 6], 0xFFBFBFBF)
+            .well(2, 0xFF676767),
         UiMode::Toolbar1996 => Layout::bars(118, 22),
         UiMode::Desktop1996 => Layout::bars(104, 22),
         UiMode::Applet1997 => Layout::bars(102, 22),
         UiMode::Terminal1999 => Layout::bars(40, 40),
         UiMode::Terminal1992 => Layout::bars(20, 80),
-        UiMode::Pc1993 => Layout::bars(52, 22),
+        UiMode::Pc1993 => Layout::bars(54, 22),
         UiMode::Toolbar1995 => Layout::bars(114, 22),
         UiMode::Desktop1995 => Layout::bars(80, 22).inset([0, 2, 2, 2], 0xFFC0C0C0),
     }
@@ -232,7 +249,7 @@ pub fn apply() {
 /// Lay the window out for the current mode: view sizes and visibility, the
 /// side view's position, and the inset around the page.
 pub fn relayout() {
-    let (mode, panel_open, window, middle, inset, browsers) = with_shell(|shell| {
+    let (mode, panel_open, window, middle, inset, well, browsers) = with_shell(|shell| {
         let browsers: Vec<(Role, Browser)> = Role::ALL
             .into_iter()
             .filter_map(|role| shell.browser(role).map(|b| (role, b)))
@@ -243,6 +260,7 @@ pub fn relayout() {
             shell.window.clone(),
             shell.middle.clone(),
             shell.inset.clone(),
+            shell.well.clone(),
             browsers,
         )
     });
@@ -274,8 +292,8 @@ pub fn relayout() {
         let index = if layout.side_left { 0 } else { 1 };
         middle.reorder_child_view(Some(&mut side), index);
     }
-    if let Some(inset) = inset {
-        super::window::lay_out_inset(&inset, &layout, content_view);
+    if let (Some(inset), Some(well)) = (inset, well) {
+        super::window::lay_out_inset(&inset, &well, &layout, content_view);
     }
     if let Some(window) = window {
         window.layout();

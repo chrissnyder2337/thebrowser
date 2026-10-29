@@ -61,6 +61,7 @@ pub struct Shell {
     /// relayout when the UI mode changes.
     pub middle: Option<Panel>,
     pub inset: Option<Panel>,
+    pub well: Option<Panel>,
     pub open_browsers: usize,
     pub is_closing: bool,
 

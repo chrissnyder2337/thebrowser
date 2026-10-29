@@ -26,8 +26,9 @@ wrap_window_delegate! {
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
             let (layout, open) = ui_mode::current();
             let height = layout.toolbar + layout.status_height(open) + layout.frame
-                + layout.inset[0] + layout.inset[2] + 120;
-            Size { width: 520 + layout.side + layout.inset[1] + layout.inset[3], height }
+                + layout.inset[0] + layout.inset[2] + 2 * layout.well + 120;
+            let width = 520 + layout.side + layout.inset[1] + layout.inset[3] + 2 * layout.well;
+            Size { width, height }
         }
     }
 
@@ -53,7 +54,12 @@ wrap_window_delegate! {
                         View::from(v)
                     })
             };
-            let (Some(middle), Some(inset)) = (panel_create(None), panel_create(None))
+            let (Some(middle), Some(inset), Some(well)) =
+                (
+                    panel_create(None),
+                    panel_create(Some(&mut InsetPanelDelegate::new(false))),
+                    panel_create(Some(&mut InsetPanelDelegate::new(true))),
+                )
             else {
                 return;
             };
@@ -64,14 +70,16 @@ wrap_window_delegate! {
             add(window, column.as_ref(), view_for(Role::Status), 0);
             add(&middle, row.as_ref(), view_for(Role::Side), 0);
             add(&middle, row.as_ref(), Some(View::from(&inset)), 1);
-            inset.add_child_view(view_for(Role::Frame).as_mut());
-            inset.add_child_view(view_for(Role::Content).as_mut());
+            inset.add_child_view(Some(&mut View::from(&well)));
+            well.add_child_view(view_for(Role::Frame).as_mut());
+            well.add_child_view(view_for(Role::Content).as_mut());
             let (layout, _) = ui_mode::current();
-            lay_out_inset(&inset, &layout, view_for(Role::Content));
+            lay_out_inset(&inset, &well, &layout, view_for(Role::Content));
             drop(views);
             with_shell(|shell| {
                 shell.middle = Some(middle.clone());
                 shell.inset = Some(inset.clone());
+                shell.well = Some(well.clone());
             });
 
             window.set_title(Some(&CefString::from("Lantern")));
@@ -92,6 +100,7 @@ wrap_window_delegate! {
                 shell.window = None;
                 shell.middle = None;
                 shell.inset = None;
+                shell.well = None;
             });
         }
 
@@ -129,6 +138,26 @@ wrap_window_delegate! {
             RuntimeStyle::ALLOY
         }
     }
+}
+
+// Colors the inset panel (or, with `well`, the well panel) from the current
+// layout. Views lose their background color on every theme change, so it's
+// set again there.
+wrap_panel_delegate! {
+    struct InsetPanelDelegate {
+        well: bool,
+    }
+
+    impl ViewDelegate {
+        fn on_theme_changed(&self, view: Option<&mut View>) {
+            if let Some(view) = view {
+                let (layout, _) = ui_mode::current();
+                view.set_background_color(if self.well { layout.well_color } else { layout.inset_color });
+            }
+        }
+    }
+
+    impl PanelDelegate {}
 }
 
 /// A view's size in the current layout; `across` is its size along the
@@ -178,11 +207,11 @@ fn add(panel: &impl ImplPanel, layout: Option<&BoxLayout>, view: Option<View>, f
     }
 }
 
-/// Lay out the inset panel for `layout`: the frame view over the page, with
-/// the mode's border around them in its color.
-pub fn lay_out_inset(inset: &Panel, layout: &ui_mode::Layout, content: Option<View>) {
+/// Lay out the inset panel for `layout`: a border around the well, and in
+/// the well, a line around the frame view over the page.
+pub fn lay_out_inset(inset: &Panel, well: &Panel, layout: &ui_mode::Layout, content: Option<View>) {
     let [top, left, bottom, right] = layout.inset;
-    let settings = BoxLayoutSettings {
+    let border = |top, left, bottom, right| BoxLayoutSettings {
         horizontal: 0,
         inside_border_insets: Insets {
             top,
@@ -193,11 +222,17 @@ pub fn lay_out_inset(inset: &Panel, layout: &ui_mode::Layout, content: Option<Vi
         cross_axis_alignment: AxisAlignment::STRETCH,
         ..Default::default()
     };
-    let box_layout = inset.set_to_box_layout(Some(&settings));
-    if let (Some(box_layout), Some(mut content)) = (box_layout, content) {
-        box_layout.set_flex_for_view(Some(&mut content), 1);
+    if let Some(outer) = inset.set_to_box_layout(Some(&border(top, left, bottom, right))) {
+        outer.set_flex_for_view(Some(&mut View::from(well)), 1);
     }
     inset.set_background_color(layout.inset_color);
+    let w = layout.well;
+    if let (Some(inner), Some(mut content)) =
+        (well.set_to_box_layout(Some(&border(w, w, w, w))), content)
+    {
+        inner.set_flex_for_view(Some(&mut content), 1);
+    }
+    well.set_background_color(layout.well_color);
 }
 
 const ICON_SMALL_PNG: &[u8] = include_bytes!("../../ui/appicon/lantern_32.png");

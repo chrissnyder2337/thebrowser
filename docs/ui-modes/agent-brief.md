@@ -63,7 +63,8 @@ more, say so in your notes as a layout (`ui_mode::Layout`, spec.md "Window layou
 with `html.panel-open`), `side` + `side_left` (a side view beside the page: write
 `side.html`, same rules as the toolbar), `frame` (a view right above the page inside the
 inset: write `frame.html`), `inset` [top,left,bottom,right] + `inset_color` (a border
-around frame and page). Chrome buttons may live in any of the views; the contract counts
+around frame and page), `well` + `well_color` (a thin line right around the page inside the
+inset: a sunken page edge). Chrome buttons may live in any of the views; the contract counts
 them across all of them.
 
 ## The contract (tests check it)

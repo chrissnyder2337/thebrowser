@@ -1,5 +1,5 @@
 /* Early PC (1993): plain pages the way a Windows 3.1 browser drew them by
-   default: Times New Roman, black text on a white page (the color is set in
+   default: Times New Roman, black text on a cream page (the color is set in
    ui_mode.rs). One rule per line, each selector wrapped in :where()
    (checked by a unit test). */
 :where(html) { color: #000; font-family: "Times New Roman", Times, serif; }
