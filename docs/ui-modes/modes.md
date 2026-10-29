@@ -185,6 +185,19 @@ only works with its era look, so `era-look` should be its default: a new
 "Text terminal" retro look (monospace, no images but their alt text,
 highlighted links, everything in one column).
 
+### `terminal-1999`: Text terminal (1999)
+Modelled on Links (screenshots in the catalog). Monospace on black, no
+icons and no activity box (a terminal had none).
+- **Toolbar** (40): a menu bar (File, View, Help, mapped to the navigate,
+  options and help menus; Links' File menu holds back, forward, reload and
+  bookmarks) with the page title at the right; a `URL:` prompt line.
+- **Status** (40): a `|`-separated status line (text, modem, meter, SSL);
+  a reverse-video line of `[Back] [Forward] [Reload] [Stop] [Home]` and a
+  blinking `[*]` while loading.
+- **Pages**: black page, grey monospace. Era look: Text terminal (1999)
+  (`ui/retro/terminal.js`), which this mode uses by default
+  (`UiMode::needs_era_look`).
+
 ### `pc-1993`: Early PC (1993)
 Modelled on Cello (from memory). A Windows 3.1 frame; menu bar (File, Edit,
 Jump, Bookmark, Search, Configure, Help); no toolbar; status line with a

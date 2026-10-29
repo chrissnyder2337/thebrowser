@@ -101,7 +101,7 @@ ui/chrome/chrome.js             controller shared by every chrome page (title ch
 ui/chrome/<mode>/               each UI mode's toolbar.html and status.html (markup and CSS), and its pages.css
 ui/chrome/page-defaults.js      puts a UI mode's browser defaults (pages.css) under content pages
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
-ui/retro/{geocities,early-web,portal}.js the looks
+ui/retro/{geocities,early-web,portal,terminal}.js the looks
 ui/retro/splash.js              Flash-style splash intro
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
 ui/dialup-images.js             "slow images" pacer injected into content pages

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<!-- Text terminal (1999): a "|"-separated status line over a reverse-video
+     line of bracketed text buttons (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #000; color: #c0c0c0;
+    font: 15px/20px "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, "Courier New", monospace;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; cursor: default;
+  }
+
+  /* ---- Status line ---- */
+  #line { height: 20px; flex: none; display: flex; white-space: pre; }
+  .pane { height: 20px; flex: none; display: flex; align-items: center; }
+  .pane::before { content: "| "; }
+  #text { flex: 1; min-width: 0; }
+  #text::before { content: "| "; }
+  #msg { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #modem-pane { padding-right: 1ch; }
+  #modem-pane:hover { background: #c0c0c0; color: #000; }
+  #modem-label { white-space: nowrap; }
+  #meter-pane { width: 12ch; }
+  #meter { height: 20px; display: flex; visibility: hidden; align-items: center; }
+  #meter.on { visibility: visible; }
+  #meter i { width: 1ch; height: 15px; flex: none; background: #808080; }
+  #lock-pane { width: 7ch; }
+  #lock-pane::after { content: "[SSL]"; visibility: hidden; }
+  #lock-pane.secure::after { visibility: visible; }
+
+  /* ---- Reverse-video button line ---- */
+  #buttons { height: 20px; flex: none; display: flex; background: #c0c0c0; color: #000; white-space: pre; position: relative; }
+  .tb { height: 20px; padding: 0; margin-right: 1ch; }
+  .tb::before { content: "["; }
+  .tb::after { content: "]"; }
+  .tb:hover:not(.disabled), .tb:focus-visible { background: #000; color: #c0c0c0; }
+  .tb.disabled { color: #707070; }
+  #throbber { height: 20px; margin-left: auto; padding: 0 1ch; color: #000; }
+  #throbber::before { content: "[*]"; visibility: hidden; }
+  #throbber.loading::before { visibility: visible; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { visibility: hidden; } }
+</style>
+</head>
+<body>
+  <div id="line">
+    <div class="pane" id="text"><span id="msg">Ready.</span></div>
+    <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator"><span id="modem-label"></span></div>
+    <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
+    <div class="pane" id="lock-pane" title=""></div>
+  </div>
+  <div id="buttons">
+    <button class="tb disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">Back</button>
+    <button class="tb disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">Forward</button>
+    <button class="tb" id="reload" data-cmd="reload" title="Reload this page (F5)">Reload</button>
+    <button class="tb disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">Stop</button>
+    <button class="tb" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">Home</button>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern"></div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

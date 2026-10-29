@@ -28,6 +28,8 @@ const TOOLBAR_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/toolbar-199
 const DESKTOP_1996_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/desktop-1996/toolbar.html");
 const DESKTOP_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/desktop-1996/status.html");
 const APPLET_1997_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/applet-1997/toolbar.html");
+const TERMINAL_1999_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/terminal-1999/toolbar.html");
+const TERMINAL_1999_STATUS_HTML: &str = include_str!("../../ui/chrome/terminal-1999/status.html");
 const APPLET_1997_STATUS_HTML: &str = include_str!("../../ui/chrome/applet-1997/status.html");
 /// The controller every chrome page shares (title channel, `lantern.update`).
 const CHROME_JS: &str = include_str!("../../ui/chrome/chrome.js");
@@ -107,6 +109,7 @@ fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
         UiMode::Toolbar1996 => (TOOLBAR_1996_TOOLBAR_HTML, TOOLBAR_1996_STATUS_HTML),
         UiMode::Desktop1996 => (DESKTOP_1996_TOOLBAR_HTML, DESKTOP_1996_STATUS_HTML),
         UiMode::Applet1997 => (APPLET_1997_TOOLBAR_HTML, APPLET_1997_STATUS_HTML),
+        UiMode::Terminal1999 => (TERMINAL_1999_TOOLBAR_HTML, TERMINAL_1999_STATUS_HTML),
     }
 }
 
@@ -281,6 +284,10 @@ fn retro_description(style: RetroStyle) -> &'static str {
             "Switches every site's style sheets off, so pages show as plain HTML: \
              gray background, Times, blue and purple links. With a hit counter, of course."
         }
+        RetroStyle::Terminal => {
+            "Draws every page the way a text-mode browser showed it in an 80-column \
+             terminal: monospace on black, highlighted links, no pictures."
+        }
         RetroStyle::Portal => {
             "Squeezes pages into an 800x600-friendly column of small Arial with \
              colored heading bars, a channel bar, a search box and a blinking banner ad."
@@ -323,7 +330,7 @@ pub fn settings_uri(settings: &Settings, saved: bool) -> String {
         );
     }
     let mut retro = String::new();
-    for style in RetroStyle::ALL {
+    for style in RetroStyle::ON_SETTINGS_PAGE {
         let _ = write!(
             retro,
             concat!(

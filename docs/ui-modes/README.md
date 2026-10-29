@@ -50,6 +50,7 @@ Update the tables below in the same commit as the work they describe.
 | `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Planned |
 | `pc-1993` | Early PC (1993) | Cello | menus | Planned |
 | `terminal-1992` | Text terminal (1992) | Lynx | monospace chrome | Later |
+| `terminal-1999` | Text terminal (1999) | Links | the Text terminal look | Built (not yet merged) |
 | `dos-1996` | DOS graphics (1996) | Arachne | a side view | Later |
 | `cube-1990` | Cube workstation (1990) | WorldWideWeb | floating windows | Not planned |
 | `workspace-1997` | Workspace (1997) | Opera 3 | several content views | Not planned |

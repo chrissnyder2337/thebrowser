@@ -72,11 +72,11 @@ With the default `sandbox` feature the bundler builds the `cdylib` (entry point
   so `--url=example.com` works.
 - `--retro=<look>`: use a retro look for this run without saving it (see the README's
   [Retro looks](../README.md#retro-looks)):
-  `geocities`, `early-web`, `portal` or `off`. `--geocities` is short for
+  `geocities`, `early-web`, `portal`, `terminal` or `off`. `--geocities` is short for
   `--retro=geocities`.
 - `--ui=<mode>`: use a browser UI mode for this run without saving it (see
-  [docs/ui-modes/](ui-modes/)): `lantern`, `workstation-1993`, `toolbar-1996`, `desktop-1996` or
-  `applet-1997`.
+  [docs/ui-modes/](ui-modes/)): `lantern`, `workstation-1993`, `toolbar-1996`, `desktop-1996`,
+  `applet-1997` or `terminal-1999`.
 - `--self-test=<file>`: once the first page has loaded (or failed), write its
   URL, title and load status to `<file>` as `key=value` lines and quit. For
   `tests/smoke.sh`.

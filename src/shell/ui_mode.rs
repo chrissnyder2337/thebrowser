@@ -24,6 +24,7 @@ pub fn heights(mode: UiMode) -> (i32, i32) {
         UiMode::Toolbar1996 => (118, 22),
         UiMode::Desktop1996 => (104, 22),
         UiMode::Applet1997 => (102, 22),
+        UiMode::Terminal1999 => (40, 40),
     }
 }
 
@@ -49,6 +50,10 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Applet1997 => Some((
             include_str!("../../ui/chrome/applet-1997/pages.css"),
             "#ffffff",
+        )),
+        UiMode::Terminal1999 => Some((
+            include_str!("../../ui/chrome/terminal-1999/pages.css"),
+            "#000000",
         )),
     }
 }

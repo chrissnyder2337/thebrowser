@@ -152,6 +152,14 @@ menus):
   browser defaults off with them; it brings its own.
 - Lantern's internal pages (`data:` URLs) are never touched, as with the
   retro looks.
+- **Modes that need their look.** A text terminal can't show a modern page,
+  so for modes where `UiMode::needs_era_look()` is true the default
+  `defaults` setting gives the era look too; `as-is` still turns it off.
+- **New looks and the settings page.** `RetroStyle::ON_SETTINGS_PAGE` lists
+  the looks the settings page offers. A look added for a mode (Text
+  terminal) appears in the Retro menu and as the mode's era look, but not
+  on the settings page until the maintainer approves that page's new
+  golden screenshots.
 
 ### Shortcut
 

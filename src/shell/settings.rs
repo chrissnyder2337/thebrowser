@@ -104,10 +104,25 @@ pub enum RetroStyle {
     EarlyWeb,
     /// A 1997 web portal: a narrow column of small Arial, banner ad included.
     Portal,
+    /// A text-mode browser in an 80-column terminal: monospace on black, no
+    /// images. The Text terminal UI mode's era look.
+    Terminal,
 }
 
 impl RetroStyle {
-    pub const ALL: [Self; 4] = [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
+    pub const ALL: [Self; 5] = [
+        Self::Off,
+        Self::GeoCities,
+        Self::EarlyWeb,
+        Self::Portal,
+        Self::Terminal,
+    ];
+
+    /// The looks the settings page lists. Adding one changes that page's
+    /// golden screenshots, which only the maintainer may approve (steward
+    /// skill, "Oracle rules"), so newer looks are in the menus until then.
+    pub const ON_SETTINGS_PAGE: [Self; 4] =
+        [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
 
     pub fn key(self) -> &'static str {
         match self {
@@ -115,6 +130,7 @@ impl RetroStyle {
             Self::GeoCities => "geocities",
             Self::EarlyWeb => "early-web",
             Self::Portal => "portal",
+            Self::Terminal => "terminal",
         }
     }
 
@@ -129,6 +145,7 @@ impl RetroStyle {
             Self::GeoCities => "GeoCities homepage (1998)",
             Self::EarlyWeb => "Early web (1995)",
             Self::Portal => "Web portal (1997)",
+            Self::Terminal => "Text terminal (1999)",
         }
     }
 }
@@ -153,15 +170,19 @@ pub enum UiMode {
     /// A browser written for the Java platform: flat icon buttons with small
     /// labels and an Address row, in the toolkit's warm grey.
     Applet1997,
+    /// A text-mode browser: a menu bar and URL prompt on top, a status line
+    /// and text buttons at the bottom, monospace on black.
+    Terminal1999,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 6] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
         Self::Desktop1996,
         Self::Applet1997,
+        Self::Terminal1999,
     ];
 
     pub fn key(self) -> &'static str {
@@ -171,6 +192,7 @@ impl UiMode {
             Self::Toolbar1996 => "toolbar-1996",
             Self::Desktop1996 => "desktop-1996",
             Self::Applet1997 => "applet-1997",
+            Self::Terminal1999 => "terminal-1999",
         }
     }
 
@@ -186,7 +208,14 @@ impl UiMode {
             Self::Toolbar1996 => "Toolbar (1996)",
             Self::Desktop1996 => "Desktop (1996)",
             Self::Applet1997 => "Applet browser (1997)",
+            Self::Terminal1999 => "Text terminal (1999)",
         }
+    }
+
+    /// Whether pages only make sense in this mode's era look (a terminal
+    /// can't show a modern page), so the default `mode_pages` gives it.
+    pub fn needs_era_look(self) -> bool {
+        self == Self::Terminal1999
     }
 
     /// The retro look that renders pages the way this mode's browsers did.
@@ -194,6 +223,7 @@ impl UiMode {
         match self {
             Self::Lantern | Self::Desktop1996 | Self::Applet1997 => RetroStyle::Off,
             Self::Workstation1993 | Self::Toolbar1996 => RetroStyle::EarlyWeb,
+            Self::Terminal1999 => RetroStyle::Terminal,
         }
     }
 }
@@ -297,7 +327,12 @@ impl Settings {
     /// The look pages get: the retro look the user picked, else the UI
     /// mode's era look if they asked for it.
     pub fn page_look(&self) -> RetroStyle {
-        if self.retro_style == RetroStyle::Off && self.mode_pages == ModePages::EraLook {
+        let era = match self.mode_pages {
+            ModePages::AsIs => false,
+            ModePages::Defaults => self.ui_mode.needs_era_look(),
+            ModePages::EraLook => true,
+        };
+        if self.retro_style == RetroStyle::Off && era {
             self.ui_mode.era_look()
         } else {
             self.retro_style
@@ -467,6 +502,22 @@ mod tests {
             .serialize();
             assert_eq!(Settings::parse(&saved).mode_pages, pages);
         }
+    }
+
+    #[test]
+    fn terminal_pages_default_to_the_era_look() {
+        let mut settings = Settings {
+            ui_mode: UiMode::Terminal1999,
+            ..Settings::default()
+        };
+        assert_eq!(settings.page_look(), RetroStyle::Terminal);
+        settings.mode_pages = ModePages::AsIs;
+        assert_eq!(settings.page_look(), RetroStyle::Off);
+        settings.mode_pages = ModePages::Defaults;
+        settings.retro_style = RetroStyle::GeoCities;
+        assert_eq!(settings.page_look(), RetroStyle::GeoCities);
+        assert!(!RetroStyle::ON_SETTINGS_PAGE.contains(&RetroStyle::Terminal));
+        assert_eq!(RetroStyle::from_key("terminal"), Some(RetroStyle::Terminal));
     }
 
     /// The branding rule (steward skill): modes are named after an era and a

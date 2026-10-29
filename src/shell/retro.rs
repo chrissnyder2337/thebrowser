@@ -13,7 +13,7 @@ use super::{
 use cef::*;
 
 const RUNTIME: &str = include_str!("../../ui/retro/runtime.js");
-const LOOKS: [(RetroStyle, &str); 3] = [
+const LOOKS: [(RetroStyle, &str); 4] = [
     (
         RetroStyle::GeoCities,
         include_str!("../../ui/retro/geocities.js"),
@@ -23,6 +23,10 @@ const LOOKS: [(RetroStyle, &str); 3] = [
         include_str!("../../ui/retro/early-web.js"),
     ),
     (RetroStyle::Portal, include_str!("../../ui/retro/portal.js")),
+    (
+        RetroStyle::Terminal,
+        include_str!("../../ui/retro/terminal.js"),
+    ),
 ];
 const SPLASH: &str = include_str!("../../ui/retro/splash.js");
 
@@ -175,6 +179,7 @@ pub fn set_style(style: RetroStyle) {
         RetroStyle::GeoCities => "GeoCities mode on. Welcome to the information superhighway!",
         RetroStyle::EarlyWeb => "Early web: it's 1995 and style sheets haven't been invented.",
         RetroStyle::Portal => "Welcome to LanternNet, your start page for the World Wide Web.",
+        RetroStyle::Terminal => "Text terminal: 80 columns, no pictures, all keyboard.",
     });
 }
 

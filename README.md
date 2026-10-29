@@ -113,6 +113,10 @@ picks one for a single run. More modes are on the way: see
   Internet Explorer 3.
 - **Applet browser (1997)**: flat icon buttons with small labels in a warm
   grey toolkit look, modelled on HotJava.
+- **Text terminal (1999)**: a menu bar and URL prompt over the page, a
+  status line and `[Back] [Forward]` buttons under it, all monospace on
+  black, modelled on Links. Pages get the Text terminal look to match:
+  monospace, highlighted links, no pictures.
 
 Pages can follow the mode too, picked under **Browser UI**: as their sites
 made them, with the mode's browser defaults (a grey page and Times on plain
