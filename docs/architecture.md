@@ -64,6 +64,14 @@ toolbar view.
 Research for new looks: [`docs/research/90s-browsers/`](research/90s-browsers/)
 catalogs the browsers of the 1990s, version by version, with screenshots.
 
+## UI modes
+
+A UI mode swaps the toolbar and status bar for another 1990s browser's
+layout. Every chrome page shares one controller, `ui/chrome/chrome.js`
+(title channel, `lantern.update`), and each mode supplies only markup and
+CSS in `ui/chrome/<mode>/`. The spec, the per-mode layouts and the status
+of the work are in [`docs/ui-modes/`](ui-modes/).
+
 ## Source layout
 
 ```
