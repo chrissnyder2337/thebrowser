@@ -127,10 +127,26 @@ panel holds the **frame view** over the **content view**, inside a border.
 | `side`, `side_left` | The side view's width and side: DOS graphics' button column, the Workspace hotlist. |
 | `frame` | A view right over the page, inside the inset: a document window's title bar. |
 | `inset`, `inset_color` | A border around frame and page (top, left, bottom, right): the TV's screen margin, a document window on a desktop. |
+| `well`, `well_color` | A thin line right around frame and page, inside the inset: a sunken page edge (Workstation) or a window's black outline (Classic desktop). |
+
+The inset and well panels have a delegate that sets their color again on
+every theme change, which resets a view's background.
+
+**Patterns built on this:**
+
+- *Sunken page*: an inset in the face colour and a dark well (Workstation 1993).
+- *Mac desktop* (Classic desktop modes): the toolbar view is the Mac menu
+  bar; the inset is desktop grey; the well is the document window's black
+  outline; the frame view is the window's title bar, with the browser's
+  own toolbar rows under it when the original put them inside the window.
 
 The side and frame views are chrome views like the toolbar and status bar
 (`side.html`, `frame.html` in the mode's folder; same controller, same
-lockdown, the toolbar's commands). Views' sizes are read from a
+lockdown, the toolbar's commands). Besides navigation, the toolbar, side and
+frame views may send `print`, `view-source`, `zoom-in`, `zoom-out` and
+`fullscreen`, for the originals' Print, Font and Fullscreen buttons. The
+status view's narrower list includes `menu`, for browsers whose menu keys
+sat at the bottom (the text terminal's O)ptions). Views' sizes are read from a
 thread-local, not shell state, because CEF asks during layout.
 
 ### Switching at runtime
