@@ -133,6 +133,42 @@ impl RetroStyle {
     }
 }
 
+/// Which 1990s browser layout the toolbar and status bar wear (see
+/// `ui/chrome/` and docs/ui-modes/). Names describe the era, never a product
+/// (steward skill, "Branding rule").
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum UiMode {
+    /// Lantern's own toolbar.
+    #[default]
+    Lantern,
+    /// A Motif workstation browser: menu bar, Title and URL fields, and a row
+    /// of text buttons under the page.
+    Workstation1993,
+}
+
+impl UiMode {
+    pub const ALL: [Self; 2] = [Self::Lantern, Self::Workstation1993];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Lantern => "lantern",
+            Self::Workstation1993 => "workstation-1993",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|mode| mode.key() == key)
+    }
+
+    /// Name for menus.
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Lantern => "Lantern (default)",
+            Self::Workstation1993 => "Workstation (1993)",
+        }
+    }
+}
+
 fn parse_bool(value: &str) -> bool {
     matches!(value, "1" | "true" | "on" | "yes")
 }
@@ -144,6 +180,7 @@ pub struct Settings {
     pub retro_style: RetroStyle,
     /// Show a Flash-style splash intro when entering a site.
     pub splash_intro: bool,
+    pub ui_mode: UiMode,
 }
 
 impl Settings {
@@ -165,6 +202,7 @@ impl Settings {
                     settings.retro_style = RetroStyle::from_key(value).unwrap_or_default()
                 }
                 "splash_intro" => settings.splash_intro = parse_bool(value),
+                "ui_mode" => settings.ui_mode = UiMode::from_key(value).unwrap_or_default(),
                 // Written by the first release of GeoCities mode.
                 "geocities" if parse_bool(value) => settings.retro_style = RetroStyle::GeoCities,
                 _ => {}
@@ -175,11 +213,12 @@ impl Settings {
 
     fn serialize(&self) -> String {
         format!(
-            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\n",
+            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\nui_mode={}\n",
             self.dialup_mode.key(),
             self.modem_speed.key(),
             self.retro_style.key(),
-            self.splash_intro
+            self.splash_intro,
+            self.ui_mode.key()
         )
     }
 
@@ -258,6 +297,7 @@ mod tests {
                 modem_speed: ModemSpeed::K28_8,
                 retro_style: RetroStyle::Portal,
                 splash_intro: true,
+                ui_mode: UiMode::Lantern,
             }
         );
         assert_eq!(Settings::parse(&settings.serialize()), settings);
@@ -301,6 +341,48 @@ mod tests {
     }
 
     #[test]
+    fn ui_modes_round_trip() {
+        for mode in UiMode::ALL {
+            assert_eq!(UiMode::from_key(mode.key()), Some(mode));
+            let saved = Settings {
+                ui_mode: mode,
+                ..Settings::default()
+            }
+            .serialize();
+            assert_eq!(Settings::parse(&saved).ui_mode, mode);
+        }
+        assert_eq!(Settings::parse("ui_mode=kiosk\n").ui_mode, UiMode::Lantern);
+    }
+
+    /// The branding rule (steward skill): modes are named after an era and a
+    /// kind of machine, never after a real browser.
+    #[test]
+    fn ui_modes_avoid_product_names() {
+        let banned = [
+            "netscape",
+            "navigator",
+            "explorer",
+            "mosaic",
+            "opera",
+            "webtv",
+            "hotjava",
+            "macwww",
+            "cello",
+            "lynx",
+            "arachne",
+            "icab",
+            "omniweb",
+            "communicator",
+        ];
+        for mode in UiMode::ALL {
+            for text in [mode.key(), mode.name()] {
+                let text = text.to_ascii_lowercase();
+                assert!(!banned.iter().any(|b| text.contains(b)), "{text}");
+            }
+        }
+    }
+
+    #[test]
     fn speeds_are_ordered() {
         let rates: Vec<_> = ModemSpeed::ALL
             .iter()
@@ -320,6 +402,7 @@ mod tests {
             modem_speed: ModemSpeed::K33_6,
             retro_style: RetroStyle::GeoCities,
             splash_intro: true,
+            ui_mode: UiMode::Workstation1993,
         };
         save_to(&path, &settings).unwrap();
         assert_eq!(load_from(&path), settings);

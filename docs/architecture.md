@@ -84,7 +84,8 @@ src/shell/dialup.rs             dial-up simulator: network emulation and the ima
 src/shell/retro.rs              retro looks: the Retro menu and running ui/retro/*.js
 src/shell/selftest.rs           --self-test=<file>: report the first load and quit
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
-ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
+ui/chrome/chrome.js             controller shared by every chrome page (title channel, lantern.update)
+ui/chrome/<mode>/               each UI mode's toolbar.html and status.html (markup and CSS)
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
 ui/retro/{geocities,early-web,portal}.js the looks
 ui/retro/splash.js              Flash-style splash intro

@@ -134,7 +134,7 @@
       <div class="sep"></div>
       <button class="big disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_STOP}}<span>Stop</span></button>
       <div class="sep"></div>
-      <button class="big" id="retro" data-cmd="retro-menu" title="Retro looks: make every page look like the '90s" aria-haspopup="menu" aria-pressed="false">{{ICON_RETRO}}<span>Retro &#9662;</span></button>
+      <button class="big" id="retro" data-cmd="retro-menu" data-anchor title="Retro looks: make every page look like the '90s" aria-haspopup="menu" aria-pressed="false">{{ICON_RETRO}}<span>Retro &#9662;</span></button>
     </div>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       <div class="glow">
@@ -159,122 +159,7 @@
   </div>
   <template id="page-icon">{{ICON_PAGE}}</template>
 <script>
-(function () {
-  "use strict";
-  var seq = 0;
-  // Title channel to Rust: "lantern|<seq>|<command>|<encoded arg>".
-  function send(cmd, arg) {
-    seq += 1;
-    document.title = "lantern|" + seq + "|" + cmd + "|" + encodeURIComponent(arg || "");
-  }
-
-  var url = document.getElementById("url");
-  var field = document.getElementById("field");
-  var throbber = document.getElementById("throbber");
-  var links = document.getElementById("links");
-  var pageIcon = document.getElementById("page-icon").innerHTML;
-  var buttons = {
-    back: document.getElementById("back"),
-    forward: document.getElementById("forward"),
-    stop: document.getElementById("stop"),
-    retro: document.getElementById("retro")
-  };
-  var state = { url: "" };
-  var editing = false;
-
-  Array.prototype.forEach.call(document.querySelectorAll(".big"), function (b) {
-    b.addEventListener("click", function () {
-      if (b.classList.contains("disabled")) return;
-      // The Retro menu opens under the button, so tell Rust where that is.
-      var r = b.getBoundingClientRect();
-      send(b.dataset.cmd, b.id === "retro" ? r.left + "," + r.bottom : "");
-    });
-  });
-  throbber.addEventListener("click", function () { send("about"); });
-
-  function go() {
-    var text = url.value.trim();
-    editing = false;
-    if (text) send("go", text);
-  }
-  document.getElementById("go").addEventListener("click", go);
-  url.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") { e.preventDefault(); go(); }
-    else if (e.key === "Escape") { editing = false; url.value = state.url; url.select(); }
-  });
-  url.addEventListener("input", function () { editing = true; });
-  url.addEventListener("focus", function () { setTimeout(function () { url.select(); }, 0); });
-  url.addEventListener("blur", function () {
-    if (editing && url.value.trim() === "") { editing = false; url.value = state.url; }
-  });
-
-  // Chrome pages have no context menu (except the URL field) and nothing to drag.
-  document.addEventListener("contextmenu", function (e) { if (e.target !== url) e.preventDefault(); });
-  document.addEventListener("dragstart", function (e) { if (e.target !== url) e.preventDefault(); });
-  document.addEventListener("dragover", function (e) { e.preventDefault(); });
-  document.addEventListener("drop", function (e) {
-    e.preventDefault();
-    var text = e.dataTransfer && (e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain"));
-    if (text) send("go", text.split("\n")[0]);
-  });
-
-  function setDisabled(el, disabled) { el.classList.toggle("disabled", !!disabled); }
-
-  function renderLinks(list) {
-    links.textContent = "";
-    if (!list.length) {
-      var none = document.createElement("span");
-      none.className = "none";
-      none.textContent = "(no bookmarks)";
-      links.appendChild(none);
-      return;
-    }
-    list.forEach(function (b) {
-      var btn = document.createElement("button");
-      btn.className = "ql";
-      btn.title = b.url;
-      btn.innerHTML = pageIcon;
-      var label = document.createElement("span");
-      label.textContent = b.title;
-      btn.appendChild(label);
-      btn.addEventListener("click", function () { send("open", b.url); });
-      links.appendChild(btn);
-    });
-  }
-
-  var lastLinks = null;
-  window.lantern = {
-    update: function (s) {
-      if ("url" in s) {
-        state.url = s.url;
-        if (!editing || document.activeElement !== url) { editing = false; url.value = s.url; }
-      }
-      if ("canBack" in s) setDisabled(buttons.back, !s.canBack);
-      if ("canFwd" in s) setDisabled(buttons.forward, !s.canFwd);
-      if ("loading" in s) {
-        setDisabled(buttons.stop, !s.loading);
-        throbber.classList.toggle("loading", !!s.loading);
-      }
-      if ("secure" in s) field.classList.toggle("secure", !!s.secure);
-      if ("retro" in s) {
-        var on = s.retro !== "off";
-        buttons.retro.classList.toggle("latched", on);
-        buttons.retro.setAttribute("aria-pressed", on ? "true" : "false");
-        buttons.retro.title = "Retro looks: " + s.retroName;
-      }
-      if (s.bookmarks) {
-        var key = JSON.stringify(s.bookmarks);
-        if (key !== lastLinks) { lastLinks = key; renderLinks(s.bookmarks); }
-      }
-    },
-    focusUrl: function () {
-      url.focus();
-      url.select();
-    }
-  };
-
-  send("ready");
-})();
+{{CHROME_JS}}
 </script>
 </body>
 </html>

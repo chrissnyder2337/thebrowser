@@ -1,18 +1,18 @@
 ---
 name: chrome-command
-description: Add or change a Lantern toolbar (or status bar) command end to end — the button in ui/toolbar.html, its pixel-art icon, the title-channel message, the Rust handler in src/shell/commands.rs, and state pushed back with lantern.update — plus the tests and checks. Use when asked to add a toolbar button, menu entry, keyboard shortcut or status-bar click that makes the browser do something.
+description: Add or change a Lantern toolbar (or status bar) command end to end — the button in ui/chrome/lantern/toolbar.html, its pixel-art icon, the title-channel message, the Rust handler in src/shell/commands.rs, and state pushed back with lantern.update — plus the tests and checks. Use when asked to add a toolbar button, menu entry, keyboard shortcut or status-bar click that makes the browser do something.
 ---
 
 # Adding a chrome command
 
-The toolbar and status bar are `data:` pages built from `ui/toolbar.html` and
-`ui/status.html`. They talk to Rust over the **title channel** and Rust talks
+The toolbar and status bar are `data:` pages built from `ui/chrome/lantern/toolbar.html` and
+`ui/chrome/lantern/status.html`. They talk to Rust over the **title channel** and Rust talks
 back with **`lantern.update({...})`** (`docs/architecture.md` → "The window and its views"). A new command
 touches each hop below. New toolbar commands are **tier 1** (`CLAUDE.md`).
 Anything that changes `lantern.invalid` actions, `client.rs` request handling
 or `util.rs` escaping is **tier 2**: stop and say so in the PR.
 
-## 1. The button (`ui/toolbar.html`)
+## 1. The button (`ui/chrome/lantern/toolbar.html`)
 
 Add a button next to its neighbours in the toolbar markup:
 
@@ -26,7 +26,7 @@ command needs no new JS. For anything else (a link, the URL field, a command
 with an argument) call `send("<command>", arg)`: it sets
 `document.title = "lantern|<seq>|<command>|" + encodeURIComponent(arg)`. The
 sequence number makes a repeated command a new title. Status-bar commands use
-the same `send` in `ui/status.html`.
+the same `send` in `ui/chrome/lantern/status.html`.
 
 Labels follow the branding rule in the steward skill: describe the era, never
 name a real browser.
@@ -69,7 +69,7 @@ If the button needs state (enabled, latched, a label):
 - add the field to `Shell` and to `Shell::toolbar_json()` using the `Json`
   builder (`Json::str` escapes; never `format!` strings into JSON or JS);
 - call `push_toolbar()` (or `push_all()`) after it changes;
-- handle the key in `window.lantern.update` in `ui/toolbar.html` with an
+- handle the key in `window.lantern.update` in `ui/chrome/lantern/toolbar.html` with an
   `if ("<key>" in s)` block, like `canBack` or `retro`. Updates are partial,
   so only act on keys that are present.
 

@@ -17,8 +17,10 @@ pub const SETTINGS: &str = "lantern:settings";
 /// Host whose URLs internal pages use as "links back into Rust".
 pub const ACTION_HOST: &str = "lantern.invalid";
 
-const TOOLBAR_HTML: &str = include_str!("../../ui/toolbar.html");
-const STATUS_HTML: &str = include_str!("../../ui/status.html");
+const TOOLBAR_HTML: &str = include_str!("../../ui/chrome/lantern/toolbar.html");
+const STATUS_HTML: &str = include_str!("../../ui/chrome/lantern/status.html");
+/// The controller every chrome page shares (title channel, `lantern.update`).
+const CHROME_JS: &str = include_str!("../../ui/chrome/chrome.js");
 const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
 const BOOKMARKS_HTML: &str = include_str!("../../ui/pages/bookmarks.html");
 const ABOUT_HTML: &str = include_str!("../../ui/pages/about.html");
@@ -112,6 +114,7 @@ pub fn toolbar_uri() -> String {
         vars.push(("ICON_LOCK".to_owned(), sheet.svg("lock", 1, "lock")));
         vars.push(("ICON_PAGE".to_owned(), sheet.svg("page", 1, "pg")));
     });
+    vars.push(("CHROME_JS".to_owned(), CHROME_JS.trim_end().to_owned()));
     with_lantern(|sheet| {
         vars.push(("LANTERN_IDLE".to_owned(), sheet.svg("idle", 2, "idle")));
         vars.push((
@@ -136,7 +139,11 @@ pub fn status_uri() -> String {
     });
     html_uri(&fill(
         STATUS_HTML,
-        &[("ICON_LOCK", lock), ("ICON_MODEM", modem)],
+        &[
+            ("ICON_LOCK", lock),
+            ("ICON_MODEM", modem),
+            ("CHROME_JS", CHROME_JS.trim_end().to_owned()),
+        ],
     ))
 }
 
