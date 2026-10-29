@@ -94,7 +94,7 @@ wrap_browser_process_handler! {
                 shell.bookmarks = list.clone();
                 shell.settings = user_settings;
             });
-            super::ui_mode::use_heights(user_settings.ui_mode);
+            super::ui_mode::use_layout(user_settings.ui_mode, false);
 
             // The content view starts on the home page unless --url= was given.
             let start = command_line.as_ref().and_then(url_switch);
@@ -112,15 +112,18 @@ wrap_browser_process_handler! {
                 }
             };
 
-            let views: Vec<(Role, BrowserView)> = [
-                (Role::Toolbar, pages::toolbar_uri(user_settings.ui_mode)),
-                (Role::Content, content_url),
-                (Role::Status, pages::status_uri(user_settings.ui_mode)),
-            ]
-            .into_iter()
-            .filter_map(|(role, url)| create_browser_view(role, &url).map(|view| (role, view)))
-            .collect();
-            assert_eq!(views.len(), 3, "failed to create the browser views");
+            let views: Vec<(Role, BrowserView)> = Role::ALL
+                .into_iter()
+                .map(|role| {
+                    let url = match role {
+                        Role::Content => content_url.clone(),
+                        _ => pages::chrome_uri(role, user_settings.ui_mode),
+                    };
+                    (role, url)
+                })
+                .filter_map(|(role, url)| create_browser_view(role, &url).map(|view| (role, view)))
+                .collect();
+            assert_eq!(views.len(), Role::ALL.len(), "failed to create the browser views");
 
             // Create the window. It shows itself in on_window_created.
             let mut delegate = LanternWindowDelegate::new(RefCell::new(views));

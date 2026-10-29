@@ -10,22 +10,76 @@ use super::{
 use cef::*;
 use std::cell::Cell;
 
+/// How a mode lays out the window (see window.rs): the views' sizes in DIP,
+/// where the side view goes, and the border around the page. A size of 0
+/// hides that view.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Layout {
+    /// The toolbar view, full width at the top.
+    pub toolbar: i32,
+    /// The status view, full width at the bottom.
+    pub status: i32,
+    /// The status view's height while the mode's panel is open (the TV
+    /// Options panel); 0 when the mode has none.
+    pub status_open: i32,
+    /// The side view's width, beside the page.
+    pub side: i32,
+    pub side_left: bool,
+    /// The frame view, right above the page and inside the inset.
+    pub frame: i32,
+    /// Border around the frame and page: top, left, bottom, right.
+    pub inset: [i32; 4],
+    /// The border's color (ARGB).
+    pub inset_color: u32,
+}
+
+impl Layout {
+    /// A toolbar over the page and a status bar under it.
+    const fn bars(toolbar: i32, status: i32) -> Self {
+        Self {
+            toolbar,
+            status,
+            status_open: 0,
+            side: 0,
+            side_left: true,
+            frame: 0,
+            inset: [0; 4],
+            inset_color: 0xFFC0C0C0,
+        }
+    }
+
+    /// The status view's height, given whether the panel is open.
+    pub fn status_height(&self, panel_open: bool) -> i32 {
+        if panel_open && self.status_open > 0 {
+            self.status_open
+        } else {
+            self.status
+        }
+    }
+}
+
 thread_local! {
     // Kept out of the shell state: CEF asks for view sizes during layout,
     // which can happen while the shell is borrowed.
-    static HEIGHTS: Cell<(i32, i32)> = Cell::new(heights(UiMode::Lantern));
+    static CURRENT: Cell<(Layout, bool)> = const { Cell::new((Layout::bars(112, 24), false)) };
+}
+
+/// How `mode` lays out the window.
+pub fn layout(mode: UiMode) -> Layout {
+    match mode {
+        UiMode::Lantern => Layout::bars(112, 24),
+        UiMode::Workstation1993 => Layout::bars(104, 72),
+        UiMode::Toolbar1996 => Layout::bars(118, 22),
+        UiMode::Desktop1996 => Layout::bars(104, 22),
+        UiMode::Applet1997 => Layout::bars(102, 22),
+        UiMode::Terminal1999 => Layout::bars(40, 40),
+    }
 }
 
 /// Heights of the toolbar and status views, in DIP.
 pub fn heights(mode: UiMode) -> (i32, i32) {
-    match mode {
-        UiMode::Lantern => (112, 24),
-        UiMode::Workstation1993 => (104, 72),
-        UiMode::Toolbar1996 => (118, 22),
-        UiMode::Desktop1996 => (104, 22),
-        UiMode::Applet1997 => (102, 22),
-        UiMode::Terminal1999 => (40, 40),
-    }
+    let layout = layout(mode);
+    (layout.toolbar, layout.status)
 }
 
 const PAGE_DEFAULTS_JS: &str = include_str!("../../ui/chrome/page-defaults.js");
@@ -81,14 +135,25 @@ fn defaults_call(css: &str, background: &str) -> String {
     )
 }
 
-/// Heights for the mode the window is in now.
-pub fn current_heights() -> (i32, i32) {
-    HEIGHTS.with(Cell::get)
+/// The layout the window is in now, and whether the mode's panel is open.
+pub fn current() -> (Layout, bool) {
+    CURRENT.with(Cell::get)
 }
 
 /// Size the views for `mode` from the next layout on.
-pub fn use_heights(mode: UiMode) {
-    HEIGHTS.with(|cell| cell.set(heights(mode)));
+pub fn use_layout(mode: UiMode, panel_open: bool) {
+    CURRENT.with(|cell| cell.set((layout(mode), panel_open)));
+}
+
+/// Open or close the mode's panel (the `panel` command).
+pub fn toggle_panel() {
+    let (layout, open) = current();
+    if layout.status_open == 0 {
+        return;
+    }
+    with_shell(|shell| shell.panel_open = !open);
+    relayout();
+    super::state::push_status();
 }
 
 /// Switch to `mode` and remember it.
@@ -120,34 +185,71 @@ pub fn set_pages(pages: ModePages) {
 /// Load the current mode's chrome pages and lay the window out for them.
 /// Each page sends `ready` once loaded, which brings the full state push.
 pub fn apply() {
-    let (mode, window, toolbar, status) = with_shell(|shell| {
-        (
-            shell.settings.ui_mode,
-            shell.window.clone(),
-            shell.toolbar.clone(),
-            shell.status.clone(),
-        )
+    let mode = with_shell(|shell| {
+        shell.panel_open = false;
+        shell.settings.ui_mode
     });
-    use_heights(mode);
-    for (role, browser, uri) in [
-        (Role::Toolbar, &toolbar, pages::toolbar_uri(mode)),
-        (Role::Status, &status, pages::status_uri(mode)),
-    ] {
-        let Some(frame) = browser.as_ref().and_then(|b| b.main_frame()) else {
+    for role in Role::CHROME {
+        let Some(frame) = with_shell(|shell| shell.browser(role)).and_then(|b| b.main_frame())
+        else {
             continue;
         };
         // Not ready until the new page says so; pushes wait until then.
-        with_shell(|shell| match role {
-            Role::Toolbar => shell.toolbar_ready = false,
-            _ => shell.status_ready = false,
-        });
-        frame.load_url(Some(&CefString::from(uri.as_str())));
+        with_shell(|shell| shell.set_ready(role, false));
+        frame.load_url(Some(&CefString::from(
+            pages::chrome_uri(role, mode).as_str(),
+        )));
     }
-    // The views' delegates size themselves from the new heights.
-    for mut browser in [toolbar, status].into_iter().flatten() {
-        if let Some(view) = browser_view_get_for_browser(Some(&mut browser)) {
-            view.invalidate_layout();
+    relayout();
+}
+
+/// Lay the window out for the current mode: view sizes and visibility, the
+/// side view's position, and the inset around the page.
+pub fn relayout() {
+    let (mode, panel_open, window, middle, inset, browsers) = with_shell(|shell| {
+        let browsers: Vec<(Role, Browser)> = Role::ALL
+            .into_iter()
+            .filter_map(|role| shell.browser(role).map(|b| (role, b)))
+            .collect();
+        (
+            shell.settings.ui_mode,
+            shell.panel_open,
+            shell.window.clone(),
+            shell.middle.clone(),
+            shell.inset.clone(),
+            browsers,
+        )
+    });
+    use_layout(mode, panel_open);
+    let layout = layout(mode);
+    let mut side_view = None;
+    let mut content_view = None;
+    for (role, mut browser) in browsers {
+        let Some(view) = browser_view_get_for_browser(Some(&mut browser)) else {
+            continue;
+        };
+        let size = match role {
+            Role::Toolbar => layout.toolbar,
+            Role::Status => layout.status_height(panel_open),
+            Role::Side => layout.side,
+            Role::Frame => layout.frame,
+            Role::Content => 1,
+        };
+        view.set_visible((size > 0).into());
+        // The views' delegates size themselves from the new layout.
+        view.invalidate_layout();
+        match role {
+            Role::Side => side_view = Some(View::from(&view)),
+            Role::Content => content_view = Some(View::from(&view)),
+            _ => {}
         }
+    }
+    if let (Some(middle), Some(mut side)) = (middle, side_view) {
+        let index = if layout.side_left { 0 } else { 1 };
+        middle.reorder_child_view(Some(&mut side), index);
+    }
+    if let Some(inset) = inset {
+        super::window::lay_out_inset(&inset, &layout, content_view);
     }
     if let Some(window) = window {
         window.layout();

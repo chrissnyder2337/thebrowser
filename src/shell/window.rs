@@ -1,4 +1,7 @@
-//! The top-level window and the three browser view delegates.
+//! The top-level window, the panels its views sit in, and the browser view
+//! delegates. The window is a column: the toolbar view; a middle row of the
+//! side view and an inset panel (the frame view over the page); the status
+//! view. A UI mode's `ui_mode::Layout` sizes, shows and hides them.
 
 use super::{
     state::{Role, with_shell},
@@ -21,8 +24,10 @@ wrap_window_delegate! {
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
-            let (toolbar, status) = ui_mode::current_heights();
-            Size { width: 520, height: toolbar + status + 120 }
+            let (layout, open) = ui_mode::current();
+            let height = layout.toolbar + layout.status_height(open) + layout.frame
+                + layout.inset[0] + layout.inset[2] + 120;
+            Size { width: 520 + layout.side + layout.inset[1] + layout.inset[3], height }
         }
     }
 
@@ -36,28 +41,44 @@ wrap_window_delegate! {
             };
             window.set_background_color(FACE_GRAY);
 
-            let layout_settings = BoxLayoutSettings {
-                horizontal: 0,
-                cross_axis_alignment: AxisAlignment::STRETCH,
-                ..Default::default()
+            let views = self.views.borrow();
+            let view_for = |role: Role| {
+                views
+                    .iter()
+                    .find(|(r, _)| *r == role)
+                    .map(|(_, v)| {
+                        if role != Role::Content {
+                            v.set_background_color(FACE_GRAY);
+                        }
+                        View::from(v)
+                    })
             };
-            let layout = window.set_to_box_layout(Some(&layout_settings));
-
-            for (role, browser_view) in self.views.borrow().iter() {
-                if *role != Role::Content {
-                    browser_view.set_background_color(FACE_GRAY);
-                }
-                let mut view = View::from(browser_view);
-                window.add_child_view(Some(&mut view));
-                if let Some(layout) = layout.as_ref() {
-                    let flex = if *role == Role::Content { 1 } else { 0 };
-                    layout.set_flex_for_view(Some(&mut view), flex);
-                }
-            }
+            let (Some(middle), Some(inset)) = (panel_create(None), panel_create(None))
+            else {
+                return;
+            };
+            let column = box_layout(window, false);
+            let row = box_layout(&middle, true);
+            add(window, column.as_ref(), view_for(Role::Toolbar), 0);
+            add(window, column.as_ref(), Some(View::from(&middle)), 1);
+            add(window, column.as_ref(), view_for(Role::Status), 0);
+            add(&middle, row.as_ref(), view_for(Role::Side), 0);
+            add(&middle, row.as_ref(), Some(View::from(&inset)), 1);
+            inset.add_child_view(view_for(Role::Frame).as_mut());
+            inset.add_child_view(view_for(Role::Content).as_mut());
+            let (layout, _) = ui_mode::current();
+            lay_out_inset(&inset, &layout, view_for(Role::Content));
+            drop(views);
+            with_shell(|shell| {
+                shell.middle = Some(middle.clone());
+                shell.inset = Some(inset.clone());
+            });
 
             window.set_title(Some(&CefString::from("Lantern")));
             set_window_icons(window);
             with_shell(|shell| shell.window = Some(window.clone()));
+            // Hide the views this mode doesn't use and place the side view.
+            ui_mode::relayout();
             window.show();
 
             if let Some((_, content)) = self.views.borrow().iter().find(|(r, _)| *r == Role::Content) {
@@ -67,13 +88,17 @@ wrap_window_delegate! {
 
         fn on_window_destroyed(&self, _window: Option<&mut Window>) {
             self.views.borrow_mut().clear();
-            with_shell(|shell| shell.window = None);
+            with_shell(|shell| {
+                shell.window = None;
+                shell.middle = None;
+                shell.inset = None;
+            });
         }
 
         fn can_close(&self, _window: Option<&mut Window>) -> ::std::os::raw::c_int {
             // Ask each browser; CEF re-invokes the close once unload handlers finish.
             let browsers: Vec<Browser> = with_shell(|shell| {
-                [Role::Content, Role::Toolbar, Role::Status]
+                Role::ALL
                     .into_iter()
                     .filter_map(|role| shell.browser(role))
                     .collect()
@@ -106,6 +131,75 @@ wrap_window_delegate! {
     }
 }
 
+/// A view's size in the current layout; `across` is its size along the
+/// other axis (the box layouts stretch it).
+fn chrome_size(role: Role, across: i32) -> Size {
+    let (layout, open) = ui_mode::current();
+    match role {
+        Role::Toolbar => Size {
+            width: across,
+            height: layout.toolbar,
+        },
+        Role::Status => Size {
+            width: across,
+            height: layout.status_height(open),
+        },
+        Role::Frame => Size {
+            width: across,
+            height: layout.frame,
+        },
+        Role::Side => Size {
+            width: layout.side,
+            height: across,
+        },
+        Role::Content => Size {
+            width: across,
+            height: if across > 0 { 600 } else { 0 },
+        },
+    }
+}
+
+fn box_layout(panel: &impl ImplPanel, horizontal: bool) -> Option<BoxLayout> {
+    let settings = BoxLayoutSettings {
+        horizontal: horizontal.into(),
+        cross_axis_alignment: AxisAlignment::STRETCH,
+        ..Default::default()
+    };
+    panel.set_to_box_layout(Some(&settings))
+}
+
+fn add(panel: &impl ImplPanel, layout: Option<&BoxLayout>, view: Option<View>, flex: i32) {
+    let Some(mut view) = view else {
+        return;
+    };
+    panel.add_child_view(Some(&mut view));
+    if let Some(layout) = layout {
+        layout.set_flex_for_view(Some(&mut view), flex);
+    }
+}
+
+/// Lay out the inset panel for `layout`: the frame view over the page, with
+/// the mode's border around them in its color.
+pub fn lay_out_inset(inset: &Panel, layout: &ui_mode::Layout, content: Option<View>) {
+    let [top, left, bottom, right] = layout.inset;
+    let settings = BoxLayoutSettings {
+        horizontal: 0,
+        inside_border_insets: Insets {
+            top,
+            left,
+            bottom,
+            right,
+        },
+        cross_axis_alignment: AxisAlignment::STRETCH,
+        ..Default::default()
+    };
+    let box_layout = inset.set_to_box_layout(Some(&settings));
+    if let (Some(box_layout), Some(mut content)) = (box_layout, content) {
+        box_layout.set_flex_for_view(Some(&mut content), 1);
+    }
+    inset.set_background_color(layout.inset_color);
+}
+
 const ICON_SMALL_PNG: &[u8] = include_bytes!("../../ui/appicon/lantern_32.png");
 const ICON_LARGE_PNG: &[u8] = include_bytes!("../../ui/appicon/lantern_256.png");
 
@@ -133,23 +227,13 @@ wrap_browser_view_delegate! {
     }
 
     impl ViewDelegate {
-        // Chrome heights follow the UI mode (ui_mode::apply relayouts).
+        // Chrome sizes follow the UI mode (ui_mode::relayout).
         fn preferred_size(&self, _view: Option<&mut View>) -> Size {
-            let (toolbar, status) = ui_mode::current_heights();
-            match self.role {
-                Role::Toolbar => Size { width: 800, height: toolbar },
-                Role::Status => Size { width: 800, height: status },
-                Role::Content => Size { width: 800, height: 600 },
-            }
+            chrome_size(self.role, 800)
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
-            let (toolbar, status) = ui_mode::current_heights();
-            match self.role {
-                Role::Toolbar => Size { width: 0, height: toolbar },
-                Role::Status => Size { width: 0, height: status },
-                Role::Content => Size { width: 0, height: 0 },
-            }
+            chrome_size(self.role, 0)
         }
     }
 

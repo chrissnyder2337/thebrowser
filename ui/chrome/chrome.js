@@ -13,6 +13,8 @@
 //   #retro          latched while a retro look is on.
 //   #links          quick links, drawn with <template id="page-icon">.
 //   #msg, #meter, #lock-pane, #modem-pane, #modem-label   the status line.
+//   <html class="panel-open">   while the mode's expanding panel is open
+//                   (`data-cmd="panel"` toggles it; the TV Options panel).
 (function () {
   "use strict";
   var seq = 0;
@@ -149,6 +151,7 @@
         var key = JSON.stringify(s.bookmarks);
         if (key !== lastLinks) { lastLinks = key; renderLinks(s.bookmarks); }
       }
+      if ("panel" in s) document.documentElement.classList.toggle("panel-open", !!s.panel);
       if ("text" in s && msg) { msg.textContent = s.text; msg.parentNode.title = s.text; }
       if ("progress" in s && meter) setBlocks(Math.round(Math.max(0, Math.min(1, s.progress)) * blocks));
       if ("modem" in s && modem) {

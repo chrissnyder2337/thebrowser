@@ -6,9 +6,10 @@ use super::{
     pages::{self, ACTION_HOST},
     retro, settings,
     state::{
-        Role, content_browser, defer, exec_js, internal_url_key, push_all, push_status,
+        Role, content_browser, defer, exec_js, internal_url_key, push_all, push_ready, push_status,
         push_toolbar, save_bookmarks, set_notice, with_shell,
     },
+    ui_mode,
     util::{normalize_url_input, parse_query, percent_decode},
 };
 use cef::*;
@@ -41,15 +42,14 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
         return false;
     };
     match (role, command.name.as_str()) {
-        (Role::Toolbar, "ready") => {
-            with_shell(|shell| shell.toolbar_ready = true);
-            push_toolbar();
+        (Role::Content, _) => return false,
+        (_, "ready") => {
+            with_shell(|shell| shell.set_ready(role, true));
+            push_ready(role);
         }
-        (Role::Status, "ready") => {
-            with_shell(|shell| shell.status_ready = true);
-            push_status();
+        (Role::Toolbar | Role::Side | Role::Frame, name) => {
+            run_chrome_command(role, name, &command.arg)
         }
-        (Role::Toolbar, name) => run_chrome_command(role, name, &command.arg),
         // Some UI modes put navigation buttons under the page
         // (ui/chrome/<mode>/status.html), but the status bar can't navigate
         // to an address or open menus.
@@ -57,13 +57,12 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
             run_chrome_command(role, name, &command.arg)
         }
         (Role::Status, name) => eprintln!("lantern: not a status bar command {name:?}"),
-        _ => {}
     }
     true
 }
 
 /// The commands the status bar may send.
-const STATUS_COMMANDS: [&str; 10] = [
+const STATUS_COMMANDS: [&str; 11] = [
     "back",
     "forward",
     "reload",
@@ -74,6 +73,7 @@ const STATUS_COMMANDS: [&str; 10] = [
     "bookmark-add",
     "focus-url",
     "settings",
+    "panel",
 ];
 
 fn run_chrome_command(role: Role, name: &str, arg: &str) {
@@ -92,6 +92,7 @@ fn run_chrome_command(role: Role, name: &str, arg: &str) {
         "retro-menu" => menus::show_retro(arg),
         "menu" => menus::show(role, arg),
         "focus-url" => focus_url_bar(),
+        "panel" => ui_mode::toggle_panel(),
         // The modem pane in the status bar.
         "settings" => show_settings(false),
         _ => eprintln!("lantern: unknown chrome command {name:?}"),

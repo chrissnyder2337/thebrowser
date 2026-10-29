@@ -100,7 +100,7 @@ wrap_display_handler! {
                     update_window_title();
                     push_title();
                 }
-                Role::Toolbar | Role::Status => {
+                Role::Toolbar | Role::Status | Role::Side | Role::Frame => {
                     commands::handle_chrome_title(self.role, &title);
                 }
             }
@@ -185,12 +185,7 @@ wrap_life_span_handler! {
             debug_assert_ne!(currently_on(ThreadId::UI), 0);
             let remaining = with_shell(|shell| {
                 shell.set_browser(self.role, None);
-                if self.role == Role::Toolbar {
-                    shell.toolbar_ready = false;
-                }
-                if self.role == Role::Status {
-                    shell.status_ready = false;
-                }
+                shell.set_ready(self.role, false);
                 shell.open_browsers = shell.open_browsers.saturating_sub(1);
                 shell.open_browsers
             });
@@ -319,7 +314,7 @@ wrap_request_handler! {
                 .unwrap_or_default();
             match self.role {
                 Role::Content => commands::handle_action_url(&url).into(),
-                Role::Toolbar | Role::Status => {
+                Role::Toolbar | Role::Status | Role::Side | Role::Frame => {
                     // The chrome pages may only load their own data: page: the
                     // first one, a reload, or the current UI mode's page.
                     let current = frame
@@ -328,11 +323,7 @@ wrap_request_handler! {
                     let role = self.role;
                     let expected = || {
                         let mode = with_shell(|shell| shell.settings.ui_mode);
-                        if role == Role::Toolbar {
-                            pages::toolbar_uri(mode)
-                        } else {
-                            pages::status_uri(mode)
-                        }
+                        pages::chrome_uri(role, mode)
                     };
                     (!pages::chrome_navigation_allowed(&url, &current, expected)).into()
                 }

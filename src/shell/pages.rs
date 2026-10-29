@@ -5,6 +5,7 @@ use super::{
     art::{with_icons, with_lantern},
     bookmarks::Bookmark,
     settings::{DialupMode, ModemSpeed, RetroStyle, Settings, UiMode},
+    state::Role,
     util::{encode_component, get_data_uri, html_escape, truncate},
 };
 use std::fmt::Write;
@@ -17,20 +18,18 @@ pub const SETTINGS: &str = "lantern:settings";
 /// Host whose URLs internal pages use as "links back into Rust".
 pub const ACTION_HOST: &str = "lantern.invalid";
 
-const TOOLBAR_HTML: &str = include_str!("../../ui/chrome/lantern/toolbar.html");
-const STATUS_HTML: &str = include_str!("../../ui/chrome/lantern/status.html");
-const WORKSTATION_1993_TOOLBAR_HTML: &str =
-    include_str!("../../ui/chrome/workstation-1993/toolbar.html");
-const WORKSTATION_1993_STATUS_HTML: &str =
-    include_str!("../../ui/chrome/workstation-1993/status.html");
-const TOOLBAR_1996_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/toolbar-1996/toolbar.html");
-const TOOLBAR_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/toolbar-1996/status.html");
-const DESKTOP_1996_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/desktop-1996/toolbar.html");
-const DESKTOP_1996_STATUS_HTML: &str = include_str!("../../ui/chrome/desktop-1996/status.html");
-const APPLET_1997_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/applet-1997/toolbar.html");
-const TERMINAL_1999_TOOLBAR_HTML: &str = include_str!("../../ui/chrome/terminal-1999/toolbar.html");
-const TERMINAL_1999_STATUS_HTML: &str = include_str!("../../ui/chrome/terminal-1999/status.html");
-const APPLET_1997_STATUS_HTML: &str = include_str!("../../ui/chrome/applet-1997/status.html");
+/// A UI mode's chrome templates, from `ui/chrome/<key>/`.
+macro_rules! chrome {
+    ($key:literal) => {
+        (
+            include_str!(concat!("../../ui/chrome/", $key, "/toolbar.html")),
+            include_str!(concat!("../../ui/chrome/", $key, "/status.html")),
+        )
+    };
+}
+
+/// What a chrome view a mode doesn't use shows (it's hidden anyway).
+const BLANK_HTML: &str = "<!doctype html><meta charset=\"utf-8\"><title>Lantern</title><body style=\"margin:0;background:#c0c0c0\"></body>";
 /// The controller every chrome page shares (title channel, `lantern.update`).
 const CHROME_JS: &str = include_str!("../../ui/chrome/chrome.js");
 const HOME_HTML: &str = include_str!("../../ui/pages/home.html");
@@ -104,13 +103,23 @@ fn common_vars() -> Vec<(&'static str, String)> {
 /// A UI mode's toolbar and status bar templates (`ui/chrome/<mode>/`).
 fn chrome_templates(mode: UiMode) -> (&'static str, &'static str) {
     match mode {
-        UiMode::Lantern => (TOOLBAR_HTML, STATUS_HTML),
-        UiMode::Workstation1993 => (WORKSTATION_1993_TOOLBAR_HTML, WORKSTATION_1993_STATUS_HTML),
-        UiMode::Toolbar1996 => (TOOLBAR_1996_TOOLBAR_HTML, TOOLBAR_1996_STATUS_HTML),
-        UiMode::Desktop1996 => (DESKTOP_1996_TOOLBAR_HTML, DESKTOP_1996_STATUS_HTML),
-        UiMode::Applet1997 => (APPLET_1997_TOOLBAR_HTML, APPLET_1997_STATUS_HTML),
-        UiMode::Terminal1999 => (TERMINAL_1999_TOOLBAR_HTML, TERMINAL_1999_STATUS_HTML),
+        UiMode::Lantern => chrome!("lantern"),
+        UiMode::Workstation1993 => chrome!("workstation-1993"),
+        UiMode::Toolbar1996 => chrome!("toolbar-1996"),
+        UiMode::Desktop1996 => chrome!("desktop-1996"),
+        UiMode::Applet1997 => chrome!("applet-1997"),
+        UiMode::Terminal1999 => chrome!("terminal-1999"),
     }
+}
+
+/// A UI mode's side view template, if it has a side view.
+fn side_template(_mode: UiMode) -> Option<&'static str> {
+    None
+}
+
+/// A UI mode's frame view template, if it has a frame view.
+fn frame_template(_mode: UiMode) -> Option<&'static str> {
+    None
 }
 
 /// Whether a chrome view (toolbar or status bar) may navigate to `url`: only
@@ -160,18 +169,30 @@ fn chrome_vars() -> Vec<(String, String)> {
     vars
 }
 
-fn chrome_uri(template: &str) -> String {
+fn fill_chrome(template: &str) -> String {
     let vars = chrome_vars();
     let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
     html_uri(&fill(template, &vars))
 }
 
 pub fn toolbar_uri(mode: UiMode) -> String {
-    chrome_uri(chrome_templates(mode).0)
+    fill_chrome(chrome_templates(mode).0)
 }
 
 pub fn status_uri(mode: UiMode) -> String {
-    chrome_uri(chrome_templates(mode).1)
+    fill_chrome(chrome_templates(mode).1)
+}
+
+/// The page a chrome view shows in `mode` (a blank one if the mode doesn't
+/// use that view).
+pub fn chrome_uri(role: Role, mode: UiMode) -> String {
+    match role {
+        Role::Toolbar => toolbar_uri(mode),
+        Role::Status => status_uri(mode),
+        Role::Side => fill_chrome(side_template(mode).unwrap_or(BLANK_HTML)),
+        Role::Frame => fill_chrome(frame_template(mode).unwrap_or(BLANK_HTML)),
+        Role::Content => fill_chrome(BLANK_HTML),
+    }
 }
 
 fn action_url(action: &str, url: &str) -> String {
