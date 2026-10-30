@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Frame</title>
+<!-- Cube workstation (1990): a document window's black title bar with the page
+     title centred and a close box (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #000; color: #fff;
+    font: bold 13px Helvetica, "Helvetica Neue", Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; align-items: center; padding: 0 5px 0 28px; }
+  #title { flex: 1; min-width: 0; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #close {
+    width: 17px; height: 17px; flex: none; margin: 0; padding: 0; outline: none;
+    background: #000; color: #fff; border: 1px solid #fff; font: 14px/15px Helvetica, Arial, sans-serif; text-align: center;
+  }
+  #close:active { background: #fff; color: #000; }
+  #close:focus-visible { outline: 1px dotted #fff; outline-offset: 1px; }
+</style>
+</head>
+<body>
+  <div id="title"></div>
+  <button id="close" data-cmd="close-window" title="Close this window" aria-label="Close">&#8864;</button>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>
