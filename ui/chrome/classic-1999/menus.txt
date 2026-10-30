@@ -1,0 +1,63 @@
+# The menu bar of a Macintosh browser, 1999.
+menu File
+- New Window
+open-url Open Location...
+- Open File...
+---
+close-window Close
+- Save As...
+---
+- Page Setup...
+print Print...
+---
+- Quit
+menu Edit
+- Undo
+---
+- Cut
+- Copy
+- Paste
+- Clear
+---
+- Select All
+---
+- Find...
+- Find Again
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu View
+stop Stop Loading
+reload Reload Page
+---
+view-source Page Source
+---
+zoom-in Larger Text
+zoom-out Smaller Text
+zoom-reset Normal Text Size
+---
+- Load Images
+- Show Image Info
+fullscreen Full Screen
+menu Go
+back Back
+forward Forward
+home Home
+search Search
+---
+- History
+menu Hotlist
+add-bookmark Add Page to Hotlist
+bookmarks Show Hotlist
+---
+- Edit Hotlist...
+menu Window
+- Minimize Window
+- Zoom Window
+---
+- Downloads
+- Error Report
+menu Help
+about About This Browser...
+- Help Contents

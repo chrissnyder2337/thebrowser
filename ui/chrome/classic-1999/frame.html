@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Frame</title>
+<!-- Classic desktop (1999): the top of the document window: a Platinum title
+     bar with close, zoom and collapse boxes, the big colour icon buttons (Back,
+     Forward, Reload, Stop | Home, Hotlist, Print | Smaller, Larger) with the
+     activity box at the right, the URL row with a Search field, and the
+     Hotlist link bar (docs/ui-modes/modes.md). -->
+<style>
+  :root { --face: #ddd; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 10px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; border-radius: 0;
+  }
+
+  /* ---- Title bar ---- */
+  #tbar { height: 22px; flex: none; position: relative; background: var(--face); border-bottom: 1px solid #000; box-shadow: inset 0 1px #fff; }
+  #tbar::before {
+    content: ""; position: absolute; left: 4px; right: 4px; top: 4px; height: 13px;
+    background: repeating-linear-gradient(#fff 0 1px, #999 1px 2px);
+  }
+  #tbar .box {
+    position: absolute; top: 4px; width: 13px; height: 13px; background: var(--face);
+    border: 1px solid #555; box-shadow: inset 1px 1px #fff, inset -1px -1px #999, 0 0 0 2px var(--face);
+  }
+  #close { left: 8px; }
+  #zoom { right: 28px; }
+  #collapse { right: 8px; }
+  #zoom::after { content: ""; position: absolute; left: 2px; top: 2px; width: 5px; height: 5px; border: 1px solid #555; }
+  #collapse::after { content: ""; position: absolute; left: 2px; right: 2px; top: 5px; height: 1px; background: #555; }
+  #tcap {
+    position: absolute; left: 50%; top: 2px; height: 17px; transform: translateX(-50%);
+    max-width: calc(100% - 120px); padding: 0 10px; background: var(--face);
+    font: bold 12px/17px Charcoal, Chicago, ChicagoFLF, Geneva, sans-serif;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #title { display: inline; }
+
+  /* ---- Icon button row ---- */
+  #tools { height: 50px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px 0 6px; border-bottom: 1px solid #999; box-shadow: 0 1px #fff; margin-bottom: 1px; }
+  .tb {
+    flex: none; width: 52px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    border: 1px solid transparent; border-radius: 3px; white-space: nowrap;
+  }
+  .tb:hover:not(.disabled) { border-color: #aaa; background: #e8e8e8; }
+  .tb:active:not(.disabled) { background: #bbb; border-color: #777; }
+  .tb:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .tb svg.off, .tb.disabled svg.on { display: none; }
+  .tb.disabled svg.off { display: block; }
+  .tb.disabled { color: #888; }
+  .sep { flex: none; width: 2px; height: 38px; margin: 0 5px; border-left: 1px solid #999; border-right: 1px solid #fff; }
+  .gap { flex: 1; }
+  #throbber { width: 40px; height: 40px; flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #888; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 0.7; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  /* ---- URL row ---- */
+  #urlrow { height: 26px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 8px; }
+  #urlrow label { flex: none; }
+  #field { flex: 1; min-width: 0; height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 8px; background: #fff; border: 1px solid #000; border-radius: 10px; box-shadow: inset 1px 1px #888; }
+  #url {
+    flex: 1; min-width: 0; height: 16px; border: 0; padding: 0; margin: 0; outline: none;
+    background: transparent; color: #000; font: 11px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif; user-select: text;
+  }
+  #url::selection { background: #3a4a8c; color: #fff; }
+  #field svg { display: none; flex: none; }
+  #field.secure svg { display: block; }
+  #search { flex: none; width: 150px; height: 20px; padding: 0 10px; text-align: left; color: #666; background: #fff; border: 1px solid #000; border-radius: 10px; box-shadow: inset 1px 1px #888; white-space: nowrap; }
+
+  /* ---- Hotlist link bar ---- */
+  #quick { height: 22px; flex: none; display: flex; align-items: center; padding: 0 6px; background: var(--face); border-top: 1px solid #fff; border-bottom: 1px solid #000; }
+  #links { display: flex; gap: 4px; min-width: 0; overflow: hidden; }
+  .ql { height: 18px; max-width: 140px; flex: none; padding: 0 6px 0 3px; display: flex; align-items: center; gap: 3px; border-radius: 3px; }
+  .ql:hover { background: #bbb; }
+  .ql:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .ql svg { flex: none; }
+  .ql span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #links .none { color: #666; }
+</style>
+</head>
+<body>
+  <div id="tbar">
+    <span class="box" id="close" title="Close"></span>
+    <span id="tcap"><span id="title"></span></span>
+    <span class="box" id="zoom"></span>
+    <span class="box" id="collapse"></span>
+  </div>
+  <div id="tools">
+    <button class="tb disabled" id="back" data-cmd="back" title="Go back (Alt+Left)" aria-label="Back">{{ICON_C99_BACK}}<span>Back</span></button>
+    <button class="tb disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)" aria-label="Forward">{{ICON_C99_FORWARD}}<span>Forward</span></button>
+    <button class="tb" id="reload" data-cmd="reload" title="Reload this page (F5)" aria-label="Reload">{{ICON_C99_RELOAD}}<span>Reload</span></button>
+    <button class="tb disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)" aria-label="Stop">{{ICON_C99_STOP}}<span>Stop</span></button>
+    <span class="sep"></span>
+    <button class="tb" id="home" data-cmd="home" title="Go to the start page (Alt+Home)" aria-label="Home">{{ICON_C99_HOME}}<span>Home</span></button>
+    <button class="tb" id="hotlist" data-cmd="bookmarks" title="Show the Hotlist" aria-label="Hotlist">{{ICON_C99_HOTLIST}}<span>Hotlist</span></button>
+    <button class="tb" id="print" data-cmd="print" title="Print this page" aria-label="Print">{{ICON_C99_PRINT}}<span>Print</span></button>
+    <span class="sep"></span>
+    <button class="tb" id="smaller" data-cmd="zoom-out" title="Smaller text" aria-label="Smaller">{{ICON_C99_SMALLER}}<span>Smaller</span></button>
+    <button class="tb" id="larger" data-cmd="zoom-in" title="Larger text" aria-label="Larger">{{ICON_C99_LARGER}}<span>Larger</span></button>
+    <span class="gap"></span>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+  <div id="urlrow">
+    <label for="url">URL:</label>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}</div>
+    <button id="search" data-cmd="search" title="Search the web">Search</button>
+  </div>
+  <div id="quick">
+    <div id="links"></div>
+    <template id="page-icon">{{ICON_PAGE}}</template>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

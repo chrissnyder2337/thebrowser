@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Classic desktop (1999): the Mac OS 8/9 Platinum menu bar across the top of
+     the screen. The document window under it is the frame view
+     (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #ddd; color: #000;
+    font: bold 12px Charcoal, Chicago, ChicagoFLF, Geneva, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; align-items: stretch; padding-left: 8px; border-bottom: 1px solid #000; box-shadow: inset 0 1px #fff; }
+  button {
+    font: inherit; color: inherit; background: transparent;
+    border: 0; margin: 0; padding: 0; outline: none; border-radius: 0;
+  }
+  #mark { width: 24px; flex: none; display: flex; align-items: center; justify-content: center; margin-right: 4px; }
+  #mark svg { display: block; }
+  .menu { height: 19px; padding: 0 10px; white-space: nowrap; line-height: 19px; }
+  .menu:hover, .menu:active, .menu:focus-visible { background: #3a4a8c; color: #fff; }
+</style>
+</head>
+<body>
+  <span id="mark"><svg width="11" height="14" viewBox="0 0 11 14" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="2" fill="#000"/><rect x="1" y="2" width="9" height="10" fill="#000"/><rect x="2" y="3" width="7" height="8" fill="#fc3"/><rect x="4" y="4" width="3" height="6" fill="#fff"/><rect x="3" y="12" width="5" height="2" fill="#000"/></svg></span>
+  <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+  <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu" title="Preferences, Retro looks and Browser UI">Edit</button>
+  <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
+  <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu">Go</button>
+  <button class="menu" data-cmd="menu" data-arg="hotlist" data-anchor aria-haspopup="menu">Hotlist</button>
+  <button class="menu" data-cmd="menu" data-arg="window" data-anchor aria-haspopup="menu">Window</button>
+  <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

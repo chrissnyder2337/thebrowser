@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Applet browser (1995): a Motif-style menu bar over a Document URL field;
+     the buttons sit under the page (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #b4b8c8;
+    --up: inset 1px 1px #e6e8f0, inset -1px -1px #5c6074, inset 2px 2px #d0d3e0, inset -2px -2px #868aa0;
+    --down: inset 1px 1px #5c6074, inset -1px -1px #e6e8f0, inset 2px 2px #868aa0, inset -2px -2px #d0d3e0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 13px Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar {
+    height: 26px; flex: none; display: flex; align-items: center; padding: 0 4px;
+    box-shadow: inset 0 1px #e6e8f0, inset 0 -1px #5c6074;
+  }
+  .menu { height: 22px; padding: 0 11px; background: transparent; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--up); }
+  .menu:active { box-shadow: var(--down); }
+  #help { margin-left: auto; }
+
+  /* ---- Document URL ---- */
+  #addr { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 8px; min-height: 0; }
+  #addr label { white-space: nowrap; }
+  #field {
+    flex: 1; min-width: 0; height: 26px; position: relative;
+    background: #fff; box-shadow: var(--down);
+  }
+  #url {
+    width: 100%; height: 20px; margin: 3px 0 0; border: 0; padding: 0 6px; outline: none;
+    background: transparent; color: #000; font: 13px Courier, "Courier New", "Liberation Mono", monospace; user-select: text;
+  }
+  #url::selection { background: #3a2ca8; color: #fff; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings">Options</button>
+    <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate</button>
+    <button class="menu" data-cmd="menu" data-arg="goto" data-anchor aria-haspopup="menu">Goto</button>
+    <button class="menu" id="help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
+  </div>
+  <div id="addr">
+    <label for="url">Document URL:</label>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

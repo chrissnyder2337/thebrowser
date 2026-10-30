@@ -1,0 +1,5 @@
+/* Applet browser (1995): plain pages as the first Java-toolkit browser drew
+   them: black Times text on a white page (the color is set in ui_mode.rs).
+   Links keep Chromium's blue and purple. One rule per line, each selector
+   wrapped in :where() (checked by a unit test). */
+:where(html) { color: #000; font-family: "Times New Roman", Times, serif; }

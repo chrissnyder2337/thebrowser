@@ -1,0 +1,66 @@
+# The menu bar of a Windows workstation browser, 1995.
+menu File
+- New Window
+open-url Open URL...
+- Open Local File...
+---
+- Save As...
+print Print...
+- Print Setup...
+---
+- Send Mail...
+---
+close-window Close Window
+- Exit
+menu Edit
+- Cut
+- Copy
+- Paste
+---
+- Select All
+---
+- Find...
+- Find Again
+menu Options
+- Load To Disk
+- Display Inline Images
+- Show Toolbar
+- Show Status Bar
+- Show URL
+---
+- Fonts...
+- Anchor Underline
+---
+- Choose Starting Point...
+- Choose Home Page...
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu Navigate
+back Back
+forward Forward
+home Home
+reload Reload
+---
+- History...
+- Starting Points
+- Internet Resources
+menu Hotlist
+bookmarks Hotlist...
+add-bookmark Add Current To Hotlist
+---
+- Add Current To Menu
+- Edit Hotlist Menu...
+menu Annotate
+- Annotate...
+---
+- Edit This Annotation...
+- Delete This Annotation...
+menu Help
+about About...
+- Help Topics
+---
+- What's New
+- Demo Document
+- Mail Support...

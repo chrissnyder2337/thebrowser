@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<!-- Classic desktop (1999): the bottom edge of the document window, where the
+     scroll bar row sat: status text and a striped progress meter
+     (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #6666cc; color: #000;
+    font: 10px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif;
+    cursor: default;
+  }
+  body { padding: 0 10px; }
+  #win {
+    height: 18px; display: flex; align-items: center; gap: 4px; padding: 0 5px;
+    background: #ddd; border: 1px solid #000; border-top: 0; box-shadow: inset 0 1px #fff;
+  }
+  .pane { height: 14px; flex: none; display: flex; align-items: center; }
+  #text { flex: 1; min-width: 0; padding: 0 4px; }
+  #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #modem-pane { gap: 4px; padding: 0 3px; }
+  #modem-pane:active { background: #bbb; }
+  #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
+  #modem-pane.dialup svg.on { display: block; }
+  #modem-label { white-space: nowrap; }
+  #meter-pane { width: 130px; height: 12px; padding: 1px; background: #fff; border: 1px solid #555; box-shadow: inset 1px 1px #999; order: 1; }
+  #meter { width: 100%; height: 8px; display: flex; visibility: hidden; }
+  #meter.on { visibility: visible; }
+  #meter i {
+    width: 8px; height: 8px; flex: none;
+    background: linear-gradient(135deg, #3355bb 25%, #bbccf4 25% 50%, #3355bb 50% 75%, #bbccf4 75%) 0 0/8px 8px;
+  }
+  #lock-pane { width: 14px; justify-content: center; order: -1; }
+  #lock-pane svg { display: none; }
+  #lock-pane.secure svg { display: block; }
+</style>
+</head>
+<body>
+  <div id="win">
+    <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>
+    <div class="pane" id="text"><span id="msg">Ready.</span></div>
+    <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="15"></div></div>
+    <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>
