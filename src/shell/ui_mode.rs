@@ -148,7 +148,7 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Tv1996 => Layout::bars(0, 34)
             .panel(170)
             .inset([12, 18, 0, 18], 0xFF202020),
-        UiMode::Dos1996 => Layout::bars(38, 20).side(150, false, true),
+        UiMode::Dos1996 => Layout::bars(46, 20).side(150, false, true),
     }
 }
 
@@ -175,7 +175,7 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         )),
         UiMode::Desktop1996 => Some((
             include_str!("../../ui/chrome/desktop-1996/pages.css"),
-            "#ffffff",
+            "#c0c0c0",
         )),
         UiMode::Applet1997 => Some((
             include_str!("../../ui/chrome/applet-1997/pages.css"),

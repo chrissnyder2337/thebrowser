@@ -36,8 +36,8 @@
   #grid { flex: none; display: grid; grid-template-columns: repeat(3, 50px); grid-auto-rows: 50px; }
   .big { display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
   .big svg { width: 40px; height: 40px; }
-  .big svg.off, .big.disabled svg.on { display: none; }
-  .big.disabled svg.off { display: block; }
+  .big svg.off { display: none; }
+  .big.disabled svg.on { opacity: .5; }
   .big:active:not(.disabled) { box-shadow: var(--down); }
   .big:active:not(.disabled) svg { transform: translate(1px, 1px); }
   .big:focus-visible, .row.btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
@@ -47,7 +47,7 @@
   .row { width: 100%; height: 18px; display: flex; align-items: center; gap: 4px; line-height: 18px; white-space: nowrap; }
   .row svg { flex: none; width: 16px; height: 16px; }
   .row svg.off { display: none; }
-  .row .name { flex: 1; min-width: 0; overflow: hidden; }
+  .row .name { flex: 1; min-width: 0; }
   .row .key { flex: none; }
   .row .name { border-left: 1px solid #808080; padding-left: 4px; position: relative; }
   .row .name::before { content: ""; position: absolute; left: -5px; top: 9px; width: 4px; height: 1px; background: #808080; }
@@ -58,7 +58,7 @@
   #stats .row { height: 16px; line-height: 16px; gap: 0; justify-content: space-between; }
   #stats .v.g { color: #008000; }
   #stats hr { margin: 0; border: 0; height: 1px; background: #808080; }
-  .big.disabled svg.off { opacity: 1; }
+
 </style>
 </head>
 <body>
