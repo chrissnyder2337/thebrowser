@@ -26,7 +26,7 @@ Update the tables below in the same commit as the work they describe.
 | 5b. Page styles | Each mode's browser defaults under pages, and its era look on request (`mode_pages`) | Done |
 | 6. Settings page | A Browser UI section (mode, page styles) and every retro look; new settings goldens (approved by the maintainer) | Done |
 | 7. Layout extras | `ui_mode::Layout`: hidden views, a side view, a frame view over the page, an inset border, the status view's expanding panel; menu bars from `menus.txt` | Done |
-| 8. More modes | See below. Each mode's pages and icons are drafted by a subagent from the brief in the session, then wired in and tested | In progress |
+| 8. More modes | See below. Each mode's pages and icons are drafted by a subagent from the brief, wired in and tested, then compared with a screenshot of the original by a separate reviewer until it passes | Done |
 
 ## Modes
 

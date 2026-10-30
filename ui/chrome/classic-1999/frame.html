@@ -79,7 +79,7 @@
   }
   #url::selection { background: #3a4a8c; color: #fff; }
   #field > svg { flex: none; }
-  #field svg.lock { display: none; }
+  #field svg.lock, #field.secure svg.pg { display: none; }
   #field.secure svg.lock { display: block; }
   .rb { flex: none; display: block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #777; background: radial-gradient(circle at 40% 35%, #fff, #bbb); position: relative; }
   .rb::after { content: ""; position: absolute; left: 4px; top: 3px; border: 3px solid transparent; border-left: 4px solid #555; border-right: 0; }
@@ -95,10 +95,10 @@
   #links { display: flex; gap: 10px; min-width: 0; overflow: hidden; }
   #more { flex: none; padding-left: 6px; font-size: 12px; color: #333; }
   #icons { height: 20px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #ddd; border-bottom: 1px solid #999; }
-  #icons i { flex: none; width: 10px; height: 10px; border-radius: 2px; background: #b8c4dc; border: 1px solid #aab; opacity: 0.7; }
-  #icons i:nth-child(3n) { border-radius: 50%; background: #c8d8c0; }
-  #icons i:nth-child(4n) { background: #d8c0c0; }
-  #icons b { flex: 1; }
+  #icons svg { flex: none; width: 10px; height: 10px; fill: none; stroke: #99a; stroke-width: 1.2; opacity: 0.9; }
+  #icons svg .f { fill: #aab; stroke: none; }
+  #icons .gap { flex: 1.2; }
+  #icons .gap2 { flex: 1; }
   #icons em { flex: none; font-style: normal; font-size: 9px; color: #3a4a8c; }
   .ql { height: 18px; max-width: 140px; flex: none; padding: 0 3px; display: flex; align-items: center; gap: 3px; border-radius: 3px; }
   .ql:hover { background: #bbb; }
@@ -143,7 +143,7 @@
     <span id="more">&raquo;</span>
     <template id="page-icon">{{ICON_PAGE}}</template>
   </div>
-  <div id="icons" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b><em>&#9660;</em></div>
+  <div id="icons" aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M7 1 2 5l5 4"/></svg><svg viewBox="0 0 10 10"><path d="M3 1l5 4-5 4"/></svg><svg viewBox="0 0 10 10"><path d="M8 5a3 3 0 1 1-1-2.2"/><path class="f" d="M9 1v4H5z"/></svg><svg viewBox="0 0 10 10"><path d="M2 2l6 6M8 2 2 8"/></svg><svg viewBox="0 0 10 10"><path d="M1 5l4-4 4 4M2 5v4h6V5"/></svg><svg viewBox="0 0 10 10"><path d="M2 1h4l2 2v6H2z"/></svg><svg viewBox="0 0 10 10"><path d="M2 4V1h6v3M1 4h8v4H1zM3 6h4v3H3z"/></svg><span class="gap"></span><em>&#9660;</em><span class="gap2"></span><svg viewBox="0 0 10 10"><path class="f" d="M5 1l1.2 2.8 2.8.2-2.2 1.9.7 2.8L5 7.2 2.5 8.7l.7-2.8L1 4l2.8-.2z"/></svg><svg viewBox="0 0 10 10"><circle cx="4" cy="4" r="2.8"/><path d="M6 6l3 3"/></svg><svg viewBox="0 0 10 10"><path d="M1 9 5 1l4 8M3 6h4"/></svg><svg viewBox="0 0 10 10"><path d="M1 3h3l1 1h4v5H1z"/></svg><svg viewBox="0 0 10 10"><path d="M1 2h8v6H1zM1 3l4 3 4-3"/></svg></div>
 <script>
 {{CHROME_JS}}
 </script>
