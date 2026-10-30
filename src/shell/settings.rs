@@ -458,6 +458,19 @@ impl Settings {
 
     /// The look pages get: the retro look the user picked, else the UI
     /// mode's era look if they asked for it.
+    /// Retro looks off, including a UI mode's era look ("Off means off").
+    pub fn looks_off(&mut self) {
+        self.retro_style = RetroStyle::Off;
+        if self.page_look() != RetroStyle::Off {
+            // A mode that needs its look gives it under the defaults too.
+            self.mode_pages = if self.ui_mode.needs_era_look() {
+                ModePages::AsIs
+            } else {
+                ModePages::Defaults
+            };
+        }
+    }
+
     pub fn page_look(&self) -> RetroStyle {
         let era = match self.mode_pages {
             ModePages::AsIs => false,
@@ -659,6 +672,29 @@ mod tests {
         settings.retro_style = RetroStyle::GeoCities;
         assert_eq!(settings.page_look(), RetroStyle::GeoCities);
         assert_eq!(RetroStyle::from_key("terminal"), Some(RetroStyle::Terminal));
+    }
+
+    #[test]
+    fn looks_off_turns_era_looks_off_too() {
+        for (mode, pages) in [
+            (UiMode::Terminal1999, ModePages::Defaults),
+            (UiMode::Tv1996, ModePages::EraLook),
+            (UiMode::Workstation1993, ModePages::EraLook),
+            (UiMode::Lantern, ModePages::Defaults),
+        ] {
+            let mut settings = Settings {
+                ui_mode: mode,
+                mode_pages: pages,
+                retro_style: RetroStyle::Portal,
+                ..Settings::default()
+            };
+            settings.looks_off();
+            assert_eq!(settings.page_look(), RetroStyle::Off, "{mode:?}");
+        }
+        // Without an era look in play, the page style setting stays.
+        let mut settings = Settings::default();
+        settings.looks_off();
+        assert_eq!(settings.mode_pages, ModePages::Defaults);
     }
 
     /// The branding rule (steward skill): modes are named after an era and a

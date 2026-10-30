@@ -18,7 +18,7 @@
   .pane { height: 20px; flex: none; display: flex; align-items: center; padding: 0 4px; box-shadow: var(--pane); }
   #text { flex: 1; min-width: 0; }
   #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  #meter-pane { width: 140px; padding: 3px; }
+  #meter-pane { width: 100px; padding: 3px; }
   #meter { width: 100%; height: 12px; display: flex; gap: 1px; visibility: hidden; }
   #meter.on { visibility: visible; }
   #meter i { width: 8px; height: 12px; flex: none; background: #000080; }
@@ -34,7 +34,7 @@
 </head>
 <body>
   <div class="pane" id="text"><span id="msg">Ready</span></div>
-  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="16"></div></div>
+  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
   <div class="pane" id="num-pane">NUM</div>
   <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
   <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>

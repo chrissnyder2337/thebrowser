@@ -8,7 +8,7 @@
      then the status line (docs/ui-modes/modes.md). -->
 <style>
   :root {
-    --face: #b4b8c8;
+    --face: #b8b8b8;
     --up: inset 1px 1px #e6e8f0, inset -1px -1px #5c6074, inset 2px 2px #d0d3e0, inset -2px -2px #868aa0;
     --down: inset 1px 1px #5c6074, inset -1px -1px #e6e8f0, inset 2px 2px #868aa0, inset -2px -2px #d0d3e0;
   }
@@ -26,12 +26,13 @@
   }
 
   /* ---- Button row ---- */
-  #tools { height: 54px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  #tools { height: 56px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; }
   .ib {
-    width: 38px; height: 38px; flex: none; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; box-shadow: var(--up);
+    width: 42px; height: 42px; flex: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 1px #5c6074, inset 0 0 0 3px #c8cad6, inset 0 0 0 4px #868aa0, inset 1px 1px 0 4px #e6e8f0;
   }
-  .ib:active:not(.disabled) { box-shadow: var(--down); }
+  .ib:active:not(.disabled) { box-shadow: 0 0 0 1px #5c6074, inset 0 0 0 3px #868aa0, inset 0 0 0 4px #c8cad6, inset -1px -1px 0 4px #e6e8f0; }
   .ib:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
   .ib svg.off { display: none; }
   .ib.disabled svg.on { display: none; }
@@ -40,7 +41,7 @@
 
   /* ---- Activity box ---- */
   #throbber {
-    width: 44px; height: 50px; flex: none; display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center;
     box-shadow: var(--down);
   }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }

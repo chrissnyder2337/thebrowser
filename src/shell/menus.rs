@@ -172,27 +172,15 @@ const ACTIONS: [(&str, Item); 19] = [
     ("close-window", Item::CloseWindow),
 ];
 
-const PLAIN: [Item; 19] = [
-    Item::Back,
-    Item::Forward,
-    Item::Reload,
-    Item::Stop,
-    Item::Home,
-    Item::Search,
-    Item::Bookmarks,
-    Item::AddBookmark,
-    Item::OpenUrl,
-    Item::Settings,
-    Item::About,
-    Item::Splash,
-    Item::Print,
-    Item::ViewSource,
-    Item::ZoomIn,
-    Item::ZoomOut,
-    Item::ZoomReset,
-    Item::Fullscreen,
-    Item::CloseWindow,
-];
+const PLAIN: [Item; ACTIONS.len()] = {
+    let mut items = [Item::Back; ACTIONS.len()];
+    let mut i = 0;
+    while i < ACTIONS.len() {
+        items[i] = ACTIONS[i].1;
+        i += 1;
+    }
+    items
+};
 const STYLE_BASE: i32 = 100;
 const MODE_BASE: i32 = 300;
 const PAGES_BASE: i32 = 400;
@@ -471,8 +459,8 @@ pub fn bar_keys(mode: UiMode) -> Vec<String> {
 }
 
 /// The Retro button's menu: `arg` is "x,y" in the toolbar.
-pub fn show_retro(arg: &str) {
-    show_at(Menu::Retro, Some(Role::Toolbar), retro::parse_point(arg));
+pub fn show_retro(role: Role, arg: &str) {
+    show_at(Menu::Retro, Some(role), retro::parse_point(arg));
 }
 
 /// The Browser UI menu at the window's top left (the keyboard shortcut).

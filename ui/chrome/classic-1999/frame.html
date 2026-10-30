@@ -27,7 +27,7 @@
   #tbar { height: 22px; flex: none; position: relative; background: var(--face); border-bottom: 1px solid #000; box-shadow: inset 0 1px #fff; }
   #tbar::before {
     content: ""; position: absolute; left: 4px; right: 4px; top: 4px; height: 13px;
-    background: repeating-linear-gradient(#fff 0 1px, #999 1px 2px);
+    background: repeating-linear-gradient(#fff 0 1px, #777 1px 2px);
   }
   #tbar .box {
     position: absolute; top: 4px; width: 13px; height: 13px; background: var(--face);
@@ -47,7 +47,7 @@
   #title { display: inline; }
 
   /* ---- Icon button row ---- */
-  #tools { height: 50px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px 0 6px; border-bottom: 1px solid #999; box-shadow: 0 1px #fff; margin-bottom: 1px; }
+  #tools { height: 50px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px 0 6px; border-bottom: 2px solid #888; box-shadow: 0 1px #fff; }
   .tb {
     flex: none; width: 52px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
     border: 1px solid transparent; border-radius: 3px; white-space: nowrap;
@@ -57,12 +57,13 @@
   .tb:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
   .tb svg.off, .tb.disabled svg.on { display: none; }
   .tb.disabled svg.off { display: block; }
-  .tb.disabled { color: #888; }
-  .sep { flex: none; width: 2px; height: 38px; margin: 0 5px; border-left: 1px solid #999; border-right: 1px solid #fff; }
+  .tb { font-weight: bold; }
+  .tb.disabled { color: #999; font-weight: normal; }
+  .sep { flex: none; width: 1px; height: 38px; margin: 0 6px; background: repeating-linear-gradient(#888 0 1px, transparent 1px 3px); }
   .gap { flex: 1; }
-  #throbber { width: 40px; height: 40px; flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #888; }
+  #throbber { width: 44px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #b4cfe8; border: 0; }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
-  #throbber .lit-box, #throbber svg.idle { zoom: 0.7; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 0.55; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
@@ -71,20 +72,35 @@
   /* ---- URL row ---- */
   #urlrow { height: 26px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 8px; }
   #urlrow label { flex: none; }
-  #field { flex: 1; min-width: 0; height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 8px; background: #fff; border: 1px solid #000; border-radius: 10px; box-shadow: inset 1px 1px #888; }
+  #field { flex: 1; min-width: 0; height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 3px 0 7px; background: #fff; border: 1px solid #555; border-radius: 10px; box-shadow: inset 1px 1px #999, 0 1px #fff; }
   #url {
     flex: 1; min-width: 0; height: 16px; border: 0; padding: 0; margin: 0; outline: none;
     background: transparent; color: #000; font: 11px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif; user-select: text;
   }
   #url::selection { background: #3a4a8c; color: #fff; }
-  #field svg { display: none; flex: none; }
-  #field.secure svg { display: block; }
-  #search { flex: none; width: 150px; height: 20px; padding: 0 10px; text-align: left; color: #666; background: #fff; border: 1px solid #000; border-radius: 10px; box-shadow: inset 1px 1px #888; white-space: nowrap; }
+  #field > svg { flex: none; }
+  #field svg.lock { display: none; }
+  #field.secure svg.lock { display: block; }
+  .rb { flex: none; display: block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid #777; background: radial-gradient(circle at 40% 35%, #fff, #bbb); position: relative; }
+  .rb::after { content: ""; position: absolute; left: 4px; top: 3px; border: 3px solid transparent; border-left: 4px solid #555; border-right: 0; }
+  .rb.sm { width: 12px; height: 12px; }
+  .rb.sm::after { left: 3px; top: 2px; }
+  #search { flex: none; width: 190px; height: 20px; display: flex; align-items: center; gap: 4px; padding: 0 3px 0 4px; text-align: left; color: #777; background: #fff; border: 1px solid #555; border-radius: 10px; box-shadow: inset 1px 1px #999, 0 1px #fff; white-space: nowrap; }
+  #search .eng { flex: none; width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f9a8d0, #b0307a); border: 1px solid #703; }
+  #search .arr { flex: none; color: #555; font-size: 9px; }
+  #search .ph { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 
   /* ---- Hotlist link bar ---- */
-  #quick { height: 22px; flex: none; display: flex; align-items: center; padding: 0 6px; background: var(--face); border-top: 1px solid #fff; border-bottom: 1px solid #000; }
-  #links { display: flex; gap: 4px; min-width: 0; overflow: hidden; }
-  .ql { height: 18px; max-width: 140px; flex: none; padding: 0 6px 0 3px; display: flex; align-items: center; gap: 3px; border-radius: 3px; }
+  #quick { height: 22px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; background: var(--face); border-top: 1px solid #fff; border-bottom: 1px solid #999; }
+  #links { display: flex; gap: 10px; min-width: 0; overflow: hidden; }
+  #more { flex: none; padding-left: 6px; font-size: 12px; color: #333; }
+  #icons { height: 20px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #ddd; border-bottom: 1px solid #999; }
+  #icons i { flex: none; width: 10px; height: 10px; border-radius: 2px; background: #b8c4dc; border: 1px solid #aab; opacity: 0.7; }
+  #icons i:nth-child(3n) { border-radius: 50%; background: #c8d8c0; }
+  #icons i:nth-child(4n) { background: #d8c0c0; }
+  #icons b { flex: 1; }
+  #icons em { flex: none; font-style: normal; font-size: 9px; color: #3a4a8c; }
+  .ql { height: 18px; max-width: 140px; flex: none; padding: 0 3px; display: flex; align-items: center; gap: 3px; border-radius: 3px; }
   .ql:hover { background: #bbb; }
   .ql:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
   .ql svg { flex: none; }
@@ -119,13 +135,15 @@
   </div>
   <div id="urlrow">
     <label for="url">URL:</label>
-    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}</div>
-    <button id="search" data-cmd="search" title="Search the web">Search</button>
+    <div id="field">{{ICON_PAGE}}{{ICON_LOCK}}<input id="url" type="text" spellcheck="false" autocomplete="off"><span class="rb" aria-hidden="true"></span></div>
+    <button id="search" data-cmd="search" title="Search the web"><span class="eng"></span><span class="arr">&#9662;</span><span class="ph">Search</span><span class="rb sm"></span></button>
   </div>
   <div id="quick">
     <div id="links"></div>
+    <span id="more">&raquo;</span>
     <template id="page-icon">{{ICON_PAGE}}</template>
   </div>
+  <div id="icons" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b><em>&#9660;</em></div>
 <script>
 {{CHROME_JS}}
 </script>

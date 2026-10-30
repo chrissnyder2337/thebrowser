@@ -62,7 +62,7 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
 }
 
 /// The commands the status bar may send.
-const STATUS_COMMANDS: [&str; 13] = [
+const STATUS_COMMANDS: [&str; 14] = [
     "back",
     "forward",
     "reload",
@@ -79,6 +79,8 @@ const STATUS_COMMANDS: [&str; 13] = [
     // Opens one of the mode's own menus (menus.txt), for browsers whose
     // menu keys sat at the bottom (the text terminal's O)ptions).
     "menu",
+    // The activity box (chrome.js sends it), in modes that keep it below the page.
+    "about",
 ];
 
 fn run_chrome_command(role: Role, name: &str, arg: &str) {
@@ -94,7 +96,7 @@ fn run_chrome_command(role: Role, name: &str, arg: &str) {
         "bookmark-add" => add_bookmark(),
         "bookmarks" => show_bookmarks(),
         "about" => show_about(),
-        "retro-menu" => menus::show_retro(arg),
+        "retro-menu" => menus::show_retro(role, arg),
         "menu" => menus::show(role, arg),
         "focus-url" => focus_url_bar(),
         "panel" => ui_mode::toggle_panel(),

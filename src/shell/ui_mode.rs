@@ -165,19 +165,13 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Workstation1996 => Layout::bars(100, 30)
             .inset([4, 6, 6, 6], 0xFFBFBFBF)
             .well(2, 0xFF676767),
-        UiMode::WorkstationPc1995 => Layout::bars(80, 24),
-        UiMode::Applet1995 => Layout::bars(62, 80),
+        UiMode::WorkstationPc1995 => Layout::bars(96, 24),
+        UiMode::Applet1995 => Layout::bars(62, 82),
         UiMode::Classic1999 => Layout::bars(20, 20)
             .frame(120)
             .inset([6, 10, 0, 10], 0xFF6666CC)
             .well(1, 0xFF000000),
     }
-}
-
-/// Heights of the toolbar and status views, in DIP.
-pub fn heights(mode: UiMode) -> (i32, i32) {
-    let layout = layout(mode);
-    (layout.toolbar, layout.status)
 }
 
 const PAGE_DEFAULTS_JS: &str = include_str!("../../ui/chrome/page-defaults.js");
@@ -469,6 +463,6 @@ mod tests {
             }
             assert!(layout.status >= 20, "{mode:?}");
         }
-        assert_eq!(heights(UiMode::Lantern), (112, 24));
+        assert_eq!(layout(UiMode::Lantern), Layout::bars(112, 24));
     }
 }

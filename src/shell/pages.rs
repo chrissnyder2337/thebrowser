@@ -66,7 +66,7 @@ const PAGE_CSS: &str = include_str!("../../ui/pages/common.css");
 
 /// Replace `{{NAME}}` placeholders in one pass. Values must already be safe
 /// HTML (use [`html_escape`] for text); inserted values are never re-scanned.
-fn fill(template: &str, vars: &[(&str, String)]) -> String {
+fn fill<V: AsRef<str>>(template: &str, vars: &[(&str, V)]) -> String {
     let mut out = String::with_capacity(template.len() * 2);
     let mut rest = template;
     while let Some(start) = rest.find("{{") {
@@ -76,7 +76,7 @@ fn fill(template: &str, vars: &[(&str, String)]) -> String {
             Some(end) => {
                 let key = &after[..end];
                 match vars.iter().find(|(k, _)| *k == key) {
-                    Some((_, value)) => out.push_str(value),
+                    Some((_, value)) => out.push_str(value.as_ref()),
                     None => {
                         debug_assert!(false, "unknown template placeholder {key}");
                         out.push_str(&rest[start..start + 2 + end + 2]);
@@ -191,6 +191,12 @@ pub fn chrome_navigation_allowed(
     initial || url == current || url == expected()
 }
 
+thread_local! {
+    // Rendering every icon is slow, and chrome pages are built on each mode
+    // switch and navigation check.
+    static CHROME_VARS: Vec<(String, String)> = chrome_vars();
+}
+
 /// Placeholders every chrome page may use: each icon frame as `ICON_<NAME>`
 /// (normal and disabled svgs; `-` becomes `_`), the lock, page and modem
 /// icons, the lantern for activity boxes, and the shared controller.
@@ -223,9 +229,10 @@ fn chrome_vars() -> Vec<(String, String)> {
 }
 
 fn fill_chrome(template: &str) -> String {
-    let vars = chrome_vars();
-    let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
-    html_uri(&fill(template, &vars))
+    CHROME_VARS.with(|vars| {
+        let vars: Vec<(&str, &str)> = vars.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+        html_uri(&fill(template, &vars))
+    })
 }
 
 pub fn toolbar_uri(mode: UiMode) -> String {
@@ -617,10 +624,10 @@ mod tests {
     #[test]
     fn fill_is_single_pass() {
         assert_eq!(
-            fill("a{{X}}b{{Y}}c", &[("X", "{{Y}}".into()), ("Y", "1".into())]),
+            fill("a{{X}}b{{Y}}c", &[("X", "{{Y}}"), ("Y", "1")]),
             "a{{Y}}b1c"
         );
-        assert_eq!(fill("open {{ only", &[]), "open {{ only");
+        assert_eq!(fill::<&str>("open {{ only", &[]), "open {{ only");
     }
 
     fn assert_filled(template: &str, vars: &[(&str, String)]) {

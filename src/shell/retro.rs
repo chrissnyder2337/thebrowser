@@ -5,7 +5,7 @@
 
 use super::{
     settings,
-    settings::{ModePages, RetroStyle},
+    settings::RetroStyle,
     state::{content_browser, push_toolbar, set_notice, with_shell},
     ui_mode,
     util::{js_string, url_host},
@@ -169,10 +169,12 @@ fn update(change: impl FnOnce(&mut settings::Settings)) -> settings::Settings {
 
 pub fn set_style(style: RetroStyle) {
     update(|s| {
-        s.retro_style = style;
-        // Off means off, including the UI mode's era look.
-        if style == RetroStyle::Off && s.mode_pages == ModePages::EraLook {
-            s.mode_pages = ModePages::Defaults;
+        if style == RetroStyle::Off {
+            s.looks_off();
+        } else if !(s.retro_style == RetroStyle::Off && s.page_look() == style) {
+            // Picking the look the UI mode already gives (checked in the
+            // menu) keeps it the mode's, not a look of the user's own.
+            s.retro_style = style;
         }
     });
     set_notice(match style {

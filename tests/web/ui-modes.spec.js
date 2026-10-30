@@ -44,7 +44,7 @@ function viewsOf(mode) {
 
 /** Commands the status view may send (commands.rs STATUS_COMMANDS). */
 const STATUS_COMMANDS = ["back", "forward", "reload", "stop", "home", "search", "bookmarks",
-  "bookmark-add", "focus-url", "settings", "panel", "go", "menu"];
+  "bookmark-add", "focus-url", "settings", "panel", "go", "menu", "about"];
 
 /**
  * Open a mode's chrome view at its real size. Rust pushes every view both
