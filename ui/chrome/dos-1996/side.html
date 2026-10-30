@@ -10,7 +10,7 @@
 <style>
   :root {
     --face: #c0c0c0;
-    --up: inset 2px 2px #fff, inset -1px -1px #000, inset -2px -2px #808080;
+    --up: inset 2px 2px #fff, inset -2px -2px #808080, inset -1px -1px #000;
     --down: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080;
   }
   * { box-sizing: border-box; }
@@ -35,9 +35,9 @@
   /* ---- 3x3 button grid ---- */
   #grid { flex: none; display: grid; grid-template-columns: repeat(3, 50px); grid-auto-rows: 50px; }
   .big { display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
-  .big svg { width: 40px; height: 40px; }
+  .big svg { width: 44px; height: 44px; }
   .big svg.off { display: none; }
-  .big.disabled svg.on { opacity: .5; }
+  .big.disabled svg.on { filter: brightness(0) invert(.5) drop-shadow(1px 1px 0 #fff); }
   .big:active:not(.disabled) { box-shadow: var(--down); }
   .big:active:not(.disabled) svg { transform: translate(1px, 1px); }
   .big:focus-visible, .row.btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
@@ -55,9 +55,9 @@
 
   /* ---- System stats (decoration) ---- */
   #stats { flex: none; padding: 1px 3px 1px 3px; box-shadow: var(--up); }
-  #stats .row { height: 16px; line-height: 16px; gap: 0; justify-content: space-between; }
+  #stats .row { height: 16px; min-height: 16px; line-height: 16px; gap: 0; justify-content: space-between; }
   #stats .v.g { color: #008000; }
-  #stats hr { margin: 0; border: 0; height: 1px; background: #808080; }
+  #stats hr { display: block; margin: 0; border: 0; height: 1px; background: #808080; }
 
 </style>
 </head>

@@ -127,7 +127,7 @@ pub fn layout(mode: UiMode) -> Layout {
             .inset([4, 6, 6, 6], 0xFFBFBFBF)
             .well(2, 0xFF676767),
         UiMode::Toolbar1996 => Layout::bars(118, 22),
-        UiMode::Desktop1996 => Layout::bars(104, 22),
+        UiMode::Desktop1996 => Layout::bars(91, 20),
         UiMode::Applet1997 => Layout::bars(102, 22),
         UiMode::Terminal1999 => Layout::bars(40, 40),
         UiMode::Terminal1992 => Layout::bars(20, 80),

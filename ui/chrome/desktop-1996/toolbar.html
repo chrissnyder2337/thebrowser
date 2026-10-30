@@ -5,7 +5,7 @@
 <title>Lantern Toolbar</title>
 <!-- Desktop (1996): a menu bar over bands with grip handles: large labelled
      buttons that stay grey until hovered, then the Address and Links bands,
-     with a tall activity box at the right (docs/ui-modes/modes.md). -->
+     with a small activity box at the right of the large buttons (docs/ui-modes/modes.md). -->
 <style>
   :root {
     --face: #c0c0c0;
@@ -34,19 +34,23 @@
   .menu:active { box-shadow: var(--thin-down); }
 
   /* ---- Bands ---- */
-  #bands { height: 84px; flex: none; display: flex; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
+  #bands { height: 71px; flex: none; display: flex; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
   #stack { flex: 1; min-width: 0; display: flex; flex-direction: column; border-top: 1px solid #fff; }
   .band { display: flex; align-items: center; min-width: 0; padding: 2px 4px 2px 2px; box-shadow: var(--thin); }
   .grip { width: 3px; align-self: stretch; flex: none; margin: 2px 6px 2px 2px; box-shadow: var(--thin); }
-  #big { height: 54px; flex: none; }
-  #lower { height: 27px; flex: none; display: flex; }
+  #big { height: 44px; flex: none; }
+  #lower { height: 24px; flex: none; display: flex; }
 
   /* ---- Large buttons: grey until hovered ---- */
   .big {
-    min-width: 50px; height: 46px; flex: none; padding: 0 3px;
+    min-width: 42px; height: 38px; flex: none; padding: 0 2px; position: relative; line-height: 12px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
   }
-  .big svg { display: block; flex: none; }
+  .big svg { display: block; flex: none; width: 24px; height: 24px; }
+  .big.arrow::after {
+    content: ""; position: absolute; top: 13px; right: 2px;
+    border: 2px solid transparent; border-top: 3px solid #000; border-bottom: 0;
+  }
   .big svg.off { display: none; }
   .big svg.on { filter: grayscale(1); }
   .big:hover:not(.disabled) svg.on, .big:focus-visible:not(.disabled) svg.on { filter: none; }
@@ -56,33 +60,31 @@
   .big.disabled { color: #808080; text-shadow: 1px 1px #fff; }
   .big.disabled svg.on { display: none; }
   .big.disabled svg.off { display: block; }
-  .sep { width: 2px; height: 40px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
+  .sep { width: 2px; height: 34px; flex: none; margin: 0 3px; box-shadow: var(--thin); }
 
   /* ---- Address band ---- */
   #address { flex: 1; }
   #address > label { flex: none; padding-right: 6px; }
   #field {
-    flex: 1; min-width: 0; height: 21px; padding: 2px; position: relative; display: flex;
+    flex: 1; min-width: 0; height: 19px; padding: 2px; position: relative; display: flex;
     background: #fff; box-shadow: var(--sunken);
   }
   #url {
-    flex: 1; min-width: 0; height: 17px; border: 0; margin: 0; padding: 1px 3px; outline: none;
+    flex: 1; min-width: 0; height: 15px; border: 0; margin: 0; padding: 0 3px; outline: none;
     background: transparent; color: #000; font: inherit; user-select: text;
   }
   #url::selection { background: #000080; color: #fff; }
-  #field svg.lock { display: none; flex: none; margin: 2px 4px 0 0; }
-  #field.secure svg.lock { display: block; }
   #drop {
-    width: 16px; height: 17px; flex: none; display: flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; flex: none; display: flex; align-items: center; justify-content: center;
     box-shadow: var(--raised);
   }
   #drop::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
   #drop:active { box-shadow: var(--sunken); }
 
   /* ---- Links band ---- */
-  #linksband { width: 38%; flex: none; max-width: 380px; }
-  #linksband > label { flex: none; padding-right: 6px; }
-  #links { display: flex; gap: 2px; min-width: 0; overflow: hidden; }
+  #linksband { flex: none; padding-left: 0; }
+  #linksband > label { flex: none; padding: 0 2px; }
+  #links { display: none; }
   .ql {
     height: 18px; max-width: 120px; flex: none; padding: 0 5px 0 3px;
     display: flex; align-items: center; gap: 3px;
@@ -96,12 +98,13 @@
   #linksband .none { color: #808080; text-shadow: 1px 1px #fff; }
 
   /* ---- Activity box ---- */
-  #act { width: 84px; flex: none; display: flex; padding: 2px; border-top: 1px solid #fff; }
+  #act { width: 40px; height: 40px; flex: none; display: flex; margin-left: auto; }
   #throbber {
     flex: 1; display: flex; align-items: center; justify-content: center;
     background: #000; box-shadow: var(--sunken);
   }
-  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.idle { zoom: 0.667; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; zoom: 0.667; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
@@ -128,26 +131,27 @@
         <button class="big" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_D96_HOME}}<span>Home</span></button>
         <div class="sep"></div>
         <button class="big" id="search" data-cmd="search" title="Search the web">{{ICON_D96_SEARCH}}<span>Search</span></button>
-        <button class="big" id="favorites" data-cmd="bookmarks" title="Show your favorites">{{ICON_D96_FAVORITES}}<span>Favorites</span></button>
-        <button class="big" id="add" data-cmd="bookmark-add" title="Add this page to your favorites (Ctrl+D)">{{ICON_D96_ADD}}<span>Add</span></button>
+        <button class="big arrow" id="favorites" data-cmd="bookmarks" title="Show your favorites">{{ICON_D96_FAVORITES}}<span>Favorites</span></button>
+        <button class="big" id="print" data-cmd="print" title="Print this page (Ctrl+P)">{{ICON_D96_PRINT}}<span>Print</span></button>
+        <button class="big" id="font" data-cmd="zoom-in" title="Change the text size">{{ICON_D96_FONT}}<span>Font</span></button>
+        <button class="big arrow" id="mail" title="Mail">{{ICON_D96_MAIL}}<span>Mail</span></button>
+        <div id="act">
+          <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+            {{LANTERN_IDLE}}
+            <div class="lit-box">{{LANTERN_LIT}}</div>
+          </div>
+        </div>
       </div>
       <div id="lower">
         <div class="band" id="address">
           <div class="grip"></div>
           <label for="url">Address</label>
-          <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
+          <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)"><button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
         </div>
         <div class="band" id="linksband">
-          <div class="grip"></div>
           <label>Links</label>
           <div id="links"></div>
         </div>
-      </div>
-    </div>
-    <div id="act">
-      <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
-        {{LANTERN_IDLE}}
-        <div class="lit-box">{{LANTERN_LIT}}</div>
       </div>
     </div>
   </div>
