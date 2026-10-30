@@ -23,6 +23,9 @@
   #line { height: 20px; flex: none; display: flex; white-space: pre; }
   .pane { height: 20px; flex: none; display: flex; align-items: center; }
   .pane::before { content: "| "; }
+  /* A pane with nothing to say leaves no stray separator. */
+  #modem-pane:not(.dialup)::before, #lock-pane:not(.secure)::before,
+  #meter-pane:has(#meter:not(.on))::before { content: none; }
   #text { flex: 1; min-width: 0; }
   #text::before { content: "| "; }
   #msg { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

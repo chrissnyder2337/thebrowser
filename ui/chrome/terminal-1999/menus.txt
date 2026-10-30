@@ -1,17 +1,23 @@
 # The menu bar of a text-mode browser, 1999.
 menu File
+open-url Go to URL
 back Go back
 forward Go forward
 - History
 reload Reload
----
 bookmarks Bookmarks
-add-bookmark Add bookmark
----
 - New window
+---
 - Save as
+- Save URL as
 - Save formatted document
 ---
+- Kill background connections
+- Kill all connections
+- Flush all caches
+- Resource info
+---
+- OS shell
 close-window Exit
 menu View
 search Search

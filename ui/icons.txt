@@ -3204,11 +3204,11 @@ frame dos-s-desktop
 ................
 
 # Set-top TV (1997): original 16x16 pictograms for the Options panel.
-= ^ #d8d8f0
-= & #6a64a8
-= * #24203a
-= ( #f0b838
-= ) #58b8d0
+= ^ #e8e8e8
+= & #8a8a8a
+= * #101010
+= ( #e1c433
+= ) #b09830
 
 frame t97-back
 ................

@@ -39,13 +39,13 @@
     box-shadow: var(--up); border-bottom: 1px solid #000;
   }
   .item:last-child { border-bottom: 0; }
-  .item i { font-style: normal; font-size: 12px; }
+  .item i { font-style: normal; font-size: 13px; }
   .item svg { width: 6px; height: 8px; display: block; }
   .item:active { box-shadow: var(--down); }
   .item:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
 
   /* ---- Floating panels ---- */
-  .panel { width: 202px; margin-left: 7px; flex: none; border: 1px solid #000; background: var(--face); box-shadow: 2px 2px #222; }
+  .panel { width: 204px; margin-left: 7px; flex: none; border: 1px solid #000; background: var(--face); box-shadow: 2px 2px #222; }
   .panel .title { justify-content: center; position: relative; background: var(--face); color: #000; border-bottom: 1px solid #000; }
   .panel .title .close {
     position: absolute; right: 1px; top: 1px; width: 17px; height: 17px;
@@ -53,13 +53,14 @@
   }
   .close svg { width: 9px; height: 9px; display: block; }
   .close:active { box-shadow: var(--down); }
-  .panel .body { padding: 6px; display: flex; flex-direction: column; gap: 4px; }
-  .row { display: flex; gap: 4px; }
+  .panel .body { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .row { display: flex; gap: 6px; }
   .row.two { justify-content: space-between; }
   .row > * { flex: 1; min-width: 0; }
-  .row.two > * { flex: none; width: 58px; }
+  .row.two > * { flex: none; width: 56px; }
+  #navp .row:not(.two) .nb { font-size: 11px; }
   .nb {
-    height: 22px; padding: 0 2px; text-align: center; font-size: 12px; white-space: nowrap;
+    height: 22px; padding: 0; text-align: center; font-size: 11.5px; white-space: nowrap;
     box-shadow: var(--up); border: 1px solid #000; background: var(--face);
   }
   .nb:active:not(.disabled) { box-shadow: var(--down); }

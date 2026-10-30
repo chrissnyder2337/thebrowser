@@ -158,7 +158,7 @@ pub fn layout(mode: UiMode) -> Layout {
             .panel(208)
             .inset([12, 18, 0, 18], 0xFF202020),
         UiMode::Workspace1997 => Layout::bars(50, 20)
-            .side(150, true, false)
+            .side(210, true, false)
             .frame(20)
             .inset([4, 4, 4, 4], 0xFF808080)
             .well(2, 0xFFC0C0C0),
