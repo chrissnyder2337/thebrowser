@@ -165,6 +165,12 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Workstation1996 => Layout::bars(100, 30)
             .inset([4, 6, 6, 6], 0xFFBFBFBF)
             .well(2, 0xFF676767),
+        UiMode::WorkstationPc1995 => Layout::bars(80, 24),
+        UiMode::Applet1995 => Layout::bars(62, 80),
+        UiMode::Classic1999 => Layout::bars(20, 20)
+            .frame(120)
+            .inset([6, 10, 0, 10], 0xFF6666CC)
+            .well(1, 0xFF000000),
     }
 }
 
@@ -251,6 +257,18 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Workstation1996 => Some((
             include_str!("../../ui/chrome/workstation-1996/pages.css"),
             "#bfbfbf",
+        )),
+        UiMode::WorkstationPc1995 => Some((
+            include_str!("../../ui/chrome/workstation-pc-1995/pages.css"),
+            "#c0c0c0",
+        )),
+        UiMode::Applet1995 => Some((
+            include_str!("../../ui/chrome/applet-1995/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Classic1999 => Some((
+            include_str!("../../ui/chrome/classic-1999/pages.css"),
+            "#ffffff",
         )),
     }
 }

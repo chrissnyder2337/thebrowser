@@ -35,7 +35,7 @@ Update the tables below in the same commit as the work they describe.
 | `lantern` | Lantern (default) | — | — | Shipped |
 | `workstation-1993` | Workstation (1993) | NCSA Mosaic for X 1.x–2.6 | menus | Built (not yet merged) |
 | `workstation-1996` | Workstation (1996) | NCSA Mosaic for X 2.7 | icons | Built (not yet merged) |
-| `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Planned |
+| `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Built (not yet merged) |
 | `desktop-1995` | Desktop (1995) | Internet Explorer 2 | icons | Built (not yet merged) |
 | `desktop-1996` | Desktop (1996) | Internet Explorer 3 | icons, hover colour | Built (not yet merged) |
 | `desktop-1997` | Desktop (1997) | Internet Explorer 4 | icons | Built (not yet merged) |
@@ -45,8 +45,8 @@ Update the tables below in the same commit as the work they describe.
 | `suite-1997` | Suite (1997) | Netscape Communicator 4 | icons | Built (not yet merged) |
 | `classic-1992` | Classic desktop (1992) | MacWWW | menus, research | Built (not yet merged) |
 | `classic-1994` | Classic desktop (1994) | NCSA Mosaic for the Mac | icons, research | Built (not yet merged) |
-| `classic-1999` | Classic desktop (1999) | iCab | icons | Planned |
-| `applet-1995` | Applet browser (1995) | HotJava alpha | icons, research | Planned |
+| `classic-1999` | Classic desktop (1999) | iCab | icons | Built (not yet merged) |
+| `applet-1995` | Applet browser (1995) | HotJava alpha | icons, research | Built (not yet merged) |
 | `applet-1997` | Applet browser (1997) | HotJava 1.x–3 | icons | Built (not yet merged) |
 | `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Built (not yet merged) |
 | `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Built (not yet merged) |

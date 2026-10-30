@@ -218,10 +218,19 @@ pub enum UiMode {
     /// A Motif workstation browser at version 2.7: a toolbar of icon buttons and
     /// a URL row over the page, the meter and Stop in the status bar.
     Workstation1996,
+    /// The workstation browser on Windows: a menu bar, one row of small icon
+    /// buttons, a URL combo and the activity box beside both.
+    WorkstationPc1995,
+    /// The first browser written for the Java platform: a Document URL field
+    /// over the page, round buttons and the activity box under it.
+    Applet1995,
+    /// A late-90s desktop browser in a Platinum document window: big colour
+    /// icon buttons, a URL row and a link bar inside the window.
+    Classic1999,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 21] = [
+    pub const ALL: [Self; 24] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -243,6 +252,9 @@ impl UiMode {
         Self::Tv1997,
         Self::Workspace1997,
         Self::Workstation1996,
+        Self::WorkstationPc1995,
+        Self::Applet1995,
+        Self::Classic1999,
     ];
 
     pub fn key(self) -> &'static str {
@@ -268,6 +280,9 @@ impl UiMode {
             Self::Tv1997 => "tv-1997",
             Self::Workspace1997 => "workspace-1997",
             Self::Workstation1996 => "workstation-1996",
+            Self::WorkstationPc1995 => "workstation-pc-1995",
+            Self::Applet1995 => "applet-1995",
+            Self::Classic1999 => "classic-1999",
         }
     }
 
@@ -299,6 +314,9 @@ impl UiMode {
             Self::Tv1997 => "Set-top TV (1997)",
             Self::Workspace1997 => "Workspace (1997)",
             Self::Workstation1996 => "Workstation (1996)",
+            Self::WorkstationPc1995 => "Workstation, PC (1995)",
+            Self::Applet1995 => "Applet browser (1995)",
+            Self::Classic1999 => "Classic desktop (1999)",
         }
     }
 
@@ -335,6 +353,9 @@ impl UiMode {
             Self::Tv1997 => RetroStyle::SetTop,
             Self::Workspace1997 => RetroStyle::Off,
             Self::Workstation1996 => RetroStyle::EarlyWeb,
+            Self::WorkstationPc1995 => RetroStyle::EarlyWeb,
+            Self::Applet1995 => RetroStyle::Off,
+            Self::Classic1999 => RetroStyle::Off,
         }
     }
 }

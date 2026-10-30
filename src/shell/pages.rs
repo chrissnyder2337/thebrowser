@@ -148,6 +148,9 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Tv1997 => mode_files!("tv-1997", menus),
         UiMode::Workspace1997 => mode_files!("workspace-1997", menus, side, frame),
         UiMode::Workstation1996 => mode_files!("workstation-1996", menus),
+        UiMode::WorkstationPc1995 => mode_files!("workstation-pc-1995", menus),
+        UiMode::Applet1995 => mode_files!("applet-1995", menus),
+        UiMode::Classic1999 => mode_files!("classic-1999", menus, frame),
     }
 }
 
@@ -466,6 +469,18 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Workstation1996 => {
             "A Motif menu bar, a toolbar of icon buttons and a URL row over a sunken page, \
              modelled on NCSA Mosaic for X 2.7."
+        }
+        UiMode::WorkstationPc1995 => {
+            "A menu bar, a row of small icon buttons and a URL combo beside the activity \
+             box, modelled on NCSA Mosaic for Windows 2."
+        }
+        UiMode::Applet1995 => {
+            "A menu bar and Document URL field over the page and a row of round buttons \
+             under it, modelled on the HotJava alpha."
+        }
+        UiMode::Classic1999 => {
+            "A Platinum menu bar over a document window with big colour icon buttons, a \
+             URL row and a link bar, modelled on iCab."
         }
     }
 }

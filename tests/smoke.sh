@@ -93,7 +93,10 @@ for entry in \
   cube-1990:off \
   tv-1997:settop \
   workspace-1997:off \
-  workstation-1996:off; do
+  workstation-1996:off \
+  workstation-pc-1995:off \
+  applet-1995:off \
+  classic-1999:off; do
   mode="${entry%%:*}"
   run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
 done
