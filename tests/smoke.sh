@@ -70,7 +70,7 @@ run() {
 }
 
 # Every retro look, in Lantern's own UI.
-for look in off geocities early-web portal terminal; do
+for look in off geocities early-web portal terminal settop; do
   run "look-$look" "$look" lantern --retro="$look"
 done
 
@@ -87,7 +87,9 @@ for entry in \
   desktop-1997:off \
   desktop-1999:off \
   classic-1992:off \
-  classic-1994:off; do
+  classic-1994:off \
+  tv-1996:settop \
+  dos-1996:off; do
   mode="${entry%%:*}"
   run "ui-$mode" "${entry#*:}" "$mode" --ui="$mode"
 done

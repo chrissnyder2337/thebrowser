@@ -32,10 +32,9 @@
       // One column that fits the screen: nothing wider than it, no floats,
       // no minimum widths, flex rows wrap and grids collapse to one track.
       all + " { font-family: " + SANS + " !important; font-size: inherit !important; line-height: 1.5 !important;" +
-        " max-width: 100% !important; min-width: 0 !important; float: none !important;" +
+        " max-width: 100% !important; float: none !important;" +
         " letter-spacing: normal !important; text-shadow: none !important; overflow-wrap: anywhere;" +
-        " flex-wrap: wrap !important; grid-template-columns: minmax(0, 1fr) !important; }",
-      p + "{ font-size: " + BODY + "px !important; }",
+        " flex-wrap: wrap !important; flex-basis: auto !important; grid-template-columns: minmax(0, 1fr) !important; }",
       // Colors only where the page set none (:where() has no specificity, so
       // any page rule beats these).
       ":where(a:link, a:visited) { color: " + LINK + "; }",
@@ -47,6 +46,8 @@
       p + ":is(small, sub, sup, figcaption, caption, label) { font-size: 16px !important; }",
       p + ":is(code, kbd, samp, tt, pre) { font-family: " + MONO + " !important; font-size: 16px !important; line-height: 1.4 !important; }",
       p + "pre { white-space: pre-wrap !important; overflow-wrap: anywhere !important; }",
+      // Flex rows wrap, and no box in one is narrower than a word or two.
+      p + ":is(div, section, aside, article, header, main, nav, form, p, ul, ol, li, span) { min-width: min(100%, 12em) !important; }",
       p + "p, " + p + "ul, " + p + "ol, " + p + "dl, " + p + "blockquote, " + p + "pre { margin-top: 0 !important; margin-bottom: 14px !important; }",
       p + ":is(ul, ol) { padding-left: 1.4em !important; }",
       p + "blockquote { margin-left: 12px !important; margin-right: 0 !important; }",
@@ -94,7 +95,7 @@
       // The screen: a 544px column in the middle of the window. :where()
       // gives the colors no weight, so a page's own always win.
       ":where(html, body) { background-color: " + SCREEN + "; color: #000; }",
-      "html body { width: auto !important; min-width: 0 !important; max-width: 544px !important;" +
+      "html body { font-size: " + BODY + "px !important; width: auto !important; min-width: 0 !important; max-width: 544px !important;" +
         " margin: 0 auto !important; padding: 12px 16px 24px !important; box-sizing: border-box !important;" +
         " overflow-x: hidden; }"
     ].join("\n"),

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- DOS graphics (1996): a Title row and a URL row over the page, in the
+     VGA grey with deep bevels (docs/ui-modes/modes.md). The buttons live in
+     the side view. -->
+<style>
+  :root {
+    --face: #c0c0c0;
+    --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+    --down: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 15px Arial, Helvetica, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; box-shadow: inset 0 1px #fff, inset 0 -1px #000; }
+  button { font: inherit; color: inherit; background: var(--face); border: 0; margin: 0; padding: 0; outline: none; }
+
+  .row { height: 19px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 0 0 0; }
+  /* The grey label boxes: embossed white text on grey. */
+  .lab {
+    width: 52px; flex: none; padding: 0 0 0 3px; display: flex; align-items: center;
+    box-shadow: var(--up); color: #c0c0c0; text-shadow: 1px 1px #fff, -1px -1px #808080;
+    font-size: 17px; font-weight: bold; line-height: 1;
+  }
+  .fld { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 3px; box-shadow: var(--down); position: relative; }
+  #title { color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 15px; padding-top: 1px; }
+  #field { background: #000; padding: 0 2px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+  #url {
+    width: 100%; height: 15px; border: 0; padding: 0; margin: 0; outline: none; background: transparent;
+    color: #00ff00; font: bold 13px "Courier New", Courier, monospace; user-select: text;
+  }
+  #url::selection { background: #00ff00; color: #000; }
+
+  /* Window icons at the right end of the Title row. */
+  #brand { flex: none; display: flex; align-items: center; gap: 3px; padding: 0 3px 0 8px; color: #c0c0c0;
+    text-shadow: 1px 1px #fff, -1px -1px #808080; font: bold 15px Arial, Helvetica, sans-serif; }
+  #win { width: 17px; height: 17px; position: relative; }
+  #win i { position: absolute; display: block; }
+  #win .sq { left: 3px; top: 4px; width: 9px; height: 9px; border: 1px solid #808080; box-shadow: 1px 1px #fff; }
+  #win .dg { left: 5px; top: 7px; width: 2px; height: 2px; background: #808080; box-shadow: 1px 1px #fff; }
+  #win:hover, #win:focus-visible { box-shadow: var(--up); }
+  #win:active { box-shadow: var(--down); }
+  #grip { flex: none; width: 16px; height: 17px; position: relative; }
+  #grip i { position: absolute; left: 3px; right: 3px; height: 1px; background: #808080; box-shadow: 0 1px #fff; }
+  .scroll { flex: none; width: 17px; box-shadow: var(--up); position: relative; }
+  .scroll i { position: absolute; left: 4px; right: 4px; height: 1px; background: #000; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="lab">Title</span>
+    <div class="fld" style="flex:1"><span id="title"></span></div>
+    <span id="brand">Lantern
+      <button id="win" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Options: settings, Retro looks and Browser UI"><i class="sq"></i><i class="dg"></i></button>
+      <span id="grip" aria-hidden="true"><i style="top:5px"></i><i style="top:8px"></i><i style="top:11px"></i></span>
+    </span>
+  </div>
+  <div class="row">
+    <label class="lab" for="url">URL</label>
+    <div class="fld" id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
+    <span class="scroll" aria-hidden="true"><i style="top:5px"></i><i style="top:8px"></i><i style="top:11px"></i></span>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

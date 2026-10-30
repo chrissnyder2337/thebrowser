@@ -25,6 +25,9 @@ pub struct Layout {
     /// The side view's width, beside the page.
     pub side: i32,
     pub side_left: bool,
+    /// The side view runs the window's full height, beside the toolbar and
+    /// status views too, instead of only beside the page.
+    pub side_full: bool,
     /// The frame view, right above the page and inside the inset.
     pub frame: i32,
     /// Border around the frame and page: top, left, bottom, right.
@@ -46,6 +49,7 @@ impl Layout {
             status_open: 0,
             side: 0,
             side_left: true,
+            side_full: false,
             frame: 0,
             inset: [0; 4],
             inset_color: 0xFFC0C0C0,
@@ -59,6 +63,25 @@ impl Layout {
         Self {
             inset,
             inset_color: color,
+            ..self
+        }
+    }
+
+    /// The same, with a side view `width` wide on the left or right, beside
+    /// the page or (`full`) the whole window.
+    const fn side(self, width: i32, left: bool, full: bool) -> Self {
+        Self {
+            side: width,
+            side_left: left,
+            side_full: full,
+            ..self
+        }
+    }
+
+    /// The same, with a panel the status view grows to `height` for.
+    const fn panel(self, height: i32) -> Self {
+        Self {
+            status_open: height,
             ..self
         }
     }
@@ -122,6 +145,10 @@ pub fn layout(mode: UiMode) -> Layout {
             .frame(64)
             .inset([6, 10, 0, 10], 0xFF848484)
             .well(1, 0xFF000000),
+        UiMode::Tv1996 => Layout::bars(0, 34)
+            .panel(170)
+            .inset([12, 18, 0, 18], 0xFF101018),
+        UiMode::Dos1996 => Layout::bars(38, 20).side(150, false, true),
     }
 }
 
@@ -189,6 +216,11 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         )),
         UiMode::Classic1994 => Some((
             include_str!("../../ui/chrome/classic-1994/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Tv1996 => Some((include_str!("../../ui/chrome/tv-1996/pages.css"), "#c8c8d8")),
+        UiMode::Dos1996 => Some((
+            include_str!("../../ui/chrome/dos-1996/pages.css"),
             "#ffffff",
         )),
     }
@@ -288,7 +320,7 @@ pub fn apply() {
 /// Lay the window out for the current mode: view sizes and visibility, the
 /// side view's position, and the inset around the page.
 pub fn relayout() {
-    let (mode, panel_open, window, middle, inset, well, browsers) = with_shell(|shell| {
+    let (mode, panel_open, window, middle, main, inset, well, browsers) = with_shell(|shell| {
         let browsers: Vec<(Role, Browser)> = Role::ALL
             .into_iter()
             .filter_map(|role| shell.browser(role).map(|b| (role, b)))
@@ -298,6 +330,7 @@ pub fn relayout() {
             shell.panel_open,
             shell.window.clone(),
             shell.middle.clone(),
+            shell.main.clone(),
             shell.inset.clone(),
             shell.well.clone(),
             browsers,
@@ -327,9 +360,9 @@ pub fn relayout() {
             _ => {}
         }
     }
-    if let (Some(middle), Some(mut side)) = (middle, side_view) {
-        let index = if layout.side_left { 0 } else { 1 };
-        middle.reorder_child_view(Some(&mut side), index);
+    if let (Some(window), Some(main), Some(middle), Some(side)) = (&window, main, middle, side_view)
+    {
+        super::window::place_side(window, &main, &middle, side, &layout);
     }
     if let (Some(inset), Some(well)) = (inset, well) {
         super::window::lay_out_inset(&inset, &well, &layout, content_view);

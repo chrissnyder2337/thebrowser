@@ -142,6 +142,8 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Desktop1999 => mode_files!("desktop-1999", menus),
         UiMode::Classic1992 => mode_files!("classic-1992", menus, frame),
         UiMode::Classic1994 => mode_files!("classic-1994", menus, frame),
+        UiMode::Tv1996 => mode_files!("tv-1996", menus),
+        UiMode::Dos1996 => mode_files!("dos-1996", menus, side),
     }
 }
 
@@ -349,6 +351,10 @@ fn retro_description(style: RetroStyle) -> &'static str {
             "Draws every page the way a text-mode browser showed it in an 80-column \
              terminal: monospace on black, highlighted links, no pictures."
         }
+        RetroStyle::SetTop => {
+            "Draws pages the way a TV set-top box did: one column of large type on \
+             grey-blue, links without underlines and a yellow box around the selected one."
+        }
         RetroStyle::Portal => {
             "Squeezes pages into an 800x600-friendly column of small Arial with \
              colored heading bars, a channel bar, a search box and a blinking banner ad."
@@ -416,6 +422,14 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Classic1994 => {
             "A menu bar over a document window holding the activity box, icon buttons and \
              a Link field, modelled on NCSA Mosaic for the Macintosh."
+        }
+        UiMode::Tv1996 => {
+            "The page fills a TV screen; a slim bar at the bottom and an Options panel of \
+             big rounded buttons, modelled on WebTV."
+        }
+        UiMode::Dos1996 => {
+            "Title and URL rows and a full-height side panel with a big activity box, a \
+             grid of icon buttons, shortcuts and system stats, modelled on Arachne."
         }
     }
 }

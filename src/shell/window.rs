@@ -54,8 +54,9 @@ wrap_window_delegate! {
                         View::from(v)
                     })
             };
-            let (Some(middle), Some(inset), Some(well)) =
+            let (Some(main), Some(middle), Some(inset), Some(well)) =
                 (
+                    panel_create(None),
                     panel_create(None),
                     panel_create(Some(&mut InsetPanelDelegate::new(false))),
                     panel_create(Some(&mut InsetPanelDelegate::new(true))),
@@ -63,11 +64,13 @@ wrap_window_delegate! {
             else {
                 return;
             };
-            let column = box_layout(window, false);
+            let outer = box_layout(window, true);
+            add(window, outer.as_ref(), Some(View::from(&main)), 1);
+            let column = box_layout(&main, false);
             let row = box_layout(&middle, true);
-            add(window, column.as_ref(), view_for(Role::Toolbar), 0);
-            add(window, column.as_ref(), Some(View::from(&middle)), 1);
-            add(window, column.as_ref(), view_for(Role::Status), 0);
+            add(&main, column.as_ref(), view_for(Role::Toolbar), 0);
+            add(&main, column.as_ref(), Some(View::from(&middle)), 1);
+            add(&main, column.as_ref(), view_for(Role::Status), 0);
             add(&middle, row.as_ref(), view_for(Role::Side), 0);
             add(&middle, row.as_ref(), Some(View::from(&inset)), 1);
             inset.add_child_view(Some(&mut View::from(&well)));
@@ -78,6 +81,7 @@ wrap_window_delegate! {
             drop(views);
             with_shell(|shell| {
                 shell.middle = Some(middle.clone());
+                shell.main = Some(main.clone());
                 shell.inset = Some(inset.clone());
                 shell.well = Some(well.clone());
             });
@@ -99,6 +103,7 @@ wrap_window_delegate! {
             with_shell(|shell| {
                 shell.window = None;
                 shell.middle = None;
+                shell.main = None;
                 shell.inset = None;
                 shell.well = None;
             });
@@ -205,6 +210,49 @@ fn add(panel: &impl ImplPanel, layout: Option<&BoxLayout>, view: Option<View>, f
     if let Some(layout) = layout {
         layout.set_flex_for_view(Some(&mut view), flex);
     }
+}
+
+/// Put the side view where `layout` wants it: beside the page in the middle
+/// row, or beside everything in the window's outer row; first or last.
+pub fn place_side(
+    window: &Window,
+    main: &Panel,
+    middle: &Panel,
+    side: View,
+    layout: &ui_mode::Layout,
+) {
+    let outer = Panel::from(window);
+    let (to, from) = if layout.side_full {
+        (&outer, middle)
+    } else {
+        (middle, &outer)
+    };
+    if index_of(from, &side) >= 0 {
+        from.remove_child_view(Some(&mut side.clone()));
+    }
+    let index = if layout.side_left { 0 } else { 1 };
+    if index_of(to, &side) < 0 {
+        to.add_child_view_at(Some(&mut side.clone()), index);
+    } else {
+        to.reorder_child_view(Some(&mut side.clone()), index);
+    }
+    // Setting a box layout again drops the children's flex, so give the
+    // other child of each row all the room the side view leaves.
+    let row = box_layout(&outer, true);
+    if let Some(row) = row {
+        row.set_flex_for_view(Some(&mut View::from(main)), 1);
+    }
+}
+
+/// The index of `view` among `panel`'s children, or -1.
+fn index_of(panel: &Panel, view: &View) -> i32 {
+    (0..panel.child_view_count() as i32)
+        .find(|&i| {
+            panel
+                .child_view_at(i)
+                .is_some_and(|child| child.is_same(Some(&mut view.clone())) != 0)
+        })
+        .unwrap_or(-1)
 }
 
 /// Lay out the inset panel for `layout`: a border around the well, and in

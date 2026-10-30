@@ -26,18 +26,18 @@
   }
 
   /* ---- Title bar ---- */
-  #tbar { height: 20px; flex: none; position: relative; background: #fff; border-bottom: 1px solid #000; }
+  #tbar { height: 20px; flex: none; position: relative; background: #ddd; border-bottom: 1px solid #000; }
   #tbar::before {
     content: ""; position: absolute; left: 4px; right: 4px; top: 3px; bottom: 3px;
-    background: repeating-linear-gradient(#000 0 1px, #fff 1px 2px);
+    background: repeating-linear-gradient(#999 0 1px, #eee 1px 2px);
   }
-  #tbar .box { position: absolute; top: 4px; width: 11px; height: 11px; background: #fff; border: 1px solid #000; box-shadow: 0 0 0 2px #fff; }
+  #tbar .box { position: absolute; top: 4px; width: 11px; height: 11px; background: #eee; border: 1px solid #666; box-shadow: 0 0 0 2px #ddd; }
   #close { left: 9px; }
   #zoom { right: 9px; }
-  #zoom::after { content: ""; position: absolute; left: 1px; top: 1px; width: 5px; height: 5px; border: 1px solid #000; }
+  #zoom::after { content: ""; position: absolute; left: 1px; top: 1px; width: 5px; height: 5px; border: 1px solid #666; }
   #tcap {
     position: absolute; left: 50%; top: 1px; height: 16px; transform: translateX(-50%);
-    max-width: calc(100% - 100px); padding: 0 10px; background: #fff;
+    max-width: calc(100% - 100px); padding: 0 10px; background: #ddd;
     font: bold 12px/16px Chicago, ChicagoFLF, Charcoal, Geneva, sans-serif;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -45,9 +45,9 @@
 
   /* ---- Toolbar row ---- */
   #tools { height: 26px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 6px; }
-  #throbber { width: 24px; height: 22px; flex: none; display: flex; align-items: center; justify-content: center; margin-right: 2px; background: #fff; border: 1px solid #000; overflow: hidden; }
+  #throbber { height: 24px; flex: none; display: flex; align-items: center; justify-content: center; margin-right: 2px; width: 28px; background: transparent; border: 0; overflow: hidden; }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
-  #throbber .lit-box, #throbber svg.idle { zoom: 0.42; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 0.5; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
@@ -59,29 +59,31 @@
   }
   .pb:active:not(.disabled) { background: #aaa; box-shadow: var(--down); }
   .pb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
-  .ib { width: 26px; }
+  .ib { width: 26px; border-radius: 0; border-color: #999; box-shadow: inset 1px 1px #fff, inset -1px -1px #aaa; }
+  .ib:active:not(.disabled) { box-shadow: inset 1px 1px #aaa, inset -1px -1px #fff; }
+  .ib.disabled { border-color: #bbb; box-shadow: inset 1px 1px #f4f4f4, inset -1px -1px #ccc; }
   .ib svg.off, .ib.disabled svg.on { display: none; }
   .ib.disabled svg.off { display: block; }
-  .tx { padding: 0 9px; }
+  .tx { padding: 0 9px; border-color: #999; color: #888; border-radius: 4px; }
   .tx.disabled { color: #888; border-color: #888; }
 
   #popup {
     flex: 1; min-width: 0; height: 20px; margin: 0 4px 0 2px; position: relative; text-align: left;
     padding: 0 22px 0 6px; background: #fff; border: 1px solid #000; box-shadow: 1px 1px #000;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #888;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000;
   }
   #popup::after { content: ""; position: absolute; right: 5px; top: 7px; border: 5px solid transparent; border-top: 6px solid #000; border-bottom: 0; }
   #search { margin-left: 4px; }
   #kw {
-    flex: none; width: 140px; height: 20px; padding: 0 5px; text-align: left; color: #666;
+    flex: none; width: 190px; height: 20px; padding: 0 5px; text-align: left; color: #000;
     background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #888;
     white-space: nowrap; overflow: hidden;
   }
 
   /* ---- Link row ---- */
-  #linkrow { height: 18px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; border-bottom: 1px solid #000; font-size: 10px; }
+  #linkrow { height: 18px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px 4px; font-size: 10px; background: linear-gradient(#e4e4e4 0 14px, #ddd 14px 17px, #000 17px); }
   #linkrow label { flex: none; }
-  #field { flex: 1; min-width: 0; height: 14px; display: flex; align-items: center; gap: 4px; padding: 0 3px; border: 1px solid transparent; }
+  #field { flex: 1; min-width: 0; height: 13px; display: flex; align-items: center; gap: 4px; padding: 0 3px; border: 1px solid transparent; }
   #field:focus-within { background: #fff; border-color: #000; }
   #url {
     flex: 1; min-width: 0; height: 12px; border: 0; padding: 0; margin: 0; outline: none;
@@ -106,7 +108,7 @@
     <button class="pb ib disabled" id="back" data-cmd="back" title="Go back (Alt+Left)" aria-label="Back">{{ICON_C94_BACK}}</button>
     <button class="pb ib disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)" aria-label="Forward">{{ICON_C94_FORWARD}}</button>
     <button class="pb ib" id="home" data-cmd="home" title="Go to the start page (Alt+Home)" aria-label="Home">{{ICON_C94_HOME}}</button>
-    <button id="popup" title="Not available">History</button>
+    <button id="popup" title="Documents visited"><span data-title></span></button>
     <button class="pb tx" id="search" data-cmd="search" title="Search the web">Search</button>
     <button id="kw" data-cmd="search" title="Search the web">keyword</button>
   </div>

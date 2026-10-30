@@ -1,0 +1,5 @@
+/* Set-top TV (1996): plain pages the way a television browser drew them by
+   default: big Helvetica and black text on a light grey-blue page (the color
+   is set in ui_mode.rs). One rule per line, each selector wrapped in :where()
+   (checked by a unit test). */
+:where(html) { color: #000; font: 19px/1.5 Helvetica, Arial, sans-serif; }

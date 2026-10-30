@@ -107,15 +107,19 @@ pub enum RetroStyle {
     /// A text-mode browser in an 80-column terminal: monospace on black, no
     /// images. The Text terminal UI mode's era look.
     Terminal,
+    /// A TV set-top box: one column of large type on grey-blue, the selected
+    /// link in a yellow box. The Set-top TV UI modes' era look.
+    SetTop,
 }
 
 impl RetroStyle {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 6] = [
         Self::Off,
         Self::GeoCities,
         Self::EarlyWeb,
         Self::Portal,
         Self::Terminal,
+        Self::SetTop,
     ];
 
     pub fn key(self) -> &'static str {
@@ -125,6 +129,7 @@ impl RetroStyle {
             Self::EarlyWeb => "early-web",
             Self::Portal => "portal",
             Self::Terminal => "terminal",
+            Self::SetTop => "settop",
         }
     }
 
@@ -140,6 +145,7 @@ impl RetroStyle {
             Self::EarlyWeb => "Early web (1995)",
             Self::Portal => "Web portal (1997)",
             Self::Terminal => "Text terminal (1999)",
+            Self::SetTop => "Set-top TV (1996)",
         }
     }
 }
@@ -194,10 +200,16 @@ pub enum UiMode {
     /// A desktop browser in a document window: the menu bar across the top,
     /// and the activity box, buttons and Link field inside the window.
     Classic1994,
+    /// A TV set-top box: the page fills the screen, a slim bar at the bottom,
+    /// and an Options panel that rises over it.
+    Tv1996,
+    /// A graphical DOS browser: Title and URL rows over the page and a
+    /// full-height panel of big icon buttons, shortcuts and system stats.
+    Dos1996,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 15] = [
+    pub const ALL: [Self; 17] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -213,6 +225,8 @@ impl UiMode {
         Self::Desktop1999,
         Self::Classic1992,
         Self::Classic1994,
+        Self::Tv1996,
+        Self::Dos1996,
     ];
 
     pub fn key(self) -> &'static str {
@@ -232,6 +246,8 @@ impl UiMode {
             Self::Desktop1999 => "desktop-1999",
             Self::Classic1992 => "classic-1992",
             Self::Classic1994 => "classic-1994",
+            Self::Tv1996 => "tv-1996",
+            Self::Dos1996 => "dos-1996",
         }
     }
 
@@ -257,13 +273,15 @@ impl UiMode {
             Self::Desktop1999 => "Desktop (1999)",
             Self::Classic1992 => "Classic desktop (1992)",
             Self::Classic1994 => "Classic desktop (1994)",
+            Self::Tv1996 => "Set-top TV (1996)",
+            Self::Dos1996 => "DOS graphics (1996)",
         }
     }
 
     /// Whether pages only make sense in this mode's era look (a terminal
     /// can't show a modern page), so the default `mode_pages` gives it.
     pub fn needs_era_look(self) -> bool {
-        matches!(self, Self::Terminal1999 | Self::Terminal1992)
+        matches!(self, Self::Terminal1999 | Self::Tv1996 | Self::Terminal1992)
     }
 
     /// The retro look that renders pages the way this mode's browsers did.
@@ -284,6 +302,8 @@ impl UiMode {
             Self::Desktop1999 => RetroStyle::Off,
             Self::Classic1992 => RetroStyle::EarlyWeb,
             Self::Classic1994 => RetroStyle::EarlyWeb,
+            Self::Tv1996 => RetroStyle::SetTop,
+            Self::Dos1996 => RetroStyle::EarlyWeb,
         }
     }
 }

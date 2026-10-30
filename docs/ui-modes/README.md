@@ -43,17 +43,17 @@ Update the tables below in the same commit as the work they describe.
 | `toolbar-1995` | Toolbar (1995) | Netscape 1.1–1.22 | icons | Built (not yet merged) |
 | `toolbar-1996` | Toolbar (1996) | Netscape 2–3 | icons | Built (not yet merged) |
 | `suite-1997` | Suite (1997) | Netscape Communicator 4 | icons | Built (not yet merged) |
-| `classic-1992` | Classic desktop (1992) | MacWWW | menus, research | Planned |
-| `classic-1994` | Classic desktop (1994) | NCSA Mosaic for the Mac | icons, research | Planned |
+| `classic-1992` | Classic desktop (1992) | MacWWW | menus, research | Built (not yet merged) |
+| `classic-1994` | Classic desktop (1994) | NCSA Mosaic for the Mac | icons, research | Built (not yet merged) |
 | `classic-1999` | Classic desktop (1999) | iCab | icons | Planned |
 | `applet-1995` | Applet browser (1995) | HotJava alpha | icons, research | Planned |
 | `applet-1997` | Applet browser (1997) | HotJava 1.x–3 | icons | Built (not yet merged) |
-| `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Planned |
+| `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Built (not yet merged) |
 | `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Planned |
 | `pc-1993` | Early PC (1993) | Cello | menus | Built (not yet merged) |
 | `terminal-1992` | Text terminal (1992) | Lynx | the Text terminal look | Built (not yet merged) |
 | `terminal-1999` | Text terminal (1999) | Links | the Text terminal look | Built (not yet merged) |
-| `dos-1996` | DOS graphics (1996) | Arachne | a side view | Later |
+| `dos-1996` | DOS graphics (1996) | Arachne | a side view | Built (not yet merged) |
 | `cube-1990` | Cube workstation (1990) | WorldWideWeb | floating windows | Not planned |
 | `workspace-1997` | Workspace (1997) | Opera 3 | several content views | Not planned |
 

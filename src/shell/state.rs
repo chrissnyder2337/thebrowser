@@ -60,6 +60,9 @@ pub struct Shell {
     /// The panels the window lays its views out in (window.rs), kept for
     /// relayout when the UI mode changes.
     pub middle: Option<Panel>,
+    /// The column of toolbar, middle row and status view, beside a
+    /// full-height side view.
+    pub main: Option<Panel>,
     pub inset: Option<Panel>,
     pub well: Option<Panel>,
     pub open_browsers: usize,

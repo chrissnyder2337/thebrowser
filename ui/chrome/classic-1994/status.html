@@ -16,28 +16,30 @@
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
-    background: #a0a0a0; color: #000;
+    background: #848484; color: #000;
     font: 10px Geneva, "Lucida Grande", Helvetica, Arial, sans-serif;
     cursor: default;
   }
   body { padding: 0 10px; }
+  /* right and bottom window shadow need room: window is 18 tall, 2px shadow */
   button {
     font: inherit; color: inherit; background: var(--face);
     border: 0; margin: 0; padding: 0; outline: none;
   }
   #win {
     height: 18px; display: flex; align-items: center; gap: 4px; padding: 0 4px;
-    background: var(--face); border: 1px solid #000; border-top: 0;
+    background: repeating-conic-gradient(#ccc 0 25%, #eee 0 50%) 0 0/2px 2px;
+    border: 1px solid #000; border-top: 0; box-shadow: 2px 2px #000;
   }
   .pane { height: 14px; flex: none; display: flex; align-items: center; }
-  #text { flex: 1; min-width: 0; padding: 0 2px; }
+  #text { flex: 1; min-width: 0; padding: 0 4px; background: #ddd; }
   #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   #modem-pane { gap: 4px; padding: 0 3px; }
   #modem-pane:active { background: #aaa; }
   #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
   #modem-pane.dialup svg.on { display: block; }
   #modem-label { white-space: nowrap; }
-  #meter-pane { width: 88px; height: 12px; padding: 1px; background: #fff; border: 1px solid #000; order: -1; }
+  #meter-pane { width: 88px; height: 12px; padding: 1px; background: #ddd; border: 1px solid #888; box-shadow: inset 1px 1px #666; order: -1; }
   #meter { width: 100%; height: 8px; display: flex; gap: 1px; visibility: hidden; }
   #meter.on { visibility: visible; }
   #meter i { width: 5px; height: 8px; flex: none; background: #3355aa; }
@@ -46,11 +48,11 @@
   #lock-pane.secure svg { display: block; }
   .pb {
     flex: none; height: 14px; padding: 0 7px; white-space: nowrap; font-size: 10px; line-height: 12px;
-    border: 1px solid #000; border-radius: 4px; box-shadow: var(--up);
+    border: 1px solid #999; border-radius: 4px; box-shadow: var(--up);
   }
   .pb:active:not(.disabled) { background: #aaa; box-shadow: var(--down); }
   .pb:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
-  .pb.disabled { color: #888; border-color: #888; }
+  .pb.disabled { color: #888; border-color: #bbb; }
 </style>
 </head>
 <body>
