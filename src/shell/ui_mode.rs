@@ -147,7 +147,7 @@ pub fn layout(mode: UiMode) -> Layout {
             .well(1, 0xFF000000),
         UiMode::Tv1996 => Layout::bars(0, 34)
             .panel(170)
-            .inset([12, 18, 0, 18], 0xFF101018),
+            .inset([12, 18, 0, 18], 0xFF202020),
         UiMode::Dos1996 => Layout::bars(38, 20).side(150, false, true),
     }
 }
