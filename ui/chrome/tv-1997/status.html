@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<!-- Set-top TV (1997): a thin bar along the bottom of the screen (title, stop,
+     progress strip, Options key); with html.panel-open the Options panel grows
+     above it: a vertical stack of main buttons on the left, a row of
+     pictogram tiles on the right and the Go to field along the bottom
+     (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --panel: #34324a; --panel-hi: #403e5a; --bar: #232130; --ink: #e8e8f8; --dim: #a4a2c4;
+    --face-hi: #7a77a2; --face: #5c5a84; --face-lo: #46446a; --edge-hi: #a6a4cc; --edge-lo: #17152a;
+    --amber: #f0b838;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--bar); color: var(--ink);
+    font: bold 13px Helvetica, "Helvetica Neue", Arial, sans-serif; cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; outline: none; cursor: default; }
+  svg { display: block; }
+
+  /* ---- Keys: bevelled purple-grey slabs ---- */
+  .key {
+    display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap;
+    background: linear-gradient(var(--face-hi), var(--face) 50%, var(--face-lo));
+    border: 1px solid; border-color: var(--edge-hi) var(--edge-lo) var(--edge-lo) var(--edge-hi);
+    box-shadow: 0 1px 0 #000, inset 0 0 0 1px rgba(255, 255, 255, .08);
+    text-shadow: 0 1px #1c1a30; color: var(--ink);
+  }
+  .key:active:not(.disabled):not(.inert) { background: linear-gradient(var(--face-lo), var(--face)); border-color: var(--edge-lo) var(--edge-hi) var(--edge-hi) var(--edge-lo); padding-top: 1px; }
+  .key:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+  .key.disabled, .key.inert { color: #8c8aac; background: #48466a; border-color: #5c5a82 #2a2846 #2a2846 #5c5a82; text-shadow: 0 1px #302e4c; box-shadow: none; }
+  .key svg { flex: none; width: 16px; height: 16px; }
+  .key svg.off, .key.disabled svg.on, .key.inert svg.on { display: none; }
+  .key.disabled svg.off, .key.inert svg.off { display: block; }
+
+  /* ---- Options panel (closed by default) ---- */
+  #panel {
+    display: none; flex: 1; min-height: 0; padding: 6px 12px;
+    background: linear-gradient(var(--panel-hi), var(--panel));
+    border: 1px solid; border-color: #8a88b0 #0e0c1c #0e0c1c #8a88b0;
+    box-shadow: inset 0 0 0 1px #24223a, inset 1px 1px 0 2px rgba(255, 255, 255, .08);
+  }
+  html.panel-open #panel { display: grid; }
+  #panel {
+    grid-template-columns: 150px 1fr; grid-template-rows: repeat(6, 24px); gap: 3px 12px; align-content: center;
+  }
+  #stack { grid-column: 1; grid-row: 1 / 7; display: grid; grid-template-rows: repeat(6, 24px); gap: 3px; }
+  #stack .key { padding: 0 10px; }
+  #tiles { grid-column: 2; grid-row: 1 / 3; display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+  #tiles .key { flex-direction: column; justify-content: center; gap: 3px; padding: 0 2px; font-size: 12px; }
+  #screen {
+    grid-column: 2; grid-row: 3 / 6; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 0 14px; min-width: 0;
+    background: #14121e; border: 1px solid; border-color: #0a0814 #5c5a82 #5c5a82 #0a0814;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, .8);
+  }
+  #screen small { font-size: 11px; font-weight: normal; color: var(--dim); }
+  #screen b { font-size: 15px; color: var(--amber); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #field { grid-column: 2; grid-row: 6; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  #url {
+    flex: 1; min-width: 0; height: 24px; padding: 0 10px; border: 1px solid; border-color: #0a0814 #5c5a82 #5c5a82 #0a0814;
+    background: #e4e4f4; color: #101018; font: bold 13px Helvetica, Arial, sans-serif; outline: none;
+  }
+  #url:focus { box-shadow: 0 0 0 2px var(--amber); }
+  #go { flex: none; height: 24px; padding: 0 20px; }
+
+  /* ---- Status bar ---- */
+  #bar { height: 34px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 12px; background: var(--bar); border-top: 1px solid #4a4868; }
+  #throbber { width: 20px; height: 29px; flex: none; overflow: hidden; }
+  #throbber .scale { width: 32px; height: 48px; transform: scale(.6); transform-origin: 0 0; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker .6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+  #title { flex: 1; min-width: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #msgbox { flex: 0 1 150px; min-width: 0; font-size: 11px; font-weight: normal; color: var(--dim); overflow: hidden; white-space: nowrap; }
+  #msg { display: block; overflow: hidden; text-overflow: ellipsis; }
+  #meter {
+    width: 100px; height: 10px; flex: none; display: flex; overflow: hidden; visibility: hidden; padding: 1px;
+    background: #0c0a16 repeating-linear-gradient(90deg, transparent 0 9px, #2c2a44 9px 10px);
+    border: 1px solid; border-color: #0a0814 #5c5a82 #5c5a82 #0a0814;
+  }
+  #meter.on { visibility: visible; }
+  #meter i { width: 5%; height: 6px; flex: none; background: linear-gradient(#ffd868, #d89c18); box-shadow: 1px 0 #0c0a16; }
+  #lock-pane, #modem-pane { flex: none; display: flex; align-items: center; gap: 4px; opacity: .65; font-size: 11px; font-weight: normal; }
+  #lock-pane svg, #modem-pane svg { height: 16px; width: auto; }
+  #lock-pane { display: none; }
+  #lock-pane.secure { display: flex; }
+  #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
+  #modem-pane.dialup svg.on { display: block; }
+  #modem-label:empty { display: none; }
+  #stop, #opts { height: 22px; padding: 0 12px; justify-content: center; }
+</style>
+</head>
+<body>
+  <div id="panel">
+    <div id="stack">
+      <button class="key disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_T97_BACK}}Back</button>
+      <button class="key disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_T97_FORWARD}}Forward</button>
+      <button class="key" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_T97_HOME}}Home</button>
+      <button class="key" data-cmd="search" title="Search the web">{{ICON_T97_SEARCH}}Search</button>
+      <button class="key" data-cmd="bookmarks" title="Favorites">{{ICON_T97_FAVORITES}}Favorites</button>
+      <button class="key" data-cmd="focus-url" title="Type an address (Ctrl+L)">{{ICON_T97_GOTO}}Go to</button>
+    </div>
+    <div id="tiles">
+      <button class="key" data-cmd="bookmark-add" title="Save this page as a favorite (Ctrl+D)">{{ICON_T97_SAVE}}Save</button>
+      <button class="key inert" title="Not available">{{ICON_T97_SEND}}Send</button>
+      <button class="key inert" title="Not available">{{ICON_T97_INFO}}Info</button>
+      <button class="key" data-cmd="search" title="Find on the web">{{ICON_T97_FIND}}Find</button>
+      <button class="key" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Text size and other settings">{{ICON_T97_TEXTSIZE}}Text size</button>
+      <button class="key inert" title="Not available">{{ICON_T97_PRINT}}Print</button>
+      <button class="key" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_T97_RELOAD}}Reload</button>
+      <button class="key" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Setup">{{ICON_T97_SETUP}}Setup</button>
+    </div>
+    <div id="screen"><small>Now showing</small><b data-title></b></div>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Type an address (Ctrl+L)"><button class="key" id="go" title="Go to this address">Go</button></div>
+  </div>
+  <div id="bar">
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern"><div class="scale">{{LANTERN_IDLE}}<div class="lit-box">{{LANTERN_LIT}}</div></div></div>
+    <span id="title"></span>
+    <div id="msgbox"><span id="msg">Ready.</span></div>
+    <div id="meter" data-blocks="20"></div>
+    <div id="lock-pane" title="">{{ICON_LOCK}}</div>
+    <div id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
+    <button class="key disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">Stop</button>
+    <button class="key" id="opts" data-cmd="panel" title="Options">Options</button>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

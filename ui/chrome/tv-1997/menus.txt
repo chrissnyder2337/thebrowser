@@ -1,0 +1,22 @@
+# The Setup screen of a 1997 set-top TV browser box.
+menu Setup
+zoom-in Text size: larger
+zoom-out Text size: smaller
+zoom-reset Text size: normal
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+---
+- Music
+- Printing
+- Mail
+- Screen
+- Phone
+- Dialing
+- TV home
+- Remote control
+- Time
+- Extras
+---
+about About...

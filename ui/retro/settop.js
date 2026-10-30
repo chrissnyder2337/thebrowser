@@ -18,9 +18,9 @@
   var EDGE = "#2a2a44";
   var BODY = 19;
 
-  // The yellow selection box: a 3px outline that follows the rounded corners,
+  // The yellow selection box: a 2px outline that follows the rounded corners,
   // with a 1px dark edge inside it.
-  var SELECTED = "outline: 3px solid #ffff00 !important; outline-offset: 1px !important;" +
+  var SELECTED = "outline: 2px solid #e1c433 !important; outline-offset: 0 !important;" +
     " border-radius: 6px !important; box-shadow: 0 0 0 1px #202020 !important;";
 
   function css(p, all) {
@@ -67,7 +67,7 @@
       p + "a:is(:hover, :focus, :focus-visible, :active) { " + SELECTED + " }",
       "html body:not(:has(a:is(:hover, :focus))) a[" + CURRENT + "] { " + SELECTED + " }",
       p + ":is(button, input, textarea, select, summary, [tabindex]):is(:focus, :focus-visible) { " +
-        "outline: 3px solid #ffff00 !important; outline-offset: 1px !important; box-shadow: 0 0 0 1px #202020 !important; }",
+        "outline: 2px solid #e1c433 !important; outline-offset: 0 !important; box-shadow: 0 0 0 1px #202020 !important; }",
       // Fields: large, rounded, white.
       p + fields + " { font-family: " + SANS + " !important; font-size: " + BODY + "px !important; line-height: 1.3 !important;" +
         " color: #000 !important; background: #ffffff !important; border: 2px solid " + EDGE + " !important;" +

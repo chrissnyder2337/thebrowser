@@ -10,8 +10,8 @@
 <style>
   :root {
     --face: #c0c0c0;
-    --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
-    --down: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+    --up: inset 2px 2px #fff, inset -1px -1px #000, inset -2px -2px #808080;
+    --down: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -19,23 +19,23 @@
     background: var(--face); color: #000;
     font: 14px Arial, Helvetica, sans-serif; cursor: default;
   }
-  body { display: flex; flex-direction: column; box-shadow: inset 1px 0 #fff, inset 0 1px #fff; }
+  body { display: flex; flex-direction: column; box-shadow: inset 1px 0 #000, inset 0 1px #fff; }
   button { font: inherit; color: inherit; background: var(--face); border: 0; margin: 0; padding: 0; outline: none; text-align: left; }
 
   /* ---- Activity box ---- */
-  #throbber { height: 92px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
+  #throbber { height: 100px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
   #throbber:active { box-shadow: var(--down); }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
-  #throbber .lit-box, #throbber svg.idle { zoom: 1.7; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 2; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
 
   /* ---- 3x3 button grid ---- */
-  #grid { flex: none; display: grid; grid-template-columns: repeat(3, 50px); grid-auto-rows: 46px; }
+  #grid { flex: none; display: grid; grid-template-columns: repeat(3, 50px); grid-auto-rows: 50px; }
   .big { display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
-  .big svg { width: 32px; height: 32px; }
+  .big svg { width: 40px; height: 40px; }
   .big svg.off, .big.disabled svg.on { display: none; }
   .big.disabled svg.off { display: block; }
   .big:active:not(.disabled) { box-shadow: var(--down); }
@@ -44,19 +44,21 @@
 
   /* ---- Shortcuts ---- */
   #keys { flex: none; padding: 2px 3px 2px 3px; margin-top: 1px; box-shadow: var(--up); }
-  .row { width: 100%; height: 16px; display: flex; align-items: center; gap: 4px; line-height: 16px; white-space: nowrap; }
+  .row { width: 100%; height: 18px; display: flex; align-items: center; gap: 4px; line-height: 18px; white-space: nowrap; }
   .row svg { flex: none; width: 16px; height: 16px; }
   .row svg.off { display: none; }
   .row .name { flex: 1; min-width: 0; overflow: hidden; }
   .row .key { flex: none; }
-  .row.inert .name { color: #404040; }
+  .row .name { border-left: 1px solid #808080; padding-left: 4px; position: relative; }
+  .row .name::before { content: ""; position: absolute; left: -5px; top: 9px; width: 4px; height: 1px; background: #808080; }
   .row.btn:active .name { text-decoration: underline; }
 
   /* ---- System stats (decoration) ---- */
-  #stats { margin-top: auto; flex: none; padding: 1px 3px 2px 3px; box-shadow: var(--up); }
-  #stats .row { height: 14px; line-height: 14px; gap: 0; justify-content: space-between; }
+  #stats { flex: none; padding: 1px 3px 1px 3px; box-shadow: var(--up); }
+  #stats .row { height: 16px; line-height: 16px; gap: 0; justify-content: space-between; }
   #stats .v.g { color: #008000; }
-  #stats hr { margin: 1px 0; border: 0; height: 2px; background: #808080; box-shadow: 0 1px #fff; }
+  #stats hr { margin: 0; border: 0; height: 1px; background: #808080; }
+  .big.disabled svg.off { opacity: 1; }
 </style>
 </head>
 <body>
@@ -85,14 +87,15 @@
     <div class="row inert">{{ICON_DOS_S_ONLINE}}<span class="name">Online resources</span></div>
     <div class="row inert">{{ICON_DOS_S_NEWMAIL}}<span class="name">Get new mail</span></div>
     <div class="row inert">{{ICON_DOS_S_IMAGES}}<span class="name">Load images</span><span class="key">Ins</span></div>
+    <div class="row inert">{{ICON_DOS_S_LINKS}}<span class="name">Web links</span></div>
     <div class="row inert">{{ICON_DOS_S_HANGUP}}<span class="name">Hangup</span><span class="key">Alt+H</span></div>
     <button class="row btn" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_DOS_S_DESKTOP}}<span class="name">Desktop</span><span class="key">F10</span></button>
   </div>
   <div id="stats" title="Decoration">
     <div class="row"><span>Dos memory (KB)</span><span class="v g">84[+]</span></div>
     <div class="row"><span>Used XMS (KB)</span><span class="v">0</span></div>
-    <div class="row"><span>Free swap (KB)</span><span class="v">1535</span></div>
-    <div class="row"><span>Used swap (KB)</span><span class="v">383</span></div>
+    <div class="row"><span>Free xSwap (KB)</span><span class="v">1535</span></div>
+    <div class="row"><span>Used xSwap (KB)</span><span class="v">383</span></div>
     <div class="row"><span>Disk space (MB)</span><span class="v">1391</span></div>
     <div class="row"><span>HTTP cache items</span><span class="v">84</span></div>
     <hr>

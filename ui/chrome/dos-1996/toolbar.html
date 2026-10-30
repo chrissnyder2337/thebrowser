@@ -22,26 +22,27 @@
   body { display: flex; flex-direction: column; box-shadow: inset 0 1px #fff, inset 0 -1px #000; }
   button { font: inherit; color: inherit; background: var(--face); border: 0; margin: 0; padding: 0; outline: none; }
 
-  .row { height: 19px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 0 0 0; }
+  .row { height: 24px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 0 0 0; }
   /* The grey label boxes: embossed white text on grey. */
+  .row + .row { height: 22px; }
   .lab {
-    width: 52px; flex: none; padding: 0 0 0 3px; display: flex; align-items: center;
-    box-shadow: var(--up); color: #c0c0c0; text-shadow: 1px 1px #fff, -1px -1px #808080;
-    font-size: 17px; font-weight: bold; line-height: 1;
+    width: 48px; flex: none; padding: 0 0 0 3px; display: flex; align-items: center;
+    box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; color: #c0c0c0; text-shadow: 1px 1px #fff, -1px -1px #808080;
+    font-size: 20px; font-weight: bold; line-height: 1;
   }
-  .fld { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0 3px; box-shadow: var(--down); position: relative; }
-  #title { color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 15px; padding-top: 1px; }
-  #field { background: #000; padding: 0 2px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+  .fld { flex: 1; min-width: 0; display: flex; align-items: center; padding: 0; position: relative; }
+  #title { color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; font-size: 16px; line-height: 20px; padding-left: 3px; }
+  #field { background: #000; padding: 1px 3px; height: 22px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
   #url {
-    width: 100%; height: 15px; border: 0; padding: 0; margin: 0; outline: none; background: transparent;
-    color: #00ff00; font: bold 13px "Courier New", Courier, monospace; user-select: text;
+    width: 100%; height: 17px; border: 0; padding: 0; margin: 0; outline: none; background: transparent;
+    color: #00ff00; font: bold 15px "Courier New", Courier, monospace; user-select: text;
   }
   #url::selection { background: #00ff00; color: #000; }
 
   /* Window icons at the right end of the Title row. */
   #brand { flex: none; display: flex; align-items: center; gap: 3px; padding: 0 3px 0 8px; color: #c0c0c0;
     text-shadow: 1px 1px #fff, -1px -1px #808080; font: bold 15px Arial, Helvetica, sans-serif; }
-  #win { width: 17px; height: 17px; position: relative; }
+  #win { width: 20px; height: 20px; position: relative; }
   #win i { position: absolute; display: block; }
   #win .sq { left: 3px; top: 4px; width: 9px; height: 9px; border: 1px solid #808080; box-shadow: 1px 1px #fff; }
   #win .dg { left: 5px; top: 7px; width: 2px; height: 2px; background: #808080; box-shadow: 1px 1px #fff; }
