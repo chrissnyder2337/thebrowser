@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Frame</title>
+<!-- Workspace (1997): the page window's title bar inside the workspace: navy
+     gradient caption, page icon and the minimize, maximize and close boxes
+     (docs/ui-modes/modes.md). -->
+<style>
+  :root { --face: #c0c0c0; --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: bold 11px "MS Sans Serif", Tahoma, Arial, sans-serif;
+    cursor: default;
+  }
+  body { padding: 1px 0; }
+  button { font: inherit; color: inherit; border: 0; margin: 0; padding: 0; outline: none; }
+  #cap {
+    height: 18px; display: flex; align-items: center; gap: 3px; padding: 0 2px 0 3px;
+    background: linear-gradient(90deg, #000080, #1084d0); color: #fff;
+  }
+  #cap > svg { flex: none; }
+  #title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .box {
+    width: 16px; height: 14px; flex: none; position: relative; background: var(--face); box-shadow: var(--up);
+  }
+  .box:active { box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080; }
+  #min { margin-left: 2px; }
+  #close { margin-left: 2px; }
+  #min::after { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 2px; background: #000; }
+  #max::after { content: ""; position: absolute; left: 3px; top: 3px; width: 9px; height: 8px; border: 1px solid #000; border-top-width: 2px; }
+  #close::before, #close::after { content: ""; position: absolute; left: 7px; top: 3px; width: 2px; height: 8px; background: #000; transform: rotate(45deg); }
+  #close::after { transform: rotate(-45deg); }
+</style>
+</head>
+<body>
+  <div id="cap">
+    {{ICON_PAGE}}
+    <span id="title">Lantern</span>
+    <button class="box" id="min" title="Minimize" aria-label="Minimize"></button>
+    <button class="box" id="max" title="Maximize" aria-label="Maximize"></button>
+    <button class="box" id="close" data-cmd="close-window" title="Close" aria-label="Close"></button>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

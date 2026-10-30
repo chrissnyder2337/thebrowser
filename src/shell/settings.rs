@@ -206,10 +206,19 @@ pub enum UiMode {
     /// A graphical DOS browser: Title and URL rows over the page and a
     /// full-height panel of big icon buttons, shortcuts and system stats.
     Dos1996,
+    /// The first workstation browser: a vertical application menu and floating
+    /// Navigation and Open panels beside a document window on a dark desktop.
+    Cube1990,
+    /// The second-generation TV set-top box: a slim bar at the bottom and a
+    /// restyled Options panel with a column of buttons and a row of tiles.
+    Tv1997,
+    /// A workspace browser: page windows inside the main window, a Hot List
+    /// panel beside them, and a zoom box next to the address.
+    Workspace1997,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 17] = [
+    pub const ALL: [Self; 20] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -227,6 +236,9 @@ impl UiMode {
         Self::Classic1994,
         Self::Tv1996,
         Self::Dos1996,
+        Self::Cube1990,
+        Self::Tv1997,
+        Self::Workspace1997,
     ];
 
     pub fn key(self) -> &'static str {
@@ -248,6 +260,9 @@ impl UiMode {
             Self::Classic1994 => "classic-1994",
             Self::Tv1996 => "tv-1996",
             Self::Dos1996 => "dos-1996",
+            Self::Cube1990 => "cube-1990",
+            Self::Tv1997 => "tv-1997",
+            Self::Workspace1997 => "workspace-1997",
         }
     }
 
@@ -275,13 +290,19 @@ impl UiMode {
             Self::Classic1994 => "Classic desktop (1994)",
             Self::Tv1996 => "Set-top TV (1996)",
             Self::Dos1996 => "DOS graphics (1996)",
+            Self::Cube1990 => "Cube workstation (1990)",
+            Self::Tv1997 => "Set-top TV (1997)",
+            Self::Workspace1997 => "Workspace (1997)",
         }
     }
 
     /// Whether pages only make sense in this mode's era look (a terminal
     /// can't show a modern page), so the default `mode_pages` gives it.
     pub fn needs_era_look(self) -> bool {
-        matches!(self, Self::Terminal1999 | Self::Tv1996 | Self::Terminal1992)
+        matches!(
+            self,
+            Self::Terminal1999 | Self::Tv1997 | Self::Tv1996 | Self::Terminal1992
+        )
     }
 
     /// The retro look that renders pages the way this mode's browsers did.
@@ -304,6 +325,9 @@ impl UiMode {
             Self::Classic1994 => RetroStyle::EarlyWeb,
             Self::Tv1996 => RetroStyle::SetTop,
             Self::Dos1996 => RetroStyle::EarlyWeb,
+            Self::Cube1990 => RetroStyle::EarlyWeb,
+            Self::Tv1997 => RetroStyle::SetTop,
+            Self::Workspace1997 => RetroStyle::Off,
         }
     }
 }

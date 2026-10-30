@@ -8,8 +8,7 @@
      (docs/ui-modes/modes.md). -->
 <style>
   :root {
-    --face: #d6d3ce;
-    --bar: #ecebe6;
+    --face: #d4d4d4;
     --up: inset 1px 1px #fff, inset -1px -1px #808080;
     --down: inset 1px 1px #808080, inset -1px -1px #fff;
   }
@@ -17,7 +16,7 @@
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
     background: var(--face); color: #000;
-    font: 11px Arial, Helvetica, sans-serif;
+    font: 11px Arial, "Liberation Sans", Helvetica, sans-serif;
     cursor: default;
   }
   body { display: flex; flex-direction: column; }
@@ -27,18 +26,18 @@
   }
 
   /* ---- Menu bar ---- */
-  #menubar { height: 22px; flex: none; display: flex; align-items: center; padding: 0 2px; background: var(--bar); }
-  .menu { height: 20px; padding: 0 8px; background: transparent; }
+  #menubar { height: 24px; flex: none; display: flex; align-items: center; padding: 0 2px; }
+  .menu { height: 22px; padding: 0 8px; background: transparent; }
   .menu:hover, .menu:focus-visible { box-shadow: var(--up); }
   .menu:active { box-shadow: var(--down); }
 
-  /* ---- Button row ---- */
+  /* ---- Button row (borders drawn inside so the box is 47px) ---- */
   #tools {
-    height: 54px; flex: none; display: flex; align-items: center; padding: 2px 4px; gap: 0;
-    border-top: 1px solid #a8a5a0; border-bottom: 1px solid #a8a5a0;
+    height: 47px; flex: none; display: flex; align-items: center; padding: 1px 1px 1px 4px; gap: 3px;
+    box-shadow: inset 0 1px #acaa99, inset 0 -1px #716f64;
   }
   .ib {
-    min-width: 48px; height: 46px; flex: none; padding: 0 5px;
+    min-width: 56px; height: 43px; flex: none; padding: 0 5px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   }
   .ib:hover:not(.disabled) { box-shadow: var(--up); }
@@ -46,37 +45,35 @@
   .ib:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
   .ib svg { flex: none; }
   .ib svg.off { display: none; }
-  .ib.disabled { color: #8a8a8a; }
+  .ib.disabled { color: #808080; }
   .ib.disabled svg.on { display: none; }
   .ib.disabled svg.off { display: block; }
   #spacer { flex: 1; }
 
   /* ---- Activity box ---- */
   #throbber {
-    width: 44px; height: 50px; flex: none; display: flex; align-items: center; justify-content: center;
-    background: #3a2a5a; box-shadow: var(--down);
+    width: 40px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: #3a2a5a; overflow: hidden;
   }
-  #throbber:active { box-shadow: var(--up); }
-  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
-  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  #throbber svg.idle { flex: none; }
+  #throbber .lit-box { width: 32px; height: 44px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; margin-top: -2px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
 
   /* ---- Address row ---- */
-  #addr { height: 26px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 4px 0 6px; }
+  #addr { height: 28px; flex: none; display: flex; align-items: flex-end; gap: 0; padding: 0; }
+  #addr label { padding: 0 0 4px 8px; margin-right: 6px; white-space: nowrap; }
   #field {
-    flex: 1; min-width: 0; height: 20px; position: relative;
-    background: #fff; box-shadow: var(--down);
+    flex: 1; min-width: 0; height: 21px; align-self: flex-end; margin-bottom: 3px; position: relative;
+    background: #fff; box-shadow: inset 0 0 0 1px #808080, inset 0 0 0 2px #404040;
   }
   #url {
-    width: 100%; height: 18px; margin: 1px 0 0; border: 0; padding: 0 6px; outline: none;
-    background: transparent; color: #000; font: 12px Arial, Helvetica, sans-serif; user-select: text;
+    width: 100%; height: 17px; margin: 2px 0 0; border: 0; padding: 0 6px; outline: none;
+    background: transparent; color: #000; font: 12px Arial, "Liberation Sans", Helvetica, sans-serif; user-select: text;
   }
   #url::selection { background: #000080; color: #fff; }
-  #field svg.lock { display: none; position: absolute; right: 5px; top: 4px; }
-  #field.secure #url { padding-right: 24px; }
-  #field.secure svg.lock { display: block; }
 </style>
 </head>
 <body>
@@ -84,7 +81,8 @@
     <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
     <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
     <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
-    <button class="menu" data-cmd="menu" data-arg="places" data-anchor aria-haspopup="menu">Places</button>
+    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu">Go</button>
+    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu">Bookmarks</button>
     <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
   </div>
   <div id="tools">
@@ -94,7 +92,7 @@
     <button class="ib" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_A97_RELOAD}}Reload</button>
     <button class="ib disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_A97_STOP}}Stop</button>
     <button class="ib" id="search" data-cmd="search" title="Search the web">{{ICON_A97_SEARCH}}Search</button>
-    <button class="ib" id="bookmarks" data-cmd="bookmarks" title="Show bookmarks">{{ICON_A97_BOOKMARKS}}Bookmarks</button>
+    <button class="ib" id="print" data-cmd="print" title="Print this page (Ctrl+P)">{{ICON_A97_PRINT}}Print</button>
     <span id="spacer"></span>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       {{LANTERN_IDLE}}
@@ -103,7 +101,7 @@
   </div>
   <div id="addr">
     <label for="url">Address:</label>
-    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off">{{ICON_LOCK}}</div>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
   </div>
 <script>
 {{CHROME_JS}}

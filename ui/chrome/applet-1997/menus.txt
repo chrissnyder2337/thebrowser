@@ -28,14 +28,15 @@ zoom-out Smaller Text
 ---
 retro Retro looks
 browser-ui Browser UI
-menu Places
+menu Go
 back Back
 forward Forward
 home Home
 ---
+- History...
+menu Bookmarks
 add-bookmark Add to Hotlist
 bookmarks Hotlist...
-- History...
 menu Help
 - Help Topics
 - Index

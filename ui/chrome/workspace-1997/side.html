@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Side</title>
+<!-- Workspace (1997): the Hotlist panel: a folder tree over a splitter and
+     the quick links in the same tree style (docs/ui-modes/modes.md). -->
+<style>
+  :root { --face: #c0c0c0; --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; padding: 2px 2px 2px 3px; }
+  button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; outline: none; text-align: left; }
+  .cap { height: 16px; flex: none; display: flex; align-items: center; padding: 0 3px; font-weight: bold; }
+  .cap b { margin-left: auto; font-weight: normal; }
+  .box { flex: 1 1 0; min-height: 0; overflow: hidden; padding: 3px 2px; background: #fff; box-shadow: var(--sunken); }
+  #split { height: 5px; flex: none; }
+  #lower { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+  .item { height: 16px; display: flex; align-items: center; gap: 3px; white-space: nowrap; overflow: hidden; }
+  .item svg { flex: none; }
+  .item svg.off { display: none; }
+  .item span { overflow: hidden; text-overflow: ellipsis; }
+  .item.l1 { padding-left: 14px; }
+  .item.sel span { background: #000080; color: #fff; padding: 0 2px; }
+  #links { display: block; }
+  .ql { width: 100%; height: 16px; display: flex; align-items: center; gap: 4px; padding: 0 0 0 4px; }
+  .ql:hover span { background: #e8e8f8; }
+  .ql:active span { background: #000080; color: #fff; }
+  .ql:focus-visible { outline: 1px dotted #000; outline-offset: -1px; }
+  .ql svg { flex: none; }
+  .ql span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 2px; }
+  #links .none { display: block; padding: 0 4px; color: #808080; }
+</style>
+</head>
+<body>
+  <div class="cap">Hot List<b aria-hidden="true">&times;</b></div>
+  <div class="box" id="tree">
+    <div class="item">{{ICON_O97_FOLDER_OPEN}}<span>Hot List</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Business and Finance</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Complementary Health</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Computer General</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Computer News</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Directories</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Disabilities</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Games</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>General Interest</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Humor</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Lifestyle</span></div>
+    <div class="item l1">{{ICON_O97_FOLDER}}<span>Music - TV - Movies</span></div>
+  </div>
+  <div id="split"></div>
+  <div id="lower">
+    <div class="cap">Title</div>
+    <div class="box"><div id="links"></div></div>
+  </div>
+  <template id="page-icon">{{ICON_PAGE}}</template>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

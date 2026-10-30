@@ -10,16 +10,14 @@
   :root {
     --desk: #555555;
     --face: #aaaaaa;
-    --light: #dddddd;
-    --dark: #555555;
-    --up: inset 1px 1px #dddddd, inset -1px -1px #555555, inset 0 0 0 2px transparent;
-    --down: inset 1px 1px #555555, inset -1px -1px #dddddd;
+    --up: inset 1px 1px #fff, inset 2px 2px #ddd, inset -1px -1px #555;
+    --down: inset 1px 1px #555, inset 2px 2px #777, inset -1px -1px #ddd;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
     background: var(--desk); color: #000;
-    font: 12px Helvetica, "Helvetica Neue", Arial, sans-serif;
+    font: 13px Helvetica, "Helvetica Neue", Arial, sans-serif;
     cursor: default;
   }
   body { display: flex; flex-direction: column; gap: 10px; padding: 0 0 8px; }
@@ -29,45 +27,47 @@
   }
   .title {
     height: 20px; flex: none; display: flex; align-items: center;
-    background: #000; color: #fff; font-weight: bold; font-size: 12px; padding: 0 6px;
+    background: #000; color: #fff; font-weight: bold; font-size: 13px; padding: 0 6px;
   }
 
   /* ---- Application menu ---- */
-  #appmenu { width: 118px; flex: none; border: 1px solid #000; border-left: 0; border-top: 0; background: var(--face); }
-  #appmenu .title { height: 22px; border-bottom: 1px solid #000; }
+  #appmenu { width: 124px; flex: none; border: 1px solid #000; border-left: 0; border-top: 0; background: var(--face); }
+  #appmenu .title { border-bottom: 1px solid #000; }
   .item {
-    width: 100%; height: 19px; display: flex; align-items: center; justify-content: space-between;
+    width: 100%; height: 20px; display: flex; align-items: center; justify-content: space-between;
     padding: 0 6px 0 5px; text-align: left; white-space: nowrap;
     box-shadow: var(--up); border-bottom: 1px solid #000;
   }
   .item:last-child { border-bottom: 0; }
-  .item i { font-style: normal; font-size: 9px; }
-  .item:active { box-shadow: var(--down); background: var(--light); }
+  .item i { font-style: normal; font-size: 12px; }
+  .item svg { width: 6px; height: 8px; display: block; }
+  .item:active { box-shadow: var(--down); }
   .item:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
 
   /* ---- Floating panels ---- */
-  .panel { width: 156px; margin-left: 7px; flex: none; border: 1px solid #000; background: var(--face); box-shadow: 2px 2px #000; }
-  .panel .title { justify-content: center; position: relative; }
+  .panel { width: 202px; margin-left: 7px; flex: none; border: 1px solid #000; background: var(--face); box-shadow: 2px 2px #222; }
+  .panel .title { justify-content: center; position: relative; background: var(--face); color: #000; border-bottom: 1px solid #000; }
   .panel .title .close {
-    position: absolute; right: 3px; top: 3px; width: 13px; height: 13px;
-    background: none; color: #fff; font-size: 12px; line-height: 12px; text-align: center;
-    border: 1px solid #fff;
+    position: absolute; right: 1px; top: 1px; width: 17px; height: 17px;
+    border: 1px solid #000; box-shadow: var(--up); display: flex; align-items: center; justify-content: center;
   }
+  .close svg { width: 9px; height: 9px; display: block; }
+  .close:active { box-shadow: var(--down); }
   .panel .body { padding: 6px; display: flex; flex-direction: column; gap: 4px; }
   .row { display: flex; gap: 4px; }
+  .row.two { justify-content: space-between; }
   .row > * { flex: 1; min-width: 0; }
+  .row.two > * { flex: none; width: 58px; }
   .nb {
-    height: 22px; padding: 0 2px; text-align: center; white-space: nowrap;
+    height: 22px; padding: 0 2px; text-align: center; font-size: 12px; white-space: nowrap;
     box-shadow: var(--up); border: 1px solid #000; background: var(--face);
   }
-  .nb:active:not(.disabled) { box-shadow: var(--down); background: var(--light); }
+  .nb:active:not(.disabled) { box-shadow: var(--down); }
   .nb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
-  .nb.disabled { color: #6a6a6a; }
-  .nb.inert { color: #000; }
+  .nb.disabled { color: #444; }
 
   /* ---- Open panel ---- */
-  #openp .lab { font-size: 12px; }
-  #field { height: 22px; padding: 3px 4px; background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #555555; }
+  #field { height: 22px; padding: 3px 4px; background: #fff; border: 1px solid #000; box-shadow: inset 1px 1px #555; }
   #url {
     width: 100%; height: 14px; border: 0; padding: 0; margin: 0; outline: none;
     background: transparent; color: #000; font: 12px Helvetica, "Helvetica Neue", Arial, sans-serif; user-select: text;
@@ -79,9 +79,9 @@
   #throbber {
     margin: auto 0 0 7px; width: 64px; height: 64px; flex: none;
     display: flex; align-items: center; justify-content: center;
-    background: var(--face); border: 1px solid #000; box-shadow: var(--up), 2px 2px #000;
+    background: var(--face); border: 1px solid #000; box-shadow: var(--up), 2px 2px #222;
   }
-  #throbber:active { box-shadow: var(--down), 2px 2px #000; }
+  #throbber:active { box-shadow: var(--down), 2px 2px #222; }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
@@ -92,30 +92,30 @@
 <body>
   <div id="appmenu">
     <div class="title">Web</div>
-    <button class="item" data-cmd="menu" data-arg="info" data-anchor aria-haspopup="menu">Info<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="document" data-anchor aria-haspopup="menu">Document<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="find" data-anchor aria-haspopup="menu">Find<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="links" data-anchor aria-haspopup="menu">Links<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="style" data-anchor aria-haspopup="menu">Style<i>&#9654;</i></button>
+    <button class="item" data-cmd="menu" data-arg="info" data-anchor aria-haspopup="menu">Info<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="document" data-anchor aria-haspopup="menu">Document<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="find" data-anchor aria-haspopup="menu">Find<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="links" data-anchor aria-haspopup="menu">Links<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="style" data-anchor aria-haspopup="menu">Style<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
     <button class="item" data-cmd="print" title="Print (Ctrl+P)">Print...<i>p</i></button>
     <button class="item" title="Not available">Page layout...</button>
-    <button class="item" data-cmd="menu" data-arg="windows" data-anchor aria-haspopup="menu">Windows<i>&#9654;</i></button>
-    <button class="item" data-cmd="menu" data-arg="services" data-anchor aria-haspopup="menu">Services<i>&#9654;</i></button>
+    <button class="item" data-cmd="menu" data-arg="windows" data-anchor aria-haspopup="menu">Windows<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
+    <button class="item" data-cmd="menu" data-arg="services" data-anchor aria-haspopup="menu">Services<i><svg viewBox="0 0 6 8" aria-hidden="true"><path d="M1.5 1.5 V7.5 L6 4.5 Z" fill="none" stroke="#555"/><path d="M0.5 0.5 V6.5 L5 3.5 Z" fill="none" stroke="#ddd"/></svg></i></button>
     <button class="item" title="Not available">Hide<i>h</i></button>
     <button class="item" data-cmd="close-window" title="Close this window">Quit<i>q</i></button>
   </div>
 
   <div class="panel" id="navp">
-    <div class="title">Navigation<button class="close" data-cmd="close-window" title="Close this window" aria-label="Close">&#8864;</button></div>
+    <div class="title">Navigation<button class="close" data-cmd="close-window" title="Close this window" aria-label="Close"><svg viewBox="0 0 9 9" aria-hidden="true"><path d="M1 1 L8 8 M8 1 L1 8" stroke="#000" stroke-width="1.5"/></svg></button></div>
     <div class="body">
       <div class="row">
         <button class="nb inert" title="Not available">&lt; Previous</button>
+        <button class="nb disabled" id="back" data-cmd="back" title="Back up: go back (Alt+Left)">Back up</button>
         <button class="nb disabled" id="forward" data-cmd="forward" title="Next: go forward (Alt+Right)">Next &gt;</button>
       </div>
-      <div class="row"><button class="nb disabled" id="back" data-cmd="back" title="Back up: go back (Alt+Left)">Back up</button></div>
-      <div class="row">
+      <div class="row two">
         <button class="nb" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">Home</button>
         <button class="nb" data-cmd="menu" data-arg="info" data-anchor aria-haspopup="menu" title="Help">Help</button>
       </div>

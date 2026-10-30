@@ -1,6 +1,6 @@
 //! Renders the text pixel-art sheets in `ui/*.txt` to inline SVG.
 //!
-//! Sheet format: `= <char> <#rrggbb>` palette lines, then `frame <name>` followed
+//! Sheet format: `= <char> <#rrggbb> [fill]` palette lines, then `frame <name>` followed
 //! by rows of cells (`.` is transparent). `#` lines are comments.
 
 use std::{collections::HashMap, fmt::Write};
@@ -14,12 +14,16 @@ fn is_hex_color(color: &str) -> bool {
 
 pub struct Sheet {
     palette: HashMap<char, String>,
+    /// Colors marked `fill`: an icon's inside, left out of its embossed
+    /// (disabled) version so line art stays line art.
+    fills: Vec<char>,
     frames: Vec<(String, Vec<Vec<char>>)>,
 }
 
 impl Sheet {
     pub fn parse(text: &str) -> Self {
         let mut palette = HashMap::new();
+        let mut fills = Vec::new();
         let mut frames: Vec<(String, Vec<Vec<char>>)> = Vec::new();
         for line in text.lines() {
             let line = line.trim_end();
@@ -37,6 +41,9 @@ impl Sheet {
                         "pixel art color {color:?} isn't #rrggbb"
                     );
                     palette.insert(key, color.to_owned());
+                    if parts.next() == Some("fill") {
+                        fills.push(key);
+                    }
                 }
             } else if let Some(name) = line.strip_prefix("frame ") {
                 frames.push((name.trim().to_owned(), Vec::new()));
@@ -44,7 +51,11 @@ impl Sheet {
                 rows.push(line.chars().collect());
             }
         }
-        Self { palette, frames }
+        Self {
+            palette,
+            fills,
+            frames,
+        }
     }
 
     fn frame(&self, name: &str) -> &[Vec<char>] {
@@ -74,6 +85,7 @@ impl Sheet {
                 let cell = row[x];
                 let color = match recolor {
                     _ if cell == '.' => None,
+                    Some(_) if self.fills.contains(&cell) => None,
                     Some(color) => Some(color),
                     None => self.palette.get(&cell).map(String::as_str),
                 };
@@ -82,7 +94,10 @@ impl Sheet {
                     continue;
                 };
                 let start = x;
-                while x < row.len() && row[x] != '.' && (recolor.is_some() || row[x] == cell) {
+                while x < row.len()
+                    && row[x] != '.'
+                    && (recolor.is_some() && !self.fills.contains(&row[x]) || row[x] == cell)
+                {
                     x += 1;
                 }
                 let _ = write!(

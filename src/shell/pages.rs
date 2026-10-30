@@ -144,6 +144,9 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Classic1994 => mode_files!("classic-1994", menus, frame),
         UiMode::Tv1996 => mode_files!("tv-1996", menus),
         UiMode::Dos1996 => mode_files!("dos-1996", menus, side),
+        UiMode::Cube1990 => mode_files!("cube-1990", menus, side, frame),
+        UiMode::Tv1997 => mode_files!("tv-1997", menus),
+        UiMode::Workspace1997 => mode_files!("workspace-1997", menus, side, frame),
     }
 }
 
@@ -430,6 +433,18 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
         UiMode::Dos1996 => {
             "Title and URL rows and a full-height side panel with a big activity box, a \
              grid of icon buttons, shortcuts and system stats, modelled on Arachne."
+        }
+        UiMode::Cube1990 => {
+            "A vertical application menu, Navigation and Open panels and a document window \
+             with a black title bar, modelled on WorldWideWeb."
+        }
+        UiMode::Tv1997 => {
+            "The page fills a TV screen; an Options panel with a column of buttons, a row \
+             of icon tiles and the page title, modelled on WebTV Plus."
+        }
+        UiMode::Workspace1997 => {
+            "A page window inside the main window, a Hot List panel of your quick links and \
+             a zoom box, modelled on Opera 3."
         }
     }
 }

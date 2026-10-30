@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Workspace (1997): a menu bar over one row of small icon buttons, the
+     address field, a zoom box and the activity box (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #c0c0c0;
+    --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+    --thin: inset 1px 1px #fff, inset -1px -1px #808080;
+    --thin-down: inset 1px 1px #808080, inset -1px -1px #fff;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; outline: none; }
+
+  /* ---- Menu bar ---- */
+  #menubar { height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px; }
+  .menu { height: 18px; padding: 0 6px; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--thin); }
+  .menu:active { box-shadow: var(--thin-down); }
+
+  /* ---- Toolbar row ---- */
+  #tools {
+    height: 30px; flex: none; display: flex; align-items: center; gap: 1px; padding: 0 3px 0 3px;
+    box-shadow: inset 0 1px #808080, inset 0 2px #fff;
+  }
+  .tb {
+    width: 26px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent;
+  }
+  .tb svg { display: block; flex: none; }
+  .tb svg.off { display: none; }
+  .tb:hover:not(.disabled), .tb:focus-visible:not(.disabled) { box-shadow: var(--thin); }
+  .tb:active:not(.disabled) { box-shadow: var(--thin-down); }
+  .tb:active:not(.disabled) > * { transform: translate(1px, 1px); }
+  .tb.disabled svg.on { display: none; }
+  .tb.disabled svg.off { display: block; }
+  .tb.inert { cursor: default; }
+  .sep { width: 2px; height: 22px; flex: none; margin: 0 3px; box-shadow: var(--thin-down); }
+
+  /* ---- Address field and zoom box ---- */
+  #field {
+    flex: 1; min-width: 60px; height: 22px; margin-left: 3px; padding: 2px; display: flex;
+    background: #fff; box-shadow: var(--sunken);
+  }
+  #url {
+    flex: 1; min-width: 0; height: 16px; border: 0; margin: 0; padding: 0 2px; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+  #zoom {
+    width: 56px; height: 22px; margin-left: 4px; flex: none; display: flex; align-items: center;
+    padding: 2px; background: #fff; box-shadow: var(--sunken); text-align: left;
+  }
+  #zoom span { flex: 1; padding-left: 3px; }
+  #zoom i {
+    width: 16px; height: 16px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: var(--face); box-shadow: var(--up);
+  }
+  #zoom i::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+  #zoom:active i { box-shadow: var(--sunken); }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 28px; height: 26px; margin-left: 4px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: #000; box-shadow: var(--sunken); overflow: hidden;
+  }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber .lit-box, #throbber svg.idle { zoom: 0.5; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu"><u>F</u>ile</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu"><u>V</u>iew</button>
+    <button class="menu" data-cmd="menu" data-arg="navigation" data-anchor aria-haspopup="menu"><u>N</u>avigation</button>
+    <button class="menu" data-cmd="menu" data-arg="lists" data-anchor aria-haspopup="menu"><u>L</u>ists</button>
+    <button class="menu" data-cmd="menu" data-arg="mail" data-anchor aria-haspopup="menu"><u>M</u>ail</button>
+    <button class="menu" data-cmd="menu" data-arg="news" data-anchor aria-haspopup="menu">N<u>e</u>ws</button>
+    <button class="menu" data-cmd="menu" data-arg="preferences" data-anchor aria-haspopup="menu"><u>P</u>references</button>
+    <button class="menu" data-cmd="menu" data-arg="window" data-anchor aria-haspopup="menu"><u>W</u>indow</button>
+    <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+  </div>
+  <div id="tools">
+    <button class="tb disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_O97_BACK}}</button>
+    <button class="tb disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_O97_FORWARD}}</button>
+    <button class="tb" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_O97_RELOAD}}</button>
+    <button class="tb disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_O97_STOP}}</button>
+    <button class="tb" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_O97_HOME}}</button>
+    <div class="sep"></div>
+    <button class="tb" id="hotlist" data-cmd="bookmarks" title="Hotlist">{{ICON_O97_HOTLIST}}</button>
+    <button class="tb inert" title="New window">{{ICON_O97_NEW_WINDOW}}</button>
+    <button class="tb" id="open" data-cmd="focus-url" title="Open (Ctrl+L)">{{ICON_O97_OPEN}}</button>
+    <button class="tb inert" title="Save">{{ICON_O97_SAVE}}</button>
+    <button class="tb" id="print" data-cmd="print" title="Print">{{ICON_O97_PRINT}}</button>
+    <button class="tb inert" title="Find">{{ICON_O97_FIND}}</button>
+    <div class="sep"></div>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)"></div>
+    <button id="zoom" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu" title="Zoom"><span>100%</span><i></i></button>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

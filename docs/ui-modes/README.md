@@ -49,13 +49,13 @@ Update the tables below in the same commit as the work they describe.
 | `applet-1995` | Applet browser (1995) | HotJava alpha | icons, research | Planned |
 | `applet-1997` | Applet browser (1997) | HotJava 1.x–3 | icons | Built (not yet merged) |
 | `tv-1996` | Set-top TV (1996) | WebTV | layout extras | Built (not yet merged) |
-| `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Planned |
+| `tv-1997` | Set-top TV (1997) | WebTV | layout extras | Built (not yet merged) |
 | `pc-1993` | Early PC (1993) | Cello | menus | Built (not yet merged) |
 | `terminal-1992` | Text terminal (1992) | Lynx | the Text terminal look | Built (not yet merged) |
 | `terminal-1999` | Text terminal (1999) | Links | the Text terminal look | Built (not yet merged) |
 | `dos-1996` | DOS graphics (1996) | Arachne | a side view | Built (not yet merged) |
-| `cube-1990` | Cube workstation (1990) | WorldWideWeb | floating windows | Not planned |
-| `workspace-1997` | Workspace (1997) | Opera 3 | several content views | Not planned |
+| `cube-1990` | Cube workstation (1990) | WorldWideWeb | floating windows | Built (not yet merged) |
+| `workspace-1997` | Workspace (1997) | Opera 3 | several content views | Built (not yet merged) |
 
 Product names are trademarks of their owners. Lantern isn't affiliated with
 or endorsed by them.

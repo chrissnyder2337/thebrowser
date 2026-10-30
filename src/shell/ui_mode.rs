@@ -126,9 +126,9 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Workstation1993 => Layout::bars(106, 98)
             .inset([4, 6, 6, 6], 0xFFBFBFBF)
             .well(2, 0xFF676767),
-        UiMode::Toolbar1996 => Layout::bars(118, 22),
+        UiMode::Toolbar1996 => Layout::bars(118, 20),
         UiMode::Desktop1996 => Layout::bars(91, 20),
-        UiMode::Applet1997 => Layout::bars(102, 22),
+        UiMode::Applet1997 => Layout::bars(99, 22),
         UiMode::Terminal1999 => Layout::bars(40, 40),
         UiMode::Terminal1992 => Layout::bars(20, 80),
         UiMode::Pc1993 => Layout::bars(54, 22),
@@ -149,6 +149,19 @@ pub fn layout(mode: UiMode) -> Layout {
             .panel(170)
             .inset([12, 18, 0, 18], 0xFF202020),
         UiMode::Dos1996 => Layout::bars(46, 20).side(150, false, true),
+        UiMode::Cube1990 => Layout::bars(0, 22)
+            .side(214, true, true)
+            .frame(23)
+            .inset([10, 10, 10, 10], 0xFF555555)
+            .well(1, 0xFF000000),
+        UiMode::Tv1997 => Layout::bars(0, 34)
+            .panel(208)
+            .inset([12, 18, 0, 18], 0xFF202020),
+        UiMode::Workspace1997 => Layout::bars(50, 20)
+            .side(150, true, false)
+            .frame(20)
+            .inset([4, 4, 4, 4], 0xFF808080)
+            .well(2, 0xFFC0C0C0),
     }
 }
 
@@ -221,6 +234,15 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Tv1996 => Some((include_str!("../../ui/chrome/tv-1996/pages.css"), "#c8c8d8")),
         UiMode::Dos1996 => Some((
             include_str!("../../ui/chrome/dos-1996/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Cube1990 => Some((
+            include_str!("../../ui/chrome/cube-1990/pages.css"),
+            "#ffffff",
+        )),
+        UiMode::Tv1997 => Some((include_str!("../../ui/chrome/tv-1997/pages.css"), "#c8c8d8")),
+        UiMode::Workspace1997 => Some((
+            include_str!("../../ui/chrome/workspace-1997/pages.css"),
             "#ffffff",
         )),
     }
