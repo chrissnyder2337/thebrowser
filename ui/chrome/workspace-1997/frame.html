@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>Lantern Frame</title>
-<!-- Workspace (1997): the page window's title bar inside the workspace: navy
-     gradient caption, page icon and the minimize, maximize and close boxes
-     (docs/ui-modes/modes.md). -->
+<!-- Workspace (1997): the page window's title bar inside the workspace (navy
+     gradient caption, minimize, maximize and close boxes) over its address
+     strip: icon buttons, address field and zoom box (docs/ui-modes/modes.md). -->
 <style>
-  :root { --face: #c0c0c0; --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080; }
+  :root { --face: #c0c0c0; --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080; --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf; }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
@@ -15,10 +15,10 @@
     font: bold 11px "MS Sans Serif", Tahoma, Arial, sans-serif;
     cursor: default;
   }
-  body { padding: 1px 0; }
+  body { display: flex; flex-direction: column; }
   button { font: inherit; color: inherit; border: 0; margin: 0; padding: 0; outline: none; }
   #cap {
-    height: 18px; display: flex; align-items: center; gap: 3px; padding: 0 2px 0 3px;
+    height: 18px; margin: 1px 0;  flex: none; display: flex; align-items: center; gap: 3px; padding: 0 2px 0 3px;
     background: linear-gradient(90deg, #000080, #1084d0); color: #fff;
   }
   #cap > svg { flex: none; }
@@ -33,6 +33,26 @@
   #max::after { content: ""; position: absolute; left: 3px; top: 3px; width: 9px; height: 8px; border: 1px solid #000; border-top-width: 2px; }
   #close::before, #close::after { content: ""; position: absolute; left: 7px; top: 3px; width: 2px; height: 8px; background: #000; transform: rotate(45deg); }
   #close::after { transform: rotate(-45deg); }
+
+  /* ---- Address strip ---- */
+  #addr { height: 26px; flex: none; display: flex; align-items: center; gap: 1px; padding: 0 3px; font-weight: normal; }
+  .ib { width: 20px; height: 20px; flex: none; display: flex; align-items: center; justify-content: center; }
+  .ib svg { display: block; }
+  .ib svg.off { display: none; }
+  #field { flex: 1; min-width: 40px; height: 22px; margin: 0 3px 0 3px; padding: 2px; display: flex; background: #fff; box-shadow: var(--sunken); }
+  #url {
+    flex: 1; min-width: 0; height: 16px; border: 0; margin: 0; padding: 0 2px; outline: none;
+    background: transparent; color: #000; font: inherit; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+  #zoom {
+    width: 56px; height: 22px; flex: none; display: flex; align-items: center;
+    padding: 2px; background: #fff; box-shadow: var(--sunken); text-align: left;
+  }
+  #zoom span { flex: 1; padding-left: 3px; }
+  #zoom i { width: 16px; height: 16px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--face); box-shadow: var(--up); }
+  #zoom i::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
+  #zoom:active i { box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080; }
 </style>
 </head>
 <body>
@@ -42,6 +62,13 @@
     <button class="box" id="min" title="Minimize" aria-label="Minimize"></button>
     <button class="box" id="max" title="Maximize" aria-label="Maximize"></button>
     <button class="box" id="close" data-cmd="close-window" title="Close" aria-label="Close"></button>
+  </div>
+  <div id="addr">
+    <span class="ib" title="Security">{{ICON_LOCK}}</span>
+    <span class="ib" title="Images">{{ICON_O97_IMAGE}}</span>
+    <span class="ib" title="Refresh">{{ICON_O97_RELOAD}}</span>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)"></div>
+    <button id="zoom" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu" title="Zoom"><span>100%</span><i></i></button>
   </div>
 <script>
 {{CHROME_JS}}

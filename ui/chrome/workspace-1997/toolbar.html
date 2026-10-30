@@ -29,9 +29,17 @@
   .menu:hover, .menu:focus-visible { box-shadow: var(--thin); }
   .menu:active { box-shadow: var(--thin-down); }
 
+  /* MDI child boxes at the menu bar's right end */
+  #mdi { margin-left: auto; display: flex; gap: 2px; padding-right: 1px; }
+  #mdi i { width: 16px; height: 14px; position: relative; background: var(--face); box-shadow: var(--up); }
+  #mdi i:nth-child(1)::after { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 2px; background: #000; }
+  #mdi i:nth-child(2)::after { content: ""; position: absolute; left: 3px; top: 3px; width: 8px; height: 7px; border: 1px solid #000; border-top-width: 2px; }
+  #mdi i:nth-child(3)::before, #mdi i:nth-child(3)::after { content: ""; position: absolute; left: 7px; top: 3px; width: 2px; height: 8px; background: #000; transform: rotate(45deg); }
+  #mdi i:nth-child(3)::after { transform: rotate(-45deg); }
+
   /* ---- Toolbar row ---- */
   #tools {
-    height: 30px; flex: none; display: flex; align-items: center; gap: 1px; padding: 0 3px 0 3px;
+    height: 28px; flex: none; display: flex; align-items: center; gap: 1px; padding: 0 3px;
     box-shadow: inset 0 1px #808080, inset 0 2px #fff;
   }
   .tb {
@@ -46,33 +54,10 @@
   .tb.disabled svg.on { display: none; }
   .tb.disabled svg.off { display: block; }
   .tb.inert { cursor: default; }
-  .sep { width: 2px; height: 22px; flex: none; margin: 0 3px; box-shadow: var(--thin-down); }
-
-  /* ---- Address field and zoom box ---- */
-  #field {
-    flex: 1; min-width: 60px; height: 22px; margin-left: 3px; padding: 2px; display: flex;
-    background: #fff; box-shadow: var(--sunken);
-  }
-  #url {
-    flex: 1; min-width: 0; height: 16px; border: 0; margin: 0; padding: 0 2px; outline: none;
-    background: transparent; color: #000; font: inherit; user-select: text;
-  }
-  #url::selection { background: #000080; color: #fff; }
-  #zoom {
-    width: 56px; height: 22px; margin-left: 4px; flex: none; display: flex; align-items: center;
-    padding: 2px; background: #fff; box-shadow: var(--sunken); text-align: left;
-  }
-  #zoom span { flex: 1; padding-left: 3px; }
-  #zoom i {
-    width: 16px; height: 16px; flex: none; display: flex; align-items: center; justify-content: center;
-    background: var(--face); box-shadow: var(--up);
-  }
-  #zoom i::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
-  #zoom:active i { box-shadow: var(--sunken); }
 
   /* ---- Activity box ---- */
   #throbber {
-    width: 28px; height: 26px; margin-left: 4px; flex: none; display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 24px; margin-left: auto; flex: none; display: flex; align-items: center; justify-content: center;
     background: #000; box-shadow: var(--sunken); overflow: hidden;
   }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
@@ -95,23 +80,21 @@
     <button class="menu" data-cmd="menu" data-arg="preferences" data-anchor aria-haspopup="menu"><u>P</u>references</button>
     <button class="menu" data-cmd="menu" data-arg="window" data-anchor aria-haspopup="menu"><u>W</u>indow</button>
     <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
+    <div id="mdi" aria-hidden="true"><i></i><i></i><i></i></div>
   </div>
   <div id="tools">
-    <button class="tb disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_O97_BACK}}</button>
-    <button class="tb disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_O97_FORWARD}}</button>
-    <button class="tb" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_O97_RELOAD}}</button>
-    <button class="tb disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_O97_STOP}}</button>
-    <button class="tb" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_O97_HOME}}</button>
-    <div class="sep"></div>
-    <button class="tb" id="hotlist" data-cmd="bookmarks" title="Hotlist">{{ICON_O97_HOTLIST}}</button>
-    <button class="tb inert" title="New window">{{ICON_O97_NEW_WINDOW}}</button>
     <button class="tb" id="open" data-cmd="focus-url" title="Open (Ctrl+L)">{{ICON_O97_OPEN}}</button>
     <button class="tb inert" title="Save">{{ICON_O97_SAVE}}</button>
     <button class="tb" id="print" data-cmd="print" title="Print">{{ICON_O97_PRINT}}</button>
     <button class="tb inert" title="Find">{{ICON_O97_FIND}}</button>
-    <div class="sep"></div>
-    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Address (Ctrl+L)"></div>
-    <button id="zoom" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu" title="Zoom"><span>100%</span><i></i></button>
+    <button class="tb disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_O97_BACK}}</button>
+    <button class="tb" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_O97_RELOAD}}</button>
+    <button class="tb disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_O97_FORWARD}}</button>
+    <button class="tb" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_O97_HOME}}</button>
+    <button class="tb disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_O97_STOP}}</button>
+    <button class="tb" id="hotlist" data-cmd="bookmarks" title="Hot List">{{ICON_O97_HOTLIST}}</button>
+    <button class="tb inert" title="Tile">{{ICON_O97_TILE}}</button>
+    <button class="tb inert" title="Cascade">{{ICON_O97_CASCADE}}</button>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       {{LANTERN_IDLE}}
       <div class="lit-box">{{LANTERN_LIT}}</div>

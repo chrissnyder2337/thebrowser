@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Lantern Side</title>
-<!-- Workspace (1997): the Hotlist panel: a folder tree over a splitter and
-     the quick links in the same tree style (docs/ui-modes/modes.md). -->
+<!-- Workspace (1997): the Hotlist panel: a folder tree over a splitter strip
+     and the quick links in the same tree style (docs/ui-modes/modes.md). -->
 <style>
-  :root { --face: #c0c0c0; --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf; }
+  :root {
+    --face: #c0c0c0;
+    --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
+    --up: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+  }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
@@ -16,19 +20,27 @@
   }
   body { display: flex; flex-direction: column; padding: 2px 2px 2px 3px; }
   button { font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0; outline: none; text-align: left; }
-  .cap { height: 16px; flex: none; display: flex; align-items: center; padding: 0 3px; font-weight: bold; }
-  .cap b { margin-left: auto; font-weight: normal; }
+  .cap { height: 14px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 2px 0 2px; }
+  .grab { width: 6px; height: 6px; flex: none; background: #000; }
+  .x { width: 10px; height: 10px; margin-left: auto; flex: none; position: relative; background: var(--face); }
+  .x::before, .x::after { content: ""; position: absolute; left: 4px; top: 1px; width: 1px; height: 8px; background: #000; transform: rotate(45deg); }
+  .x::after { transform: rotate(-45deg); }
   .box { flex: 1 1 0; min-height: 0; overflow: hidden; padding: 3px 2px; background: #fff; box-shadow: var(--sunken); }
-  #split { height: 5px; flex: none; }
+  #split { height: 16px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 2px; }
+  #split i { height: 12px; min-width: 14px; padding: 0 3px; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 9px; line-height: 1; background: var(--face); box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; }
   #lower { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
-  .item { height: 16px; display: flex; align-items: center; gap: 3px; white-space: nowrap; overflow: hidden; }
+  .sort { width: 0; height: 0; margin-left: 4px; border: 3px solid transparent; border-bottom: 5px solid #c00; border-top: 0; }
+  .item { height: 15px; display: flex; align-items: center; gap: 3px; white-space: nowrap; overflow: hidden; }
   .item svg { flex: none; }
   .item svg.off { display: none; }
   .item span { overflow: hidden; text-overflow: ellipsis; }
-  .item.l1 { padding-left: 14px; }
-  .item.sel span { background: #000080; color: #fff; padding: 0 2px; }
-  #links { display: block; }
-  .ql { width: 100%; height: 16px; display: flex; align-items: center; gap: 4px; padding: 0 0 0 4px; }
+  .item.l1 { padding-left: 2px; }
+  .item.root { margin-bottom: 1px; }
+  .item.root span { font-weight: bold; border: 1px solid #a04040; padding: 0 2px; line-height: 12px; }
+  .ex { width: 9px; height: 9px; flex: none; position: relative; border: 1px solid #808080; background: #fff; }
+  .ex::before { content: ""; position: absolute; left: 1px; top: 3px; width: 5px; height: 1px; background: #000; }
+  .ex::after { content: ""; position: absolute; left: 3px; top: 1px; width: 1px; height: 5px; background: #000; }
+  .ql { width: 100%; height: 15px; display: flex; align-items: center; gap: 4px; padding: 0 0 0 2px; }
   .ql:hover span { background: #e8e8f8; }
   .ql:active span { background: #000080; color: #fff; }
   .ql:focus-visible { outline: 1px dotted #000; outline-offset: -1px; }
@@ -38,24 +50,28 @@
 </style>
 </head>
 <body>
-  <div class="cap">Hot List<b aria-hidden="true">&times;</b></div>
+  <div class="cap"><i class="grab"></i>Hot List<i class="x" aria-hidden="true"></i></div>
   <div class="box" id="tree">
-    <div class="item">{{ICON_O97_FOLDER_OPEN}}<span>Hot List</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Business and Finance</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Complementary Health</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Computer General</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Computer News</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Directories</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Disabilities</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Games</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>General Interest</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Humor</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Lifestyle</span></div>
-    <div class="item l1">{{ICON_O97_FOLDER}}<span>Music - TV - Movies</span></div>
+    <div class="item root">{{ICON_O97_FOLDER_OPEN}}<span>Hot List</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Business and Finance</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Complementary Health</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Computer General</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Computer News</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Directories</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Disabilities</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Games</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>General Interest</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Humor</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Lifestyle</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Music - TV - Movies</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>News (International)</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Search Engines</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Shopping</span></div>
+    <div class="item l1"><i class="ex"></i>{{ICON_O97_FOLDER}}<span>Software Download</span></div>
   </div>
-  <div id="split"></div>
+  <div id="split" aria-hidden="true"><i>&#9650;</i><i>+</i><i>File</i><i>Edit</i></div>
   <div id="lower">
-    <div class="cap">Title</div>
+    <div class="cap">Title<i class="sort"></i></div>
     <div class="box"><div id="links"></div></div>
   </div>
   <template id="page-icon">{{ICON_PAGE}}</template>
