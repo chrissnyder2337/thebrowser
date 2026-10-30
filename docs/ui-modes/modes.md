@@ -54,11 +54,11 @@ status text and Stop.
 **Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: classic Motif grey face (the reference's light face is its host scheme); meter hidden when idle; icons slightly small; lantern.
 
 ### `workstation-pc-1995`: Workstation, PC (1995)
-Modelled on NCSA Mosaic for Windows 2.0 (checked against a screenshot or documentation during the build). Menu bar; one row of
-small icon buttons; URL combo; activity box at the right; status bar with
+Modelled on NCSA Mosaic for Windows 2.0 (checked against its release notes; no screenshot found). Menu bar; one row of
+small icon buttons; a Document URL combo (2.0 dropped the Document Title bar); activity box at the right; status bar with
 message, progress bar, NUM and clock panes.
 **Pages**: grey page, Times. Era look: Early web (1995).
-**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: no real screenshot exists (judged against documentation); lock in both the field and the status bar; lantern.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against its documentation): left as they are: no window screenshot of 2.0 for Windows exists anywhere reachable (judged against its release notes, which say the Document Title bar was removed in 2.0); lock in both the field and the status bar; lantern.
 
 ## Desktop family
 

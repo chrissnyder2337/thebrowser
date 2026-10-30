@@ -34,7 +34,7 @@
   .menu:active { box-shadow: var(--thin-down); }
 
   /* ---- Rows ---- */
-  #bands { height: 76px; flex: none; display: flex; }
+  #bands { height: 52px; flex: none; display: flex; }
   #stack { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   #tools { height: 28px; flex: none; display: flex; align-items: center; padding: 0 4px; }
   .row { height: 24px; flex: none; display: flex; align-items: center; padding: 0 4px; gap: 4px; }
@@ -116,7 +116,6 @@
         <button class="tb" id="add" data-cmd="bookmark-add" title="Add Current To Hotlist (Ctrl+D)" aria-label="Add Current To Hotlist">{{ICON_WPC_ADD}}</button>
         <button class="tb" id="hotlist" data-cmd="bookmarks" title="Hotlist" aria-label="Hotlist">{{ICON_WPC_HOTLIST}}</button>
       </div>
-      <div class="row"><span class="lab">Document Title:</span><div id="title"></div></div>
       <div class="row">
         <label for="url">Document URL:</label>
         <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="URL (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>

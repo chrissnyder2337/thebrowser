@@ -165,7 +165,7 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Workstation1996 => Layout::bars(100, 30)
             .inset([4, 6, 6, 6], 0xFFBFBFBF)
             .well(2, 0xFF676767),
-        UiMode::WorkstationPc1995 => Layout::bars(96, 24),
+        UiMode::WorkstationPc1995 => Layout::bars(72, 24),
         UiMode::Applet1995 => Layout::bars(62, 82),
         UiMode::Classic1999 => Layout::bars(20, 20)
             .frame(140)
