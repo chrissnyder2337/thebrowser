@@ -215,10 +215,13 @@ pub enum UiMode {
     /// A workspace browser: page windows inside the main window, a Hot List
     /// panel beside them, and a zoom box next to the address.
     Workspace1997,
+    /// A Motif workstation browser at version 2.7: a toolbar of icon buttons and
+    /// a URL row over the page, the meter and Stop in the status bar.
+    Workstation1996,
 }
 
 impl UiMode {
-    pub const ALL: [Self; 20] = [
+    pub const ALL: [Self; 21] = [
         Self::Lantern,
         Self::Workstation1993,
         Self::Toolbar1996,
@@ -239,6 +242,7 @@ impl UiMode {
         Self::Cube1990,
         Self::Tv1997,
         Self::Workspace1997,
+        Self::Workstation1996,
     ];
 
     pub fn key(self) -> &'static str {
@@ -263,6 +267,7 @@ impl UiMode {
             Self::Cube1990 => "cube-1990",
             Self::Tv1997 => "tv-1997",
             Self::Workspace1997 => "workspace-1997",
+            Self::Workstation1996 => "workstation-1996",
         }
     }
 
@@ -293,6 +298,7 @@ impl UiMode {
             Self::Cube1990 => "Cube workstation (1990)",
             Self::Tv1997 => "Set-top TV (1997)",
             Self::Workspace1997 => "Workspace (1997)",
+            Self::Workstation1996 => "Workstation (1996)",
         }
     }
 
@@ -328,6 +334,7 @@ impl UiMode {
             Self::Cube1990 => RetroStyle::EarlyWeb,
             Self::Tv1997 => RetroStyle::SetTop,
             Self::Workspace1997 => RetroStyle::Off,
+            Self::Workstation1996 => RetroStyle::EarlyWeb,
         }
     }
 }

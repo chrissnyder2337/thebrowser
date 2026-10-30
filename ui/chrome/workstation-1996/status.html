@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<!-- Workstation (1996): the status text, the progress meter and Stop in one
+     line under the page (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #bfbfbf;
+    --up: inset 2px 2px #e4e4e4, inset -2px -2px #5a5a5a;
+    --down: inset 2px 2px #5a5a5a, inset -2px -2px #e4e4e4;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: bold 13px "Courier New", Courier, monospace;
+    cursor: default;
+  }
+  body {
+    display: flex; align-items: center; gap: 4px; padding: 0 6px 2px;
+    box-shadow: inset 2px 0 #e4e4e4, inset -2px 0 #5a5a5a;
+  }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+  .pane { height: 24px; flex: none; display: flex; align-items: center; padding: 0 6px; box-shadow: var(--down); }
+  #text { flex: 1; min-width: 0; }
+  #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #modem-pane { gap: 5px; }
+  #modem-pane:active { box-shadow: var(--up); }
+  #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
+  #modem-pane.dialup svg.on { display: block; }
+  #modem-label { white-space: nowrap; }
+  #meter-pane { width: 130px; padding: 4px 5px; }
+  #meter { width: 100%; height: 14px; display: flex; gap: 2px; visibility: hidden; }
+  #meter.on { visibility: visible; }
+  #meter i { width: 10px; height: 14px; flex: none; background: #191970; }
+  #lock-pane { width: 30px; justify-content: center; padding: 0; }
+  #lock-pane svg { display: none; }
+  #lock-pane.secure svg { display: block; }
+  .tb { height: 24px; padding: 0 10px; box-shadow: var(--up); white-space: nowrap; color: #6a0a0a; }
+  .tb:active:not(.disabled) { box-shadow: var(--down); }
+  .tb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .tb.disabled { color: #8a8a8a; }
+</style>
+</head>
+<body>
+  <div class="pane" id="text"><span id="msg">Ready.</span></div>
+  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
+  <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
+  <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>
+  <button class="tb disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">Stop</button>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

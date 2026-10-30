@@ -1,0 +1,74 @@
+# The menu bar of a Motif workstation browser, 1996.
+menu File
+- New Window
+- Clone Window
+---
+open-url Open URL...
+- Open Local...
+---
+reload Reload Current
+- Refresh Current
+---
+- Find In Current
+view-source View Source...
+---
+- Save As...
+print Print...
+- Mail To...
+---
+close-window Close Window
+- Exit Program
+menu Options
+- Fancy Selections
+---
+- Load To Local Disk
+---
+- Delay Image Loading
+- Load Images In Current
+---
+- Reload Config Files
+---
+- Flush Image Cache
+- Clear Global History...
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu Navigate
+back Back
+forward Forward
+home Home Document
+---
+- Window History...
+bookmarks Hotlist...
+add-bookmark Add Current To Hotlist
+---
+- Internet Starting Points
+- Internet Resources Meta-Index
+menu Annotate
+- Annotate...
+---
+- Edit This Annotation...
+- Delete This Annotation...
+menu News
+- Next Thread
+- Previous Thread
+- Next Article
+- Previous Article
+---
+- Show Group List
+- Show Index
+---
+- Post...
+- Follow Up...
+menu Help
+about About...
+- Manual...
+---
+- What's New...
+- Demo...
+---
+- On Window...
+- On FAQ...
+---
+- Mail Developers...

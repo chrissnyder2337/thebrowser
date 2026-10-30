@@ -147,7 +147,24 @@ fn mode_files(mode: UiMode) -> ModeFiles {
         UiMode::Cube1990 => mode_files!("cube-1990", menus, side, frame),
         UiMode::Tv1997 => mode_files!("tv-1997", menus),
         UiMode::Workspace1997 => mode_files!("workspace-1997", menus, side, frame),
+        UiMode::Workstation1996 => mode_files!("workstation-1996", menus),
     }
+}
+
+/// The chrome view holding `mode`'s address field (`#url`): the toolbar in
+/// most modes, the page window's frame or the TV's bottom panel in others.
+pub fn url_role(mode: UiMode) -> Role {
+    let files = mode_files(mode);
+    let has_url = |page: Option<&str>| page.is_some_and(|p| p.contains(r#"id="url""#));
+    [
+        (Role::Toolbar, Some(files.toolbar)),
+        (Role::Status, Some(files.status)),
+        (Role::Side, files.side),
+        (Role::Frame, files.frame),
+    ]
+    .into_iter()
+    .find(|(_, page)| has_url(*page))
+    .map_or(Role::Toolbar, |(role, _)| role)
 }
 
 /// A UI mode's menu bar (`ui/chrome/<mode>/menus.txt`), if it has its own.
@@ -446,6 +463,10 @@ fn ui_mode_description(mode: UiMode) -> &'static str {
             "A page window inside the main window, a Hot List panel of your quick links and \
              a zoom box, modelled on Opera 3."
         }
+        UiMode::Workstation1996 => {
+            "A Motif menu bar, a toolbar of icon buttons and a URL row over a sunken page, \
+             modelled on NCSA Mosaic for X 2.7."
+        }
     }
 }
 
@@ -668,6 +689,10 @@ mod tests {
             toolbar_uri(UiMode::Lantern),
             toolbar_uri(UiMode::Workstation1993)
         );
+        // Every mode has one address field, and focusing it finds it.
+        assert_eq!(url_role(UiMode::Lantern), Role::Toolbar);
+        assert_eq!(url_role(UiMode::Tv1996), Role::Status);
+        assert_eq!(url_role(UiMode::Workspace1997), Role::Frame);
     }
 
     #[test]

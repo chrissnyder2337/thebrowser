@@ -34,7 +34,7 @@ Update the tables below in the same commit as the work they describe.
 |---|---|---|---|---|
 | `lantern` | Lantern (default) | — | — | Shipped |
 | `workstation-1993` | Workstation (1993) | NCSA Mosaic for X 1.x–2.6 | menus | Built (not yet merged) |
-| `workstation-1996` | Workstation (1996) | NCSA Mosaic for X 2.7 | icons | Planned |
+| `workstation-1996` | Workstation (1996) | NCSA Mosaic for X 2.7 | icons | Built (not yet merged) |
 | `workstation-pc-1995` | Workstation, PC (1995) | NCSA Mosaic for Windows 2 | icons | Planned |
 | `desktop-1995` | Desktop (1995) | Internet Explorer 2 | icons | Built (not yet merged) |
 | `desktop-1996` | Desktop (1996) | Internet Explorer 3 | icons, hover colour | Built (not yet merged) |

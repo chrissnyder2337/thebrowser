@@ -196,13 +196,19 @@ pub fn focus_content() {
 
 /// Focus the toolbar view and select the URL field.
 pub fn focus_url_bar() {
-    let Some(toolbar) = with_shell(|shell| shell.toolbar.clone()) else {
+    let role = pages::url_role(with_shell(|shell| shell.settings.ui_mode));
+    // The TV modes keep the address in a panel that may be closed.
+    let (layout, open) = ui_mode::current();
+    if role == Role::Status && layout.status_open > 0 && !open {
+        ui_mode::toggle_panel();
+    }
+    let Some(view) = with_shell(|shell| shell.browser(role)) else {
         return;
     };
-    if let Some(host) = toolbar.host() {
+    if let Some(host) = view.host() {
         host.set_focus(1);
     }
-    exec_js(&toolbar, "window.lantern&&lantern.focusUrl()");
+    exec_js(&view, "window.lantern&&lantern.focusUrl()");
 }
 
 /// Load a URL in the content view (a real web address, not an internal page).

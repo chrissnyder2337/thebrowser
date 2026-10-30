@@ -157,11 +157,14 @@ pub fn layout(mode: UiMode) -> Layout {
         UiMode::Tv1997 => Layout::bars(0, 34)
             .panel(208)
             .inset([12, 18, 0, 18], 0xFF202020),
-        UiMode::Workspace1997 => Layout::bars(50, 20)
+        UiMode::Workspace1997 => Layout::bars(48, 20)
             .side(210, true, false)
-            .frame(20)
+            .frame(46)
             .inset([4, 4, 4, 4], 0xFF808080)
             .well(2, 0xFFC0C0C0),
+        UiMode::Workstation1996 => Layout::bars(100, 30)
+            .inset([4, 6, 6, 6], 0xFFBFBFBF)
+            .well(2, 0xFF676767),
     }
 }
 
@@ -244,6 +247,10 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         UiMode::Workspace1997 => Some((
             include_str!("../../ui/chrome/workspace-1997/pages.css"),
             "#ffffff",
+        )),
+        UiMode::Workstation1996 => Some((
+            include_str!("../../ui/chrome/workstation-1996/pages.css"),
+            "#bfbfbf",
         )),
     }
 }
