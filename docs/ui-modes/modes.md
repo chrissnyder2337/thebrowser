@@ -44,6 +44,7 @@ Modelled on NCSA Mosaic for X 1.x–2.6 (screenshot in the catalog).
   New Window, Close Window (no matching feature).
 - **Pages**: grey `#bfbfbf` page, Times, black text (screenshot in the
   catalog). Era look: Early web (1995).
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: page edge is one dark line, not a two-tone bevel; lantern (branding); required panes.
 
 ### `workstation-1996`: Workstation (1996)
 Modelled on NCSA Mosaic for X 2.7 (from memory). As 1993, but an icon
@@ -65,6 +66,7 @@ small icon-only buttons (Open, Print, Send | Back, Forward, Stop, Refresh,
 Home | Search, News, Favorites, Add | larger/smaller text | Cut, Copy,
 Paste); Address row; activity box spanning both rows. Status: text,
 progress, icon pane.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: faint etched line; MS Sans Serif fallback font; lantern on dark square (branding).
 
 ### `desktop-1996`: Desktop (1996)
 Modelled on Internet Explorer 3 (from memory). Menu bar; bands with grip
@@ -74,17 +76,20 @@ Links band; tall activity box at the right of the bands.
 **Pages** (whole Desktop family): white page, Times, blue and purple links.
 Era look: none yet (a "Desktop web (1996)" look: tables, MS Sans Serif
 forms, no CSS3).
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: no faint swoosh watermark behind the buttons; lantern.
 
 ### `desktop-1997`: Desktop (1997)
 Modelled on Internet Explorer 4 (from memory). The menu bar is a band;
 flat buttons with dropdown arrows on Back and Forward; Search, Favorites,
 History, Channels, Fullscreen, Mail ▾, Print, Edit; Address and Links
 bands; status bar with a page icon, progress and a zone pane.
+**Fidelity** (reviewer verdict PASS after 4 rounds, against a screenshot of the original): left as they are: "Links" band label (the reference is a localized build); lantern.
 
 ### `desktop-1999`: Desktop (1999)
 Modelled on Internet Explorer 5 (from memory). As 1997 with a small
 activity box in the menu band, Tools menu, a Go button after the address,
 and Discuss.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: Tahoma fallback font.
 
 ## Toolbar and Suite family
 
@@ -98,6 +103,7 @@ Location and directory rows.
 **Pages** (Toolbar 1995 and 1996): grey `#c0c0c0` page, Times, blue and
 purple links (screenshots in the catalog). Era look: Early web (1995). Status: key pane,
 "Document: Done", progress.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: disabled Back/Forward slightly fainter than the original's emboss; lantern; lock in Location field.
 
 ### `toolbar-1996`: Toolbar (1996)
 Modelled on Netscape 2–3 (screenshot in the catalog). Small icons with
@@ -105,6 +111,7 @@ labels (Back, Forward, Home | Edit | Reload, Images, Open, Print, Find |
 Stop); Location with a bookmark icon; directory buttons (What's New?,
 What's Cool?, Destinations, Net Search, People, Software). Status adds mail
 and help panes.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: face #c0c0c0 (the reference was captured on a later Windows theme); "Page complete." status wording; directory buttons are the user's quick links; lantern.
 
 ### `suite-1997`: Suite (1997)
 Modelled on Netscape Communicator 4 (screenshot in the catalog). Three
@@ -113,6 +120,7 @@ Search, Guide, Print, Security, Stop, activity box), location (Bookmarks
 button, Location field, What's Related), personal toolbar (quick links).
 Status: padlock, text, progress, a component bar of four small icons.
 **Pages**: white page by then, Times. Era look: Web portal (1997).
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: lantern in the activity box.
 
 ## Classic desktop family
 
@@ -122,11 +130,13 @@ white, almost no toolbar: a URL strip under the title; navigation lives in
 the menus (File, Edit, Navigate, Bookmarks).
 **Pages**: white page, black text, Times or New York; images may need a
 one-bit look. Era look: Early web (1995), or a new one-bit look.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: Chicago not installed (fallback bold sans); stripes pure black.
 
 ### `classic-1994`: Classic desktop (1994)
 Modelled on NCSA Mosaic for the Mac (from memory). Grey bevelled rounded
 buttons with icons and labels, URL field, activity box; the status line
 shares the bottom edge with the horizontal scroll bar.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: Home not drawn pressed on the start page; no menu-bar help/app icons (inert); Chicago fallback.
 
 ### `classic-1999`: Classic desktop (1999)
 Modelled on iCab (from memory). Late-90s grey look; big colour icon
@@ -147,6 +157,7 @@ buttons with small labels (Back, Forward, Home, Reload, Stop, Search,
 Print); activity box at the right; Address row; plain status bar.
 **Pages** (both Applet modes): white page, sans-serif text (Dialog), as in
 the catalog screenshot. Era look: none yet.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: lantern; XP-theme menu strip in the reference out of scope.
 
 ## Set-top TV family
 
@@ -161,11 +172,13 @@ shows the page title and a progress bar.
 by the highlight box rather than underlines. Era look: a new "Set-top TV"
 look (large text, single column, no small fonts), together with the layout
 extras.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: no real Options-panel capture found (panel judged from the general look); lantern in the bar.
 
 ### `tv-1997`: Set-top TV (1997)
 Modelled on WebTV (from memory). As 1996, with the Options panel open over
 the bottom of the page: Go to, Find, Info, Save, Send, Reload, Text size,
 Print, Browser UI, Setup.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: no capture of the Plus Options panel exists (layout from documentation); lantern.
 
 ## More families
 
@@ -175,6 +188,7 @@ windows: a vertical menu at the top left (Info, Navigate, Document, Find,
 Edit, Links, Style, Print, Windows, Services, Hide, Quit), a Navigation
 panel (< Previous, Back up, Next >, Home, Help) and a document window with
 the scroller on the left. Probably needs a frameless window; not planned.
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: panels stacked in a fixed left column, not floating; dark desktop; scroller on the right (native); no Info window; lantern tile.
 
 ### `terminal-1992`: Text terminal (1992)
 Modelled on Lynx (screenshot in the catalog). An 80-column terminal: title
@@ -184,6 +198,7 @@ two lines of key help.
 only works with its era look, so `era-look` should be its default: a new
 "Text terminal" retro look (monospace, no images but their alt text,
 highlighted links, everything in one column).
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: no "#" marker or page count on the title line; 88 columns at 800px, not 80; URL prompt is a permanent line.
 
 ### `terminal-1999`: Text terminal (1999)
 Modelled on Links (screenshots in the catalog). Monospace on black, no
@@ -197,11 +212,13 @@ icons and no activity box (a terminal had none).
 - **Pages**: black page, grey monospace. Era look: Text terminal (1999)
   (`ui/retro/terminal.js`), which this mode uses by default
   (`UiMode::needs_era_look`).
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: permanent URL row (Links used a Go to URL dialog); link colour unverified (Lynx green); menu accelerators not shown.
 
 ### `pc-1993`: Early PC (1993)
 Modelled on Cello (from memory). A Windows 3.1 frame; menu bar (File, Edit,
 Jump, Bookmark, Search, Configure, Help); no toolbar; status line with a
 Ready pane and the URL.
+**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original): left as they are: URL and status text in separate fields; Stop is grey when idle.
 
 ### `dos-1996`: DOS graphics (1996)
 Modelled on Arachne (screenshot in the catalog). Title and URL rows on top;
@@ -209,6 +226,7 @@ a right-hand panel with a big activity box, a 3×3 grid of icon buttons
 (Back, Forward, Home, Reload, Add, Bookmarks, Stop, Search, Help), a list
 of shortcuts and a system-stats box. Needs a side view.
 **Pages**: white page, Arial-like text. Era look: Early web (1995).
+**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original): left as they are: tiles smooth, not chipped stone; status bar spans under the page only; stats values are decoration; lantern.
 
 ### `workspace-1997`: Workspace (1997)
 Modelled on Opera 3 (from memory). Several page windows inside one main
