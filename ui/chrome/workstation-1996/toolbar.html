@@ -16,7 +16,7 @@
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
     background: var(--face); color: #000;
-    font: bold 14px "Courier New", Courier, monospace;
+    font: 13px "Courier New", Courier, monospace;
     cursor: default;
   }
   body { display: flex; flex-direction: column; box-shadow: inset 2px 2px #e4e4e4, inset -2px -2px #5a5a5a; }
@@ -40,37 +40,39 @@
   #left { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 
   /* Icon buttons */
-  #tools { height: 38px; flex: none; display: flex; align-items: center; gap: 2px; }
+  #tools { height: 32px; flex: none; display: flex; align-items: center; gap: 0; }
   #grip { width: 8px; height: 32px; flex: none; margin-right: 3px; border-left: 2px dotted #5a5a5a; }
   .ib {
-    width: 36px; height: 36px; flex: none; display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center;
     box-shadow: var(--up);
   }
   .ib:active:not(.disabled) { box-shadow: var(--down); padding: 2px 0 0 2px; }
+  .ib.inert { cursor: default; }
   .ib:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
-  .ib svg { width: 24px; height: 24px; }
+  .ib svg { width: 22px; height: 22px; }
   .ib svg.off, .ib.disabled svg.on { display: none; }
-  .ib.disabled svg.off { display: block; }
+  .ib.disabled svg.off, .ib.inert svg.on { display: block; }
+  .ib.inert svg.off { display: none; }
 
   /* URL row */
   #urlrow { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 0; }
   .lab { flex: none; color: #000; padding-left: 2px; }
   #field {
-    flex: 1; min-width: 0; height: 28px; padding: 5px 8px; position: relative;
-    background: #e6e6e6; box-shadow: var(--down);
+    flex: 1; min-width: 0; height: 24px; padding: 3px 6px; position: relative;
+    background: #f4f4f4; box-shadow: var(--down);
   }
   #url {
     width: 100%; height: 18px; border: 0; padding: 0; margin: 0; outline: none;
-    background: transparent; color: #000; font: inherit; user-select: text;
+    background: transparent; color: #000; font: 13px Courier, "Courier New", monospace; user-select: text;
   }
   #url::selection { background: #191970; color: #fff; }
   #title { display: none; }
 
   /* ---- Security box and hotlist button ---- */
-  #side { width: 46px; flex: none; display: flex; flex-direction: column; gap: 2px; }
+  #side { width: 36px; flex: none; display: flex; flex-direction: column; gap: 0; }
   #side > * { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
-  #sec { position: relative; flex-direction: column; font-size: 11px; font-style: italic; color: #1a1aff; line-height: 1; gap: 2px; }
-  #sec svg { width: 10px; height: 12px; }
+  #sec { position: relative; flex-direction: column; font: 12px "Times New Roman", Times, serif; color: #0000cc; line-height: 1; gap: 2px; }
+  #sec svg { width: 13px; height: 16px; }
   #sec .ssl, body:has(#field.secure) #sec .none { display: none; }
   body:has(#field.secure) #sec .ssl { display: inline; }
   #sec svg, #hot svg.off { display: none; }
@@ -81,11 +83,10 @@
   #hot svg.off { display: none; }
 
   /* ---- Activity box ---- */
-  #throbber { width: 66px; flex: none; display: flex; align-items: center; justify-content: center; }
+  #throbber { width: 66px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--up); }
   #throbber:active { box-shadow: var(--down); }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
-  #throbber .lit-box, #throbber svg.idle { zoom: 1.1; }
-  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+    #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
@@ -109,12 +110,12 @@
         <button class="ib" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_W96_RELOAD}}</button>
         <button class="ib" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_W96_HOME}}</button>
         <button class="ib" id="open" data-cmd="focus-url" title="Open a URL (Ctrl+L)">{{ICON_W96_OPEN}}</button>
-        <button class="ib disabled" title="Save As (not available)">{{ICON_W96_SAVE}}</button>
-        <button class="ib disabled" title="Clone window (not available)">{{ICON_W96_CLONE}}</button>
-        <button class="ib disabled" title="Close window (not available)">{{ICON_W96_CLOSE}}</button>
-        <button class="ib disabled" title="Find in document (not available)">{{ICON_W96_FIND}}</button>
+        <button class="ib inert disabled" title="Save As (not available)">{{ICON_W96_SAVE}}</button>
+        <button class="ib inert disabled" title="Clone window (not available)">{{ICON_W96_CLONE}}</button>
+        <button class="ib inert disabled" title="Close window (not available)">{{ICON_W96_CLOSE}}</button>
+        <button class="ib inert disabled" title="Find in document (not available)">{{ICON_W96_FIND}}</button>
         <button class="ib" id="print" data-cmd="print" title="Print">{{ICON_W96_PRINT}}</button>
-        <button class="ib disabled" title="Newsgroups (not available)">{{ICON_W96_NEWS}}</button>
+        <button class="ib inert disabled" title="Newsgroups (not available)">{{ICON_W96_NEWS}}</button>
       </div>
       <div id="urlrow">
         <label class="lab" for="url">URL:</label>

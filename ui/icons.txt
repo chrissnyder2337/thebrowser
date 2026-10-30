@@ -3778,8 +3778,8 @@ frame o97-image
 ................
 
 # Workstation (1996) toolbar icons: 24x24, drawn for the square icon buttons.
-= £ #3030c8
-= ¥ #8c8cf0
+= £ #3030c8 fill
+= ¥ #8c8cf0 fill
 = § #804020
 = ¤ #e8c070
 = ¢ #404040
@@ -4096,3 +4096,39 @@ frame w96-hotlist
 .KKKKKKKKKKKKKKKKKKKK...
 ..K.....................
 
+
+frame o97-globe
+....KKKKKKKK....
+..KK::::::::KK..
+.K::gg::::::::K.
+.K:ggggg:::g::K.
+K::ggggg::ggg::K
+K:::ggg:::ggg::K
+K::::g::::ggg::K
+K:::::::::gg:::K
+K:::gg:::::::::K
+.K:gggg::::::::K
+.KK:ggg::::::KK.
+..KK::::::::KK..
+....KKKKKKKK....
+................
+................
+................
+
+frame o97-news
+................
+..KKKKKKKKKKKK..
+..KWWWWWWWWWWK..
+..KWNNNNWRRRWK..
+..KWNNNNWRRRWK..
+..KWWWWWWWWWWK..
+..KWMMMMWMMMWK..
+..KWWWWWWWWWWK..
+..KWMMMMWMMMWK..
+..KWWWWWWWWWWK..
+..KWMMMMWMMMWK..
+..KWWWWWWWWWWK..
+..KKKKKKKKKKKK..
+................
+................
+................
