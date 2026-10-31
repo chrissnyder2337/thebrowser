@@ -8,9 +8,9 @@
      then the status line (docs/ui-modes/modes.md). -->
 <style>
   :root {
-    --face: #b8b8b8;
-    --up: inset 1px 1px #e6e8f0, inset -1px -1px #5c6074, inset 2px 2px #d0d3e0, inset -2px -2px #868aa0;
-    --down: inset 1px 1px #5c6074, inset -1px -1px #e6e8f0, inset 2px 2px #868aa0, inset -2px -2px #d0d3e0;
+    --face: #c0c0c0;
+    --up: inset 1px 1px #fff, inset -1px -1px #404040, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
+    --down: inset 1px 1px #404040, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -19,29 +19,27 @@
     font: 13px Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
     cursor: default;
   }
-  body { display: flex; flex-direction: column; box-shadow: inset 0 1px #e6e8f0; }
+  body { display: flex; flex-direction: column; box-shadow: inset 0 1px #fff; }
   button {
     font: inherit; color: inherit; background: var(--face);
     border: 0; margin: 0; padding: 0; outline: none;
   }
 
   /* ---- Button row ---- */
-  #tools { height: 56px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  #tools { height: 56px; flex: none; position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 8px; }
   .ib {
-    width: 36px; height: 36px; flex: none; border-radius: 50%;
+    width: 34px; height: 34px; flex: none; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 0 1px #505050, inset 0 0 0 3px #d8d8d8, inset 0 0 0 5px #707070, inset 1px 1px 0 5px #fff;
+    box-shadow: 0 0 0 1px #6a6a6a, inset 2px 2px 0 #8a8a8a, inset -2px -2px 0 #e4e4e4, inset 0 0 0 4px #c0c0c0;
   }
-  .ib:active:not(.disabled) { box-shadow: 0 0 0 1px #505050, inset 0 0 0 3px #707070, inset 0 0 0 5px #d8d8d8, inset -1px -1px 0 5px #fff; }
+  .ib:active:not(.disabled) { box-shadow: 0 0 0 1px #6a6a6a, inset 2px 2px 0 #e4e4e4, inset -2px -2px 0 #8a8a8a, inset 0 0 0 4px #c0c0c0; }
   .ib:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
   .ib svg.off { display: none; }
-  .ib.disabled svg.on { display: none; }
-  .ib.disabled svg.off { display: block; }
-  #spacer { flex: 1; }
+  .ib.disabled svg.on { opacity: .75; }
 
   /* ---- Activity box ---- */
   #throbber {
-    width: 44px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center;
+    position: absolute; right: 8px; top: 2px; width: 44px; height: 52px; display: flex; align-items: center; justify-content: center;
     box-shadow: var(--down);
   }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
@@ -62,7 +60,7 @@
   #meter-pane { width: 100px; padding: 3px 4px; }
   #meter { width: 100%; height: 12px; display: flex; gap: 1px; visibility: hidden; }
   #meter.on { visibility: visible; }
-  #meter i { width: 8px; height: 12px; flex: none; background: #3a2ca8; }
+  #meter i { width: 8px; height: 12px; flex: none; background: #000080; }
   #lock-pane { width: 26px; justify-content: center; padding: 0; }
   #lock-pane svg { display: none; }
   #lock-pane.secure svg { display: block; }
@@ -75,7 +73,6 @@
     <button class="ib" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_A95_HOME}}</button>
     <button class="ib" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_A95_RELOAD}}</button>
     <button class="ib disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_A95_STOP}}</button>
-    <span id="spacer"></span>
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
       {{LANTERN_IDLE}}
       <div class="lit-box">{{LANTERN_LIT}}</div>

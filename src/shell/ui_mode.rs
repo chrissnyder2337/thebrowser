@@ -22,6 +22,9 @@ pub struct Layout {
     /// The status view's height while the mode's panel is open (the TV
     /// Options panel); 0 when the mode has none.
     pub status_open: i32,
+    /// The open panel takes the whole window, hiding the page, like a
+    /// set-top box's full-screen Setup page.
+    pub panel_full: bool,
     /// The side view's width, beside the page.
     pub side: i32,
     pub side_left: bool,
@@ -47,6 +50,7 @@ impl Layout {
             toolbar,
             status,
             status_open: 0,
+            panel_full: false,
             side: 0,
             side_left: true,
             side_full: false,
@@ -82,6 +86,14 @@ impl Layout {
     const fn panel(self, height: i32) -> Self {
         Self {
             status_open: height,
+            ..self
+        }
+    }
+
+    /// The same, with a panel that takes the whole window when open.
+    const fn full_panel(self) -> Self {
+        Self {
+            panel_full: true,
             ..self
         }
     }
@@ -154,8 +166,9 @@ pub fn layout(mode: UiMode) -> Layout {
             .frame(23)
             .inset([10, 10, 10, 10], 0xFF555555)
             .well(1, 0xFF000000),
-        UiMode::Tv1997 => Layout::bars(0, 34)
-            .panel(208)
+        UiMode::Tv1997 => Layout::bars(0, 40)
+            .panel(214)
+            .full_panel()
             .inset([12, 18, 0, 18], 0xFF202020),
         UiMode::Workspace1997 => Layout::bars(48, 20)
             .side(210, true, false)
@@ -357,6 +370,22 @@ pub fn toggle_panel() {
     with_shell(|shell| shell.panel_open = !open);
     relayout();
     super::state::push_status();
+    // A full-screen panel hides the page, so keys go to whichever shows.
+    if layout.panel_full {
+        let role = if open { Role::Content } else { Role::Status };
+        if let Some(host) = with_shell(|shell| shell.browser(role)).and_then(|b| b.host()) {
+            host.set_focus(1);
+        }
+    }
+}
+
+/// Close the mode's panel if it is open and hides the page, so a command
+/// sent from it shows its result.
+pub fn close_full_panel() {
+    let (layout, open) = current();
+    if open && layout.panel_full {
+        toggle_panel();
+    }
 }
 
 /// Switch to `mode` and remember it.
@@ -429,6 +458,7 @@ pub fn relayout() {
     let layout = layout(mode);
     let mut side_view = None;
     let mut content_view = None;
+    let mut status_view = None;
     for (role, mut browser) in browsers {
         let Some(view) = browser_view_get_for_browser(Some(&mut browser)) else {
             continue;
@@ -446,12 +476,18 @@ pub fn relayout() {
         match role {
             Role::Side => side_view = Some(View::from(&view)),
             Role::Content => content_view = Some(View::from(&view)),
+            Role::Status => status_view = Some(View::from(&view)),
             _ => {}
         }
     }
+    let (main_panel, middle_panel) = (main.clone(), middle.clone());
     if let (Some(window), Some(main), Some(middle), Some(side)) = (&window, main, middle, side_view)
     {
         super::window::place_side(window, &main, &middle, side, &layout);
+    }
+    if let (Some(main), Some(middle), Some(status)) = (main_panel, middle_panel, status_view) {
+        let full = panel_open && layout.panel_full;
+        super::window::fill_with_status(&main, &middle, status, full);
     }
     if let (Some(inset), Some(well)) = (inset, well) {
         super::window::lay_out_inset(&inset, &well, &layout, content_view);
@@ -464,6 +500,15 @@ pub fn relayout() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn only_a_mode_with_a_panel_can_fill_the_window_with_it() {
+        for mode in UiMode::ALL {
+            let layout = layout(mode);
+            assert!(!layout.panel_full || layout.status_open > 0, "{mode:?}");
+        }
+        assert!(layout(UiMode::Tv1997).panel_full);
+    }
 
     #[test]
     fn every_mode_but_lantern_has_its_scrollbars() {

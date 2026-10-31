@@ -180,5 +180,19 @@ for (const mode of MODES) {
         await expect(page).toHaveScreenshot(`${view}-${mode.key}-idle.png`);
       }
     });
+
+    // The panel the status view grows into: a strip under the page, or the
+    // whole window (panelFull, the page hidden).
+    if (mode.statusOpen > 0) {
+      test("its open panel matches the golden screenshot", async ({ browser }) => {
+        const height = mode.panelFull ? 600 - mode.toolbarHeight : mode.statusOpen;
+        const { page, errors } = await open(browser, mode, ["status", 800, height]);
+        await page.evaluate(() => window.lantern.update({ panel: true }));
+        await expect(page.locator("html")).toHaveClass(/panel-open/);
+        await page.mouse.move(0, 0);
+        await expect(page).toHaveScreenshot(`status-${mode.key}-panel.png`);
+        expect(errors).toEqual([]);
+      });
+    }
   });
 }

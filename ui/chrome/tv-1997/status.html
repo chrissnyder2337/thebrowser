@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>Lantern Status</title>
 <!-- Set-top TV (1997): the same charcoal-and-gold bar as 1996 (title, progress,
-     Options key); with html.panel-open the Options panel grows above it in the
-     style of a set-top Setup screen: a maroon rail with the lantern tile and the
+     Options key); with html.panel-open the Options panel takes the window above
+     it (the page is hidden) in the style of a set-top Setup screen: a maroon rail with the lantern tile and the
      panel name, three columns of heading-and-description items, a Done key
      (docs/ui-modes/modes.md). -->
 <style>
@@ -53,7 +53,7 @@
   .item { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 0; outline: none; text-align: left; }
   .item b { align-self: flex-start; color: #44cfd8; font-size: 14px; line-height: 15px; white-space: nowrap; padding: 0 3px; margin-left: -5px; border: 2px solid transparent; border-radius: 3px; }
   .item span { color: #fff; font-size: 11px; line-height: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item:hover:not(.disabled):not(.inert) b, .item:focus-visible b, #items:not(:hover):not(:focus-within) .item:first-child b { border-color: #e1c433; }
+  .item:hover:not(.disabled):not(.inert) b, .item:focus-visible b, #items:not(:hover):not(:focus-within) .item:not(.disabled):not(.item:not(.disabled) ~ .item) b { border-color: #e1c433; }
   #field:focus-within { border-color: #e1c433; }
   .item.disabled, .item.inert { opacity: .42; }
   #field { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; }
@@ -67,6 +67,26 @@
   }
   #go { flex: none; height: 20px; padding: 0 10px; font-size: 11px; justify-content: center; border-radius: 8px; }
   #done { flex: none; height: 26px; padding: 0 26px; justify-content: center; border-radius: 8px; color: #202020; text-shadow: none; background: linear-gradient(#e4e4e4, #a8a8a8); border-color: #666; box-shadow: 0 1px 2px rgba(0, 0, 0, .6), inset 0 1px #fff; }
+
+  /* ---- Full screen: the window gives the open panel all its height (the
+     page is hidden), so it takes a Setup page's scale: a wide rail, a big
+     heading, two columns of large items ---- */
+  @media (min-height: 320px) {
+    #rail { width: 112px; padding-top: 18px; }
+    #tile { width: 76px; height: 70px; border-radius: 16px; }
+    #tile .scale { transform: scale(1.25); }
+    #rail-name { font-size: 54px; line-height: 112px; height: 220px; bottom: 16px; }
+    #body { padding: 22px 40px 22px 40px; text-shadow: 0 0 3px rgba(0, 0, 0, .8); }
+    #heading { height: 44px; font-size: 32px; line-height: 44px; padding-left: 4px; }
+    #items { margin-top: 18px; grid-template-rows: repeat(6, 1fr); grid-template-columns: repeat(2, 1fr); column-gap: 30px; }
+    .item b { font-size: 22px; line-height: 26px; }
+    .item span { font-size: 17px; line-height: 21px; }
+    #lower { margin-top: 18px; padding-top: 16px; border-top: 2px solid #555; gap: 24px; }
+    #field label { font-size: 22px; }
+    #url { height: 30px; font-size: 16px; border-radius: 15px; }
+    #go { height: 30px; font-size: 15px; }
+    #done { height: 40px; padding: 0 40px; font-size: 20px; border-radius: 10px; }
+  }
 
   /* ---- Status bar ---- */
   #bar {

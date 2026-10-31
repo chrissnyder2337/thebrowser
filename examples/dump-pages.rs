@@ -118,6 +118,7 @@ fn main() -> ExitCode {
             ("toolbarHeight", Json::Num(f64::from(layout.toolbar))),
             ("statusHeight", Json::Num(f64::from(layout.status))),
             ("statusOpen", Json::Num(f64::from(layout.status_open))),
+            ("panelFull", Json::Bool(layout.panel_full)),
             (
                 "sideWidth",
                 Json::Num(f64::from(if views.contains(&Role::Side) {

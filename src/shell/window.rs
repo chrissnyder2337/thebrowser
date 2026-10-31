@@ -244,6 +244,17 @@ pub fn place_side(
     }
 }
 
+/// Give the status view the whole column (`full`: a full-screen panel, the
+/// page hidden) or only its own height, with the middle row taking the rest.
+pub fn fill_with_status(main: &Panel, middle: &Panel, status: View, full: bool) {
+    middle.set_visible((!full).into());
+    // Setting a box layout again drops the children's flex.
+    if let Some(column) = box_layout(main, false) {
+        column.set_flex_for_view(Some(&mut View::from(middle)), 1);
+        column.set_flex_for_view(Some(&mut status.clone()), i32::from(full));
+    }
+}
+
 /// The index of `view` among `panel`'s children, or -1.
 fn index_of(panel: &Panel, view: &View) -> i32 {
     (0..panel.child_view_count() as i32)

@@ -54,6 +54,9 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
         // (ui/chrome/<mode>/status.html), but the status bar can't open
         // bookmarks' URLs or menus.
         (Role::Status, name) if STATUS_COMMANDS.contains(&name) => {
+            if !matches!(name, "panel" | "menu" | "focus-url") {
+                ui_mode::close_full_panel();
+            }
             run_chrome_command(role, name, &command.arg)
         }
         (Role::Status, name) => eprintln!("lantern: not a status bar command {name:?}"),
