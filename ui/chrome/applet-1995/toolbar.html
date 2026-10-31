@@ -3,19 +3,16 @@
 <head>
 <meta charset="utf-8">
 <title>Lantern Toolbar</title>
-<!-- Applet browser (1995): a Motif-style menu bar over a Document URL field;
-     the buttons sit under the page (docs/ui-modes/modes.md). -->
+<!-- Applet browser (1995): a plain menu bar, a centred row of round bevelled
+     buttons with a small activity box at its right, a Place field and a
+     status line, all on one light grey face (docs/ui-modes/modes.md). -->
 <style>
-  :root {
-    --face: #b8b8b8;
-    --up: inset 1px 1px #e6e8f0, inset -1px -1px #5c6074, inset 2px 2px #d0d3e0, inset -2px -2px #868aa0;
-    --down: inset 1px 1px #5c6074, inset -1px -1px #e6e8f0, inset 2px 2px #868aa0, inset -2px -2px #d0d3e0;
-  }
+  :root { --face: #d6d6d6; }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
     background: var(--face); color: #000;
-    font: 13px Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    font: 12px Arial, "Liberation Sans", Helvetica, sans-serif;
     cursor: default;
   }
   body { display: flex; flex-direction: column; }
@@ -25,41 +22,83 @@
   }
 
   /* ---- Menu bar ---- */
-  #menubar {
-    height: 26px; flex: none; display: flex; align-items: center; padding: 0 4px;
-    box-shadow: inset 0 1px #e6e8f0, inset 0 -1px #5c6074;
-  }
-  .menu { height: 22px; padding: 0 11px; background: transparent; }
-  .menu:hover, .menu:focus-visible { box-shadow: var(--up); }
-  .menu:active { box-shadow: var(--down); }
-  #help { margin-left: auto; }
+  #menubar { height: 22px; flex: none; display: flex; align-items: center; padding: 0 2px; background: #fff; }
+  .menu { height: 20px; padding: 0 6px; background: transparent; }
+  .menu:hover, .menu:focus-visible { background: var(--face); box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; }
+  .menu:active { box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
 
-  /* ---- Document URL ---- */
-  #addr { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 8px; min-height: 0; }
-  #addr label { white-space: nowrap; }
+  /* ---- Button row ---- */
+  #tools { height: 40px; flex: none; display: flex; align-items: center; padding: 0 14px 0 12px; }
+  #btns { flex: 1; display: flex; justify-content: center; gap: 5px; padding-left: 56px; }
+  .ib {
+    width: 31px; height: 23px; flex: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #d0d0d0;
+    box-shadow: 0 0 0 1px #5a5a5a, inset 0 0 0 1px #f4f4f4, inset 0 0 0 3px #a8a8a8, inset 1px 1px 0 3px #fff;
+  }
+  .ib:active:not(.disabled) { box-shadow: 0 0 0 1px #5a5a5a, inset 0 0 0 1px #909090, inset 0 0 0 3px #e8e8e8, inset -1px -1px 0 3px #fff; }
+  .ib:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
+  .ib svg.off { display: none; }
+  .ib.disabled svg.on { display: none; }
+  .ib.disabled svg.off { display: block; }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 56px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: var(--face); box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; overflow: hidden;
+  }
+  #throbber svg.idle { zoom: 0.6; }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; zoom: 0.6; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  /* ---- Place field ---- */
+  #addr { height: 28px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 12px 0 11px; }
+  #addr label { width: 36px; flex: none; white-space: nowrap; }
   #field {
-    flex: 1; min-width: 0; height: 26px; position: relative;
-    background: #fff; box-shadow: var(--down);
+    flex: 1; min-width: 0; height: 22px; position: relative;
+    background: #fff; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #404040;
   }
   #url {
-    width: 100%; height: 20px; margin: 3px 0 0; border: 0; padding: 0 6px; outline: none;
-    background: transparent; color: #000; font: 13px Courier, "Courier New", "Liberation Mono", monospace; user-select: text;
+    width: 100%; height: 16px; margin: 3px 0 0; border: 0; padding: 0 3px; outline: none;
+    background: transparent; color: #000; font: 12px Arial, "Liberation Sans", Helvetica, sans-serif; user-select: text;
   }
-  #url::selection { background: #3a2ca8; color: #fff; }
+  #url::selection { background: #000080; color: #fff; }
+
+  /* ---- Status text ---- */
+  #note { height: 20px; flex: none; padding: 3px 12px 0 25px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 </style>
 </head>
 <body>
   <div id="menubar">
     <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
-    <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings">Options</button>
-    <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate</button>
-    <button class="menu" data-cmd="menu" data-arg="goto" data-anchor aria-haspopup="menu">Goto</button>
-    <button class="menu" id="help" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu" title="Preferences, retro looks and Browser UI">Edit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
+    <button class="menu" data-cmd="menu" data-arg="places" data-anchor aria-haspopup="menu">Places</button>
+    <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
+  </div>
+  <div id="tools">
+    <div id="btns">
+      <button class="ib disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_A95_BACK}}</button>
+      <button class="ib disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_A95_FORWARD}}</button>
+      <button class="ib" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_A95_HOME}}</button>
+      <button class="ib" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_A95_RELOAD}}</button>
+      <button class="ib disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_A95_STOP}}</button>
+      <button class="ib" id="bookmarks" data-cmd="bookmarks" title="Bookmarks">{{ICON_A95_BOOKMARKS}}</button>
+      <button class="ib" id="search" data-cmd="search" title="Search the web">{{ICON_A95_SEARCH}}</button>
+    </div>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
   </div>
   <div id="addr">
-    <label for="url">Document URL:</label>
+    <label for="url">Place:</label>
     <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
   </div>
+  <div id="note" title=""><span id="msg">done</span></div>
 <script>
 {{CHROME_JS}}
 </script>
