@@ -102,7 +102,7 @@ wrap_browser_process_handler! {
             let content_url = match start.as_deref().and_then(normalize_url_input) {
                 Some(url) => url,
                 None => {
-                    let uri = pages::home_uri(&list);
+                    let uri = pages::home_uri(&list, user_settings.ui_mode);
                     with_shell(|shell| {
                         shell.internal_label = Some(pages::HOME.to_owned());
                         shell

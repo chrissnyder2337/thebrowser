@@ -1,0 +1,24 @@
+/* An early Windows browser's home document: grey page, Times, Windows 95 controls, bulleted links. */
+html { background: #c0c0c0; }
+body { padding: 8px; font: 16px "Times New Roman", Times, serif; color: #000; }
+.panel { max-width: none; margin: 0; padding: 0; background: transparent; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 14px; align-items: center; margin-bottom: 4px; }
+.head svg.logo { width: 64px; height: 96px; }
+h1 { font: bold 32px "Times New Roman", Times, serif; margin: 0 0 4px; }
+h1 small { font: 14px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 14px; line-height: normal; }
+.head p { margin: 0; }
+fieldset { margin: 12px 0 0; padding: 0; box-shadow: none; }
+legend { position: static; display: block; padding: 0; margin: 0 0 6px; background: transparent;
+  font: bold 24px "Times New Roman", Times, serif; }
+hr { margin: 10px 0; }
+.search { margin: 0; gap: 8px; max-width: 520px; }
+input[type=search] { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; }
+ul.marks { display: block; list-style: disc; padding-left: 40px; columns: 1; margin: 0 0 14px; }
+ul.marks li { display: list-item; padding: 0; }
+ul.marks li::before { content: none; }
+ul.marks a { overflow: visible; text-overflow: clip; white-space: normal; }
+.tips { color: #000; }
+kbd { font: 14px "Courier New", Courier, monospace; padding: 0; background: transparent; box-shadow: none; }

@@ -400,6 +400,7 @@ pub fn set_mode(mode: UiMode) {
     settings::save(&updated);
     apply();
     retro::refresh();
+    super::commands::refresh_home_page();
     set_notice(&format!("Browser UI: {}.", mode.name()));
 }
 

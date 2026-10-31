@@ -150,10 +150,11 @@ URL row; status text and a striped progress bar.
 ## Applet browser family
 
 ### `applet-1995`: Applet browser (1995)
-Modelled on the HotJava alpha (checked against its documentation during the build). Menu bar; Document
-URL field; page; a bottom row of icon-only buttons (Back, Forward, Home,
-Reload, Stop, Help), status text and the activity box.
-**Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: no real window screenshot exists (judged against the alpha guide and its button glyphs); lantern; required status line.
+Modelled on the HotJava alpha 2 on a Motif desktop. Menu bar (File,
+Options, Navigate, Goto, and Help at the far right); Document URL field; a
+grey page; a centred row of round icon buttons under it (Back, Forward,
+Home, Reload, Stop), status text and the activity box.
+**Fidelity** (reviewer verdict PASS after 6 rounds, against a screenshot of the alpha 2 window): left as they are: glyphs a little small for the buttons; disabled buttons dimmed (the original never greyed them); required status line; lantern.
 
 ### `applet-1997`: Applet browser (1997)
 Modelled on HotJava 1.x–3 (screenshot in the catalog). Menu bar; icon
@@ -179,10 +180,13 @@ extras.
 **Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: no real Options-panel capture found (panel judged from the general look); lantern in the bar.
 
 ### `tv-1997`: Set-top TV (1997)
-Modelled on WebTV (checked against a screenshot or documentation during the build). As 1996, with the Options panel open over
-the bottom of the page: Go to, Find, Info, Save, Send, Reload, Text size,
-Print, Browser UI, Setup.
-**Fidelity** (reviewer verdict PASS after 2 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: no capture of the Plus Options panel exists (layout from documentation); lantern.
+Modelled on WebTV Plus. As 1996, with a taller bar; the Options key opens
+a panel that takes the whole screen like the Plus Setup page: a maroon rail
+with the panel's name written up it, a big heading, two columns of teal
+items over white descriptions (Back, Forward, Home, Reload, Stop, Search,
+Favorites, Save, Find, Text size, Setup), a yellow focus box, a Go to row
+and a Done key. Choosing an item closes the panel.
+**Fidelity** (reviewer verdict PASS after 4 rounds, against screenshots of the Plus home screen and Setup page): left as they are: Go to row and greyed items (the original had neither); lock and modem panes in the bar; lantern.
 
 ## More families
 

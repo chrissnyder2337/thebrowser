@@ -1,0 +1,25 @@
+/* A 1994 Macintosh browser's home page: plain Times document, grey-bevelled Mac controls. */
+html { background: #fff; }
+body { padding: 10px 14px 28px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; }
+.panel { max-width: none; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 14px; margin-bottom: 8px; }
+.head svg.logo { width: 64px; height: 96px; }
+h1 { font: bold 32px "Times New Roman", Times, serif; margin: 0 0 6px; }
+h1 small { font: 12px Geneva, Helvetica, Arial, sans-serif; color: #000; }
+p { line-height: 1.25; margin: 0 0 10px; }
+a { color: #0000ee; }
+a:visited { color: #551a8b; }
+fieldset { margin: 14px 0 0; padding: 14px 10px 8px; border: 1px solid #000; box-shadow: none; }
+legend { top: -9px; left: 8px; background: #fff; font: bold 12px Chicago, Charcoal, Geneva, Helvetica, Arial, sans-serif; }
+input[type=text], input[type=search] { font: 12px Geneva, Helvetica, Arial, sans-serif; height: 22px; padding: 2px 4px; border: 1px solid #000; background: #fff; box-shadow: inset 1px 1px #808080; }
+button, .btn { font: bold 12px Chicago, Charcoal, Geneva, Helvetica, Arial, sans-serif; height: 24px; line-height: 22px; min-width: 66px; padding: 0 12px; border: 1px solid #000; border-radius: 6px; background: #ddd; color: #000;
+  box-shadow: inset 1px 1px #fff, inset -1px -1px #888; }
+button:active, .btn:active { background: #aaa; padding: 0 12px; box-shadow: inset 1px 1px #666; }
+ul.marks li { font-size: 16px; }
+ul.marks li::before { width: 5px; height: 5px; border-radius: 50%; background: #000; box-shadow: none; }
+ul.marks a { white-space: normal; }
+hr { border: 0; border-top: 2px groove #aaa; margin: 14px 0 10px; }
+.tips { color: #000; font-size: 14px; }
+kbd { font: 12px Geneva, Helvetica, Arial, sans-serif; background: #ddd; border: 1px solid #000; border-radius: 3px; box-shadow: none; padding: 0 3px; }

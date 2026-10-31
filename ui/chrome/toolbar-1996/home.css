@@ -1,0 +1,27 @@
+/* A mid-90s home page: grey page, Times, centred title, bordered table-like boxes, bulleted links. */
+html { background: #c0c0c0; }
+body { padding: 8px 12px; font: 16px "Times New Roman", Times, serif; color: #000; }
+.panel { max-width: none; margin: 0; padding: 0; background: transparent; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { flex-direction: column; text-align: center; gap: 4px; margin-bottom: 0; }
+.head svg.logo { width: 64px; height: 96px; }
+h1 { font: bold 32px "Times New Roman", Times, serif; margin: 0 0 4px; }
+h1 small { font: 14px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 12px; line-height: normal; }
+.head p { font-style: italic; margin: 0 0 8px; }
+fieldset { margin: 10px 0 0; padding: 0 0 8px; background: transparent;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #fff, inset -2px -2px #808080; }
+legend { position: static; display: block; width: 100%; padding: 3px 8px; margin: 0 0 8px; background: #808080; color: #fff;
+  font: bold 18px "Times New Roman", Times, serif; }
+hr { border: 0; height: 2px; margin: 12px 0; background: transparent;
+  border-top: 1px solid #808080; border-bottom: 1px solid #fff; }
+.search { margin: 0 8px; gap: 6px; }
+input[type=search] { font: 13px "Courier New", Courier, monospace; height: 23px; }
+button { font: 13px Arial, Helvetica, sans-serif; }
+ul.marks { display: block; list-style: disc; padding: 0 8px 0 36px; margin: 0; columns: 2 220px; }
+ul.marks li { display: list-item; padding: 2px 0; }
+ul.marks li::before { content: none; }
+ul.marks a { overflow: visible; text-overflow: clip; white-space: normal; }
+.tips { color: #000; font-size: 14px; text-align: center; }
+kbd { font: 13px "Courier New", Courier, monospace; padding: 0; background: transparent; box-shadow: none; }

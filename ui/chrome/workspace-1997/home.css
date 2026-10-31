@@ -1,0 +1,23 @@
+/* A 1997 multi-window Windows browser's home page: white Times page, grey Win95 controls, flat header band. */
+html { background: #fff; }
+body { padding: 0 0 28px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; }
+.panel { max-width: none; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0 16px; }
+.head { gap: 16px; margin: 0 -16px 12px; padding: 12px 16px; background: #c0c0c0; border-bottom: 2px solid #808080; }
+.head svg.logo { width: 64px; height: 96px; }
+h1 { font: bold 28px "Times New Roman", Times, serif; margin: 0 0 4px; }
+h1 small { font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif; color: #000; }
+p { line-height: 1.3; margin: 0 0 10px; }
+a { color: #0000ff; }
+a:visited { color: #800080; }
+fieldset { margin: 16px 0 0; padding: 14px 10px 8px; border: 0; background: none;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #fff, inset -2px -2px #808080; }
+legend { top: -8px; left: 8px; background: #fff; font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif; }
+input[type=text], input[type=search] { font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif; }
+button, .btn { font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif; }
+ul.marks li { font-size: 16px; }
+ul.marks a { white-space: normal; }
+hr { border: 0; border-top: 1px solid #808080; border-bottom: 1px solid #fff; margin: 14px 0 10px; }
+.tips { color: #000; font-size: 14px; }
+kbd { font: 11px "MS Sans Serif", Tahoma, Arial, sans-serif; }

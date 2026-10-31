@@ -1,0 +1,31 @@
+/* Set-top TV home screen (1997 Plus-era): dark slate-blue screen, a row of big tiles, a sub-menu strip and a lit content panel. */
+html { background: #3b4468 linear-gradient(#5a648c, #3b4468 220px, #2d3454); min-height: 100%; }
+body { padding: 0 0 30px; font: 20px/1.4 Helvetica, Arial, sans-serif; color: #fff; -webkit-font-smoothing: auto; font-smooth: auto; }
+a, a:visited, a:active { color: #fff; text-decoration: none; }
+.panel { max-width: none; padding: 0; background: none; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 18px; margin: 0; padding: 12px 24px; background: linear-gradient(#59648c, #3d4669); border-bottom: 1px solid #1f2540; }
+.head svg.logo { width: 44px; height: 66px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+h1 { font: bold 34px Helvetica, Arial, sans-serif; margin: 0; color: #fff; text-shadow: 0 2px 3px rgba(0, 0, 0, .5); }
+h1 small { font: 18px Helvetica, Arial, sans-serif; color: #e1c433; text-shadow: none; }
+.head p { margin: 2px 0 0; color: #c9d0ea; }
+fieldset { margin: 16px 24px 0; padding: 14px 16px; background: linear-gradient(#a3a79a, #7c8077); color: #111; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, .5), inset 0 1px rgba(255, 255, 255, .4); }
+legend { position: static; display: block; float: left; width: 100%; margin: 0 0 8px; padding: 0; background: none; font: bold 26px Helvetica, Arial, sans-serif; color: #1c2140; }
+.search { clear: both; gap: 10px; }
+input[type=search] { height: 44px; padding: 0 14px; font: 20px Helvetica, Arial, sans-serif; color: #e1c433; background: #0c0c0c; border: 2px solid #555; border-radius: 8px; box-shadow: inset 0 2px 3px #000; caret-color: #e1c433; }
+input[type=search]::placeholder { color: #8a8140; }
+input[type=search]:focus { border-color: #e1c433; }
+input::selection { background: #e1c433; color: #000; }
+button { height: 44px; line-height: 40px; min-width: 110px; padding: 0 24px; font: bold 20px Helvetica, Arial, sans-serif; color: #202020; background: linear-gradient(#e4e4e4, #a8a8a8); border: 1px solid #666; border-radius: 8px; box-shadow: 0 1px 2px rgba(0, 0, 0, .6), inset 0 1px #fff; }
+button:hover, button:focus-visible { outline: 0; border: 2px solid #e1c433; line-height: 38px; }
+button:active { padding: 0 24px; background: linear-gradient(#a8a8a8, #cfcfcf); }
+ul.marks { columns: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; clear: both; }
+ul.marks li { padding: 0; }
+ul.marks li::before { content: "\25B8"; width: auto; height: auto; background: none; box-shadow: none; color: #e1c433; font-size: 22px; }
+ul.marks a { flex: 1; min-width: 0; padding: 6px 12px; font-weight: bold; color: #111; background: rgba(255, 255, 255, .3); border: 2px solid transparent; border-radius: 6px; }
+ul.marks a:hover, ul.marks a:focus { outline: 0; border-color: #e1c433; background: rgba(255, 255, 255, .55); }
+hr { border: 0; border-top: 1px solid #1f2540; margin: 20px 24px 12px; }
+.tips { margin: 0 24px 8px; color: #c9d0ea; font-size: 18px; }
+kbd { padding: 1px 8px; color: #e1c433; background: #0c0c0c; border-radius: 4px; box-shadow: inset 0 1px 2px #000; }
+.tips a { color: #44cfd8; font-weight: bold; text-decoration: underline; }

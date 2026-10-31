@@ -1,0 +1,33 @@
+/* An early X workstation browser's home page: plain grey document, Times, Motif form controls. */
+html { background: #bfbfbf; }
+body { padding: 8px 12px 24px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; color: #000; }
+a { color: #0000ee; text-decoration: underline; }
+a:visited { color: #551a8b; }
+a:active { color: #ee0000; }
+.panel { max-width: none; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption, svg.logo { display: none; }
+.inner { padding: 0; }
+.head { display: block; margin: 0; }
+h1 { font: bold 32px/1.15 "Times New Roman", Times, serif; margin: 10px 0 8px; }
+h1 small { font: italic 16px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 12px; line-height: 1.2; }
+fieldset { margin: 0 0 8px; padding: 0; box-shadow: none; position: static; min-width: 0; }
+legend { position: static; float: left; width: 100%; padding: 0; margin: 12px 0 8px; background: none;
+  font: bold 24px/1.15 "Times New Roman", Times, serif; }
+legend + * { clear: both; }
+.search { gap: 8px; align-items: center; margin: 0 0 12px; }
+input[type=search] { font: 15px Courier, "Courier New", monospace; height: 28px; padding: 2px 8px; color: #000;
+  background: #9c9c9c; box-shadow: inset 2px 2px #5a5a5a, inset -2px -2px #e4e4e4; }
+input::selection { background: #191970; color: #fff; }
+button { font: bold 14px Helvetica, "Helvetica Neue", Arial, sans-serif; color: #6a0a0a; background: #bfbfbf;
+  height: 28px; line-height: 28px; min-width: 0; padding: 0 12px;
+  box-shadow: inset 2px 2px #e4e4e4, inset -2px -2px #5a5a5a; }
+button:active { box-shadow: inset 2px 2px #5a5a5a, inset -2px -2px #e4e4e4; padding: 0 12px; }
+button:focus-visible { outline: 1px solid #000; outline-offset: -4px; }
+ul.marks { columns: 1; margin: 0 0 12px; padding: 0 0 0 40px; list-style: disc; }
+ul.marks li { display: list-item; padding: 0; line-height: 1.25; }
+ul.marks li::before { content: none; }
+ul.marks a { white-space: normal; overflow: visible; }
+hr { border: 0; height: 4px; margin: 16px 0; background: none; border-top: 2px solid #5a5a5a; border-bottom: 2px solid #e4e4e4; }
+.tips { color: #000; }
+kbd { font: 15px Courier, "Courier New", monospace; padding: 0; background: none; box-shadow: none; }

@@ -27,6 +27,8 @@ struct ModeFiles {
     menus: Option<&'static str>,
     side: Option<&'static str>,
     frame: Option<&'static str>,
+    /// The start page's look in this mode (`home.css`).
+    home: Option<&'static str>,
 }
 
 macro_rules! mode_files {
@@ -38,6 +40,7 @@ macro_rules! mode_files {
             menus: None,
             side: None,
             frame: None,
+            home: None,
         };
         $(mode_files!(@ files, $key, $extra);)*
         files
@@ -50,6 +53,9 @@ macro_rules! mode_files {
     };
     (@ $files:ident, $key:literal, frame) => {
         $files.frame = Some(include_str!(concat!("../../ui/chrome/", $key, "/frame.html")))
+    };
+    (@ $files:ident, $key:literal, home) => {
+        $files.home = Some(include_str!(concat!("../../ui/chrome/", $key, "/home.css")))
     };
 }
 
@@ -128,29 +134,29 @@ fn common_vars() -> Vec<(&'static str, String)> {
 fn mode_files(mode: UiMode) -> ModeFiles {
     match mode {
         UiMode::Lantern => mode_files!("lantern"),
-        UiMode::Workstation1993 => mode_files!("workstation-1993", menus),
-        UiMode::Toolbar1996 => mode_files!("toolbar-1996", menus),
-        UiMode::Desktop1996 => mode_files!("desktop-1996", menus),
-        UiMode::Applet1997 => mode_files!("applet-1997", menus),
-        UiMode::Terminal1999 => mode_files!("terminal-1999", menus),
-        UiMode::Terminal1992 => mode_files!("terminal-1992", menus),
-        UiMode::Pc1993 => mode_files!("pc-1993", menus),
-        UiMode::Toolbar1995 => mode_files!("toolbar-1995", menus),
-        UiMode::Desktop1995 => mode_files!("desktop-1995", menus),
-        UiMode::Suite1997 => mode_files!("suite-1997", menus),
-        UiMode::Desktop1997 => mode_files!("desktop-1997", menus),
-        UiMode::Desktop1999 => mode_files!("desktop-1999", menus),
-        UiMode::Classic1992 => mode_files!("classic-1992", menus, frame),
-        UiMode::Classic1994 => mode_files!("classic-1994", menus, frame),
-        UiMode::Tv1996 => mode_files!("tv-1996", menus),
-        UiMode::Dos1996 => mode_files!("dos-1996", menus, side),
-        UiMode::Cube1990 => mode_files!("cube-1990", menus, side, frame),
-        UiMode::Tv1997 => mode_files!("tv-1997", menus),
-        UiMode::Workspace1997 => mode_files!("workspace-1997", menus, side, frame),
-        UiMode::Workstation1996 => mode_files!("workstation-1996", menus),
-        UiMode::WorkstationPc1995 => mode_files!("workstation-pc-1995", menus),
-        UiMode::Applet1995 => mode_files!("applet-1995", menus),
-        UiMode::Classic1999 => mode_files!("classic-1999", menus, frame),
+        UiMode::Workstation1993 => mode_files!("workstation-1993", menus, home),
+        UiMode::Toolbar1996 => mode_files!("toolbar-1996", menus, home),
+        UiMode::Desktop1996 => mode_files!("desktop-1996", menus, home),
+        UiMode::Applet1997 => mode_files!("applet-1997", menus, home),
+        UiMode::Terminal1999 => mode_files!("terminal-1999", menus, home),
+        UiMode::Terminal1992 => mode_files!("terminal-1992", menus, home),
+        UiMode::Pc1993 => mode_files!("pc-1993", menus, home),
+        UiMode::Toolbar1995 => mode_files!("toolbar-1995", menus, home),
+        UiMode::Desktop1995 => mode_files!("desktop-1995", menus, home),
+        UiMode::Suite1997 => mode_files!("suite-1997", menus, home),
+        UiMode::Desktop1997 => mode_files!("desktop-1997", menus, home),
+        UiMode::Desktop1999 => mode_files!("desktop-1999", menus, home),
+        UiMode::Classic1992 => mode_files!("classic-1992", menus, frame, home),
+        UiMode::Classic1994 => mode_files!("classic-1994", menus, frame, home),
+        UiMode::Tv1996 => mode_files!("tv-1996", menus, home),
+        UiMode::Dos1996 => mode_files!("dos-1996", menus, side, home),
+        UiMode::Cube1990 => mode_files!("cube-1990", menus, side, frame, home),
+        UiMode::Tv1997 => mode_files!("tv-1997", menus, home),
+        UiMode::Workspace1997 => mode_files!("workspace-1997", menus, side, frame, home),
+        UiMode::Workstation1996 => mode_files!("workstation-1996", menus, home),
+        UiMode::WorkstationPc1995 => mode_files!("workstation-pc-1995", menus, home),
+        UiMode::Applet1995 => mode_files!("applet-1995", menus, home),
+        UiMode::Classic1999 => mode_files!("classic-1999", menus, frame, home),
     }
 }
 
@@ -274,7 +280,8 @@ fn action_url(action: &str, url: &str) -> String {
     )
 }
 
-pub fn home_uri(bookmarks: &[Bookmark]) -> String {
+/// The start page, styled for `mode` (its `home.css` over the shared page).
+pub fn home_uri(bookmarks: &[Bookmark], mode: UiMode) -> String {
     let mut list = String::new();
     for b in bookmarks {
         let _ = write!(
@@ -289,6 +296,7 @@ pub fn home_uri(bookmarks: &[Bookmark]) -> String {
     }
     let mut vars = common_vars();
     vars.push(("BOOKMARK_LIST", list));
+    vars.push(("MODE_STYLE", mode_files(mode).home.unwrap_or("").to_owned()));
     html_uri(&fill(HOME_HTML, &vars))
 }
 
@@ -620,6 +628,20 @@ pub fn error_uri(failed_url: &str, error_code: i32, error_text: &str) -> String 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_mode_but_lantern_styles_its_start_page_from_its_own_files() {
+        for mode in UiMode::ALL {
+            let home = mode_files(mode).home;
+            assert_eq!(home.is_none(), mode == UiMode::Lantern, "{mode:?}");
+            let css = home.unwrap_or("");
+            // Compiled-in and trusted, but self-contained: nothing fetched,
+            // and no placeholders for fill to expand.
+            for banned in ["url(", "@import", "{{", "</style"] {
+                assert!(!css.contains(banned), "{mode:?} home.css has {banned}");
+            }
+        }
+    }
 
     #[test]
     fn fill_is_single_pass() {

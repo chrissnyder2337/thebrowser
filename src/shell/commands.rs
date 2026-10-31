@@ -276,8 +276,8 @@ pub fn show_internal(label: &str, uri: String) {
 }
 
 pub fn show_home() {
-    let list = with_shell(|shell| shell.bookmarks.clone());
-    show_internal(pages::HOME, pages::home_uri(&list));
+    let (list, mode) = with_shell(|shell| (shell.bookmarks.clone(), shell.settings.ui_mode));
+    show_internal(pages::HOME, pages::home_uri(&list, mode));
     focus_content();
 }
 
@@ -287,12 +287,12 @@ thread_local! {
 
 /// Home page with its search box focused (via a unique `#search-N` fragment).
 pub fn show_search() {
-    let list = with_shell(|shell| shell.bookmarks.clone());
+    let (list, mode) = with_shell(|shell| (shell.bookmarks.clone(), shell.settings.ui_mode));
     let seq = SEARCH_SEQ.with(|seq| {
         seq.set(seq.get().wrapping_add(1));
         seq.get()
     });
-    let uri = format!("{}#search-{seq}", pages::home_uri(&list));
+    let uri = format!("{}#search-{seq}", pages::home_uri(&list, mode));
     show_internal(pages::HOME, uri);
     focus_content();
 }
@@ -337,6 +337,13 @@ pub fn show_error(failed_url: &str, error_code: i32, error_text: &str) {
         failed_url,
         pages::error_uri(failed_url, error_code, error_text),
     );
+}
+
+/// Re-render the start page if it's showing, in the new mode's look.
+pub fn refresh_home_page() {
+    if with_shell(|shell| shell.internal_label.clone()).as_deref() == Some(pages::HOME) {
+        show_home();
+    }
 }
 
 /// Re-render the current internal page if it lists bookmarks.

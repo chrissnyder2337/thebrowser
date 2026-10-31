@@ -3,7 +3,8 @@
 //! Lantern runs for each retro look to `<dir>/retro-<look>.js`, so the
 //! Playwright suite in tests/web can use them without CEF. Every UI mode's
 //! chrome pages go to `toolbar-<mode>.html` and `status-<mode>.html`, with
-//! the modes' keys and view heights in `ui-modes.json`, and each mode's page
+//! the modes' keys and view heights in `ui-modes.json`, its start page to
+//! `home-<mode>.html`, and each mode's page
 //! defaults script to `mode-pages-<mode>.js` (`mode-pages-off.js` removes them),
 //! and each scrollbar style's script to `scrollbars-<style>.js`.
 //!
@@ -76,8 +77,14 @@ fn main() -> ExitCode {
     let mut pages = vec![
         ("toolbar".to_owned(), pages::toolbar_uri(UiMode::Lantern)),
         ("status".to_owned(), pages::status_uri(UiMode::Lantern)),
-        ("home".to_owned(), pages::home_uri(&bookmarks)),
-        ("home-empty".to_owned(), pages::home_uri(&[])),
+        (
+            "home".to_owned(),
+            pages::home_uri(&bookmarks, UiMode::Lantern),
+        ),
+        (
+            "home-empty".to_owned(),
+            pages::home_uri(&[], UiMode::Lantern),
+        ),
         ("bookmarks".to_owned(), pages::bookmarks_uri(&bookmarks)),
         (
             "about".to_owned(),
@@ -109,6 +116,9 @@ fn main() -> ExitCode {
                 _ => "frame",
             };
             pages.push((format!("{view}-{key}"), pages::chrome_uri(*role, mode)));
+        }
+        if mode != UiMode::Lantern {
+            pages.push((format!("home-{key}"), pages::home_uri(&bookmarks, mode)));
         }
         let layout = ui_mode::layout(mode);
         let keys = |list: Vec<String>| Json::Arr(list.into_iter().map(Json::str).collect());

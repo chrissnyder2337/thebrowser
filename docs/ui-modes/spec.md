@@ -124,6 +124,7 @@ panel holds the **frame view** over the **content view**, inside a border.
 |---|---|
 | `toolbar`, `status` | Heights of the top and bottom views. |
 | `status_open` | The status view's height while the mode's panel is open (`data-cmd="panel"` toggles it, chrome.js sets `html.panel-open`): the TV Options panel. |
+| `panel_full` | The open panel takes the whole window and hides the page, like a set-top box's full-screen Setup page (Set-top TV 1997). A command sent from it, other than `panel`, `menu` and `focus-url`, closes it first so its result shows; keyboard focus moves to the panel and back to the page. |
 | `side`, `side_left` | The side view's width and side: DOS graphics' button column, the Workspace hotlist. |
 | `frame` | A view right over the page, inside the inset: a document window's title bar. |
 | `inset`, `inset_color` | A border around frame and page (top, left, bottom, right): the TV's screen margin, a document window on a desktop. |
@@ -203,6 +204,14 @@ menus):
   browser defaults off with them; it brings its own.
 - Lantern's internal pages (`data:` URLs) are never touched, as with the
   retro looks.
+- **The start page** takes the mode's look from its own sheet instead:
+  `ui/chrome/<mode>/home.css`, added after the page's styles, restyles the
+  shared `ui/pages/home.html` as a page that browser and its era would have
+  shown at home (a plain grey document for the early workstations, a TV
+  home screen, a text terminal's page). Only the look changes: the search
+  box, bookmarks and tips stay. The sheet is self-contained (no `url()` or
+  `@import`, unit-tested), and switching modes re-renders the start page if
+  it's showing.
 - **Modes that need their look.** A text terminal can't show a modern page,
   so for modes where `UiMode::needs_era_look()` is true the default
   `defaults` setting gives the era look too; `as-is` still turns it off.
@@ -254,7 +263,9 @@ every mode.
   (`toolbar-<key>.html`, `status-<key>.html`, `side-`, `frame-`) and
   `ui-modes.json` (keys, view sizes, menu keys). `ui-modes.spec.js` checks every mode's contract, that its
   buttons send the right title-channel messages, that `lantern.update`
-  shows the state, and adds golden screenshots for each mode. The Lantern
+  shows the state, and adds golden screenshots for each mode, its start
+  page (`home-<key>.html`, which must fit without horizontal scrolling) and
+  its open panel. The Lantern
   mode's existing goldens must keep passing unchanged.
 - **Page defaults** (`mode-pages.spec.js`): on a plain fixture page the
   mode's defaults apply (with a golden); on a fixture that styles itself,

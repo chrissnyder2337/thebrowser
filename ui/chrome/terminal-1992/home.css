@@ -1,0 +1,34 @@
+/* Text-terminal start page (1992): plain monospace on black, the logo hidden, links as bright bracketed text. */
+html { background: #000; }
+body { padding: 0 8px; font: 15px/20px "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, "Courier New", monospace; color: #c0c0c0; -webkit-font-smoothing: auto; font-smooth: auto; }
+a, a:visited, a:active { color: #55ffff; text-decoration: none; }
+a:hover, a:focus { background: #c0c0c0; color: #000; outline: 0; }
+.panel { max-width: 88ch; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption, svg { display: none; }
+.inner { padding: 0; }
+.head { display: block; margin: 0; }
+h1 { font: bold 15px/20px "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, monospace; margin: 0; color: #fff; text-align: right; }
+h1 small { font: inherit; color: #c0c0c0; }
+.head p { margin: 0 0 20px; line-height: 20px; }
+fieldset { margin: 0 0 20px; padding: 0; box-shadow: none; }
+legend { position: static; display: block; float: left; width: 100%; padding: 0; margin: 0; background: none; color: #ffff55; font-weight: bold; }
+legend::before { content: "  "; }
+.search { clear: both; gap: 1ch; margin: 0; align-items: center; }
+input[type=search] { height: 20px; padding: 0; font: inherit; color: #fff; background: #000; border: 0; border-bottom: 1px solid #c0c0c0; border-radius: 0; box-shadow: none; caret-color: #fff; }
+input[type=search]::placeholder { color: #707070; }
+input::selection { background: #c0c0c0; color: #000; }
+button { min-width: 0; height: 20px; line-height: 20px; padding: 0; font: inherit; color: #55ffff; background: none; border: 0; box-shadow: none; }
+button::before { content: "["; }
+button::after { content: "]"; }
+button:hover, button:focus-visible { outline: 0; background: #c0c0c0; color: #000; }
+button:active { padding: 0; }
+ul.marks { columns: 1; clear: both; }
+ul.marks li { padding: 0; gap: 0; }
+ul.marks li::before { content: "  "; white-space: pre; width: auto; height: auto; background: none; box-shadow: none; }
+ul.marks a { white-space: normal; }
+hr { border: 0; border-top: 1px dashed #808080; margin: 0 0 20px; }
+.tips { margin: 0 0 20px; color: #c0c0c0; line-height: 20px; }
+kbd { padding: 0; color: #fff; background: none; box-shadow: none; }
+kbd::before { content: "["; }
+kbd::after { content: "]"; }
+.tips a { text-decoration: underline; }

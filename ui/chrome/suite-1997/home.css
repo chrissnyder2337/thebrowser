@@ -1,0 +1,26 @@
+/* A late-90s portal start page: white page, Arial, coloured section bars, flat boxed panels. */
+html { background: #fff; }
+body { padding: 0 0 24px; font: 13px Arial, Helvetica, "Liberation Sans", sans-serif; color: #000; }
+.panel { max-width: none; margin: 0; padding: 0; background: transparent; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 16px; margin: 0; padding: 10px 16px; background: #003366; color: #fff; border-bottom: 3px solid #ffcc00; }
+.head svg.logo { width: 48px; height: 72px; }
+h1 { font: bold 26px Arial, Helvetica, sans-serif; margin: 0 0 4px; color: #fff; }
+h1 small { font: 11px Arial, Helvetica, sans-serif; color: #ffcc00; }
+p { line-height: 1.35; }
+.head p { margin: 0; color: #cce0ff; }
+fieldset { margin: 14px 16px 0; padding: 10px 0 0; background: #f0f0f0; border: 1px solid #999;
+  box-shadow: none; }
+legend { position: static; display: block; width: 100%; padding: 3px 8px; margin: -10px 0 8px; background: #336699; color: #fff;
+  font: bold 13px Arial, Helvetica, sans-serif; }
+.search { margin: 0 10px 10px; }
+input[type=search] { font: 13px Arial, Helvetica, sans-serif; height: 23px; background: #fff; border: 1px solid #666; box-shadow: none; }
+button { font: bold 12px Arial, Helvetica, sans-serif; background: #ffcc00; color: #000; border: 1px solid #996600; box-shadow: none; }
+button:active { box-shadow: inset 1px 1px #996600; padding: 1px 9px 0 11px; }
+ul.marks { margin: 0 10px 8px; }
+ul.marks li::before { box-shadow: none; background: #336699; width: 6px; height: 6px; }
+a { color: #0000cc; }
+hr { margin: 14px 16px; border: 0; border-top: 1px solid #999; }
+.tips { margin: 0 16px 8px; color: #333; font-size: 12px; }
+kbd { background: #fff; border: 1px solid #999; box-shadow: none; padding: 0 3px; }

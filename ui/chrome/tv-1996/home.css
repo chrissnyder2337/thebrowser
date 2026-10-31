@@ -1,0 +1,30 @@
+/* Set-top TV home screen (1996): light grey-blue page, big sans type, links as boxes picked by a yellow highlight. */
+html { background: #b4bccc; }
+body { padding: 20px 28px 30px; font: 20px/1.4 Helvetica, Arial, sans-serif; color: #000; -webkit-font-smoothing: auto; font-smooth: auto; }
+a, a:visited, a:active { color: #000; text-decoration: none; }
+.panel { max-width: none; padding: 0; background: none; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 20px; margin: 0 0 18px; padding: 10px 16px; background: #2c3354; color: #fff; border-radius: 10px; }
+.head svg.logo { width: 48px; height: 72px; }
+h1 { font: bold 34px Helvetica, Arial, sans-serif; margin: 0; color: #fff; }
+h1 small { font: 18px Helvetica, Arial, sans-serif; color: #e1c433; }
+.head p { margin: 2px 0 0; font-size: 20px; color: #d8dcea; }
+fieldset { margin: 16px 0 0; padding: 12px 0 0; box-shadow: none; }
+legend { position: static; display: block; float: left; width: 100%; margin: 0 0 8px; padding: 0; background: none; font: bold 24px Helvetica, Arial, sans-serif; color: #202848; }
+.search { clear: both; gap: 10px; }
+input[type=search] { height: 44px; padding: 0 12px; font: 20px Helvetica, Arial, sans-serif; color: #000; background: #fff; border: 2px solid #5a6488; border-radius: 8px; box-shadow: none; }
+input[type=search]:focus { border-color: #e1c433; box-shadow: 0 0 0 3px #e1c433; }
+input::selection { background: #e1c433; color: #000; }
+button { height: 44px; line-height: 40px; min-width: 110px; padding: 0 22px; font: bold 20px Helvetica, Arial, sans-serif; color: #fff; background: #2c3354; border: 2px solid #2c3354; border-radius: 8px; box-shadow: none; }
+button:focus-visible, button:hover { outline: 0; border-color: #e1c433; box-shadow: 0 0 0 3px #e1c433; }
+button:active { padding: 0 22px; background: #151a33; }
+ul.marks { columns: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; clear: both; }
+ul.marks li { padding: 0; }
+ul.marks li::before { display: none; }
+ul.marks a { display: block; width: 100%; padding: 8px 14px; font-weight: bold; background: #e8ecf4; border: 3px solid #7a85a8; border-radius: 8px; }
+ul.marks a:hover, ul.marks a:focus { outline: 0; border-color: #e1c433; box-shadow: 0 0 0 3px #e1c433; background: #fff; }
+hr { border: 0; border-top: 3px solid #7a85a8; margin: 20px 0 12px; }
+.tips { color: #202848; font-size: 18px; }
+kbd { padding: 1px 8px; background: #fff; border: 2px solid #7a85a8; border-radius: 5px; box-shadow: none; }
+.tips a { font-weight: bold; text-decoration: underline; }

@@ -181,6 +181,24 @@ for (const mode of MODES) {
       }
     });
 
+    // The start page in this mode's look (ui/chrome/<mode>/home.css), at
+    // the size the mode leaves for the page.
+    if (mode.key !== "lantern") {
+      test("its start page fits and matches the golden screenshot", async ({ browser }) => {
+        const width = 800 - mode.sideWidth;
+        const height = 600 - mode.toolbarHeight - mode.statusHeight - mode.frameHeight;
+        const page = await browser.newPage({ viewport: { width, height } });
+        const errors = trackErrors(page);
+        await page.goto(pageUrl(`home-${mode.key}.html`));
+        await expect(page.locator("#q")).toBeVisible();
+        await expect(page.locator("ul.marks a")).toHaveCount(3);
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+        expect(overflow, "no horizontal scroll").toBeLessThanOrEqual(0);
+        await expect(page).toHaveScreenshot(`home-${mode.key}.png`);
+        expect(errors).toEqual([]);
+      });
+    }
+
     // The panel the status view grows into: a strip under the page, or the
     // whole window (panelFull, the page hidden).
     if (mode.statusOpen > 0) {

@@ -1,0 +1,19 @@
+/* A later toolkit-built browser start page: white document, sans text, a grey-and-slate control look. */
+html { background: #fff; }
+body { padding: 8px 12px 24px; font: 14px Arial, Helvetica, sans-serif; -webkit-font-smoothing: auto; }
+.panel { max-width: none; margin: 0; padding: 0; background: #fff; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 14px; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 2px solid #666699; }
+h1 { font: bold 26px Arial, Helvetica, sans-serif; color: #333366; }
+h1 small { font: 12px Arial, Helvetica, sans-serif; color: #666; }
+fieldset { margin: 14px 0 0; padding: 14px 12px 10px; background: #fff; border: 1px solid #999; box-shadow: none; }
+legend { position: static; margin-left: 4px; padding: 0 4px; background: #fff; color: #333366; font-weight: bold; }
+input[type=search] { font: 14px Arial, Helvetica, sans-serif; border: 1px solid #666; box-shadow: inset 1px 1px #999; height: 24px; }
+button, .btn { font: bold 12px Arial, Helvetica, sans-serif; color: #000; background: #ccc; border: 1px solid #666; box-shadow: inset 1px 1px #fff, inset -1px -1px #999; }
+button:active, .btn:active { background: #9999cc; box-shadow: inset 1px 1px #666; padding: 0 10px; }
+button:focus-visible, .btn:focus-visible { outline: 1px dotted #333366; }
+ul.marks li::before { background: #666699; box-shadow: none; }
+hr { border: 0; border-top: 1px solid #999; margin: 14px 0; }
+.tips { color: #333; }
+kbd { font: bold 12px Arial, Helvetica, sans-serif; background: #ccc; box-shadow: inset 1px 1px #fff, inset -1px -1px #999; }
