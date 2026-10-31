@@ -32,7 +32,7 @@
   .key.disabled, .key.inert { color: #77704a; background: linear-gradient(#4a4a4a, #383838 50%, #2e2e2e); box-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
 
   /* ---- Options panel (closed by default): a Setup-screen look ---- */
-  #panel { display: none; flex: 1; min-height: 0; border-top: 1px solid #666; background: #3a4048; }
+  #panel { display: none; flex: 1; min-height: 0; border-top: 1px solid #666; background: #3a3a3a; }
   html.panel-open #panel { display: flex; }
   #rail {
     width: 78px; flex: none; position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 10px;
@@ -47,27 +47,30 @@
     position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 28px; font-weight: bold; color: #a27d89;
     writing-mode: vertical-rl; transform: rotate(180deg); line-height: 78px; height: 100px; text-shadow: 0 1px #4e3640;
   }
-  #body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 8px 18px 8px 16px; background: linear-gradient(#454c55, #343a42); }
-  #items { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(4, 1fr); grid-auto-flow: column; grid-auto-columns: 1fr; column-gap: 14px; }
-  .item { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; text-align: left; }
-  .item b { color: #44cfd8; font-size: 14px; line-height: 15px; white-space: nowrap; }
+  #body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 6px 18px 6px 16px; background: linear-gradient(#444, #333); }
+  #heading { flex: none; height: 22px; padding-left: 6px; color: #fff; font-size: 16px; font-weight: bold; line-height: 22px; }
+  #items { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(3, 1fr); grid-auto-flow: column; grid-template-columns: repeat(4, 1fr); column-gap: 14px; }
+  .item { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 0; outline: none; text-align: left; }
+  .item b { align-self: flex-start; color: #44cfd8; font-size: 14px; line-height: 15px; white-space: nowrap; padding: 0 3px; margin-left: -5px; border: 2px solid transparent; border-radius: 3px; }
   .item span { color: #fff; font-size: 11px; line-height: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .item:hover:not(.disabled):not(.inert), .item:focus-visible, #field:focus-within { border-color: #f2d21c; }
+  .item:hover:not(.disabled):not(.inert) b, .item:focus-visible b, #items:not(:hover):not(:focus-within) .item:first-child b { border-color: #e1c433; }
+  #field:focus-within { border-color: #e1c433; }
   .item.disabled, .item.inert { opacity: .42; }
-  #field { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; }
-  #field label { color: #44cfd8; font-size: 14px; font-weight: bold; line-height: 14px; }
-  #fieldrow { display: flex; align-items: center; gap: 6px; }
+  #field { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; }
+  #field label { flex: none; color: #44cfd8; font-size: 14px; font-weight: bold; }
+  #fieldrow { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+  #lower { flex: none; display: flex; align-items: center; gap: 12px; margin-top: 4px; }
   #url {
-    flex: 1; min-width: 0; height: 17px; padding: 0 8px; border: 0; border-radius: 8px;
+    flex: 1; min-width: 0; height: 20px; padding: 0 10px; border: 0; border-radius: 10px;
     background: #0c0c0c; color: var(--gold); font: 12px Helvetica, Arial, sans-serif; outline: none;
     box-shadow: inset 0 1px 3px #000, 0 1px rgba(255, 255, 255, .15);
   }
-  #go { flex: none; height: 17px; padding: 0 10px; font-size: 11px; justify-content: center; border-radius: 8px; }
-  #done { align-self: flex-end; flex: none; height: 26px; padding: 0 26px; margin-top: 4px; justify-content: center; color: #fff; }
+  #go { flex: none; height: 20px; padding: 0 10px; font-size: 11px; justify-content: center; border-radius: 8px; }
+  #done { flex: none; height: 26px; padding: 0 26px; justify-content: center; border-radius: 8px; color: #202020; text-shadow: none; background: linear-gradient(#e4e4e4, #a8a8a8); border-color: #666; box-shadow: 0 1px 2px rgba(0, 0, 0, .6), inset 0 1px #fff; }
 
   /* ---- Status bar ---- */
   #bar {
-    height: 34px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px;
+    height: 40px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px;
     background: linear-gradient(#333, #202020); border-top: 1px solid #666;
   }
   #throbber { width: 20px; height: 29px; flex: none; overflow: hidden; }
@@ -78,10 +81,10 @@
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
   #pill {
-    flex: 1 1 auto; min-width: 0; height: 26px; display: flex; align-items: center; gap: 10px; padding: 0 10px;
+    flex: 1 1 auto; min-width: 0; height: 30px; display: flex; align-items: center; gap: 10px; padding: 0 10px;
     background: #0c0c0c; border-radius: 8px; box-shadow: inset 0 2px 3px #000, 0 1px rgba(255, 255, 255, .15);
   }
-  #title { flex: 1; min-width: 0; color: var(--gold); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #title { flex: 1; min-width: 0; color: var(--gold); font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #msgbox { flex: 0 1 150px; min-width: 0; text-align: right; font-size: 11px; color: #9a9a9a; overflow: hidden; white-space: nowrap; }
   #msg { display: block; overflow: hidden; text-overflow: ellipsis; }
   #meter {
@@ -91,7 +94,7 @@
   #meter.on { visibility: visible; }
   #meter i { width: 5%; height: 10px; flex: none; background: linear-gradient(#f0d860, #b89820); }
   #status-box {
-    flex: none; height: 26px; display: flex; align-items: center; gap: 4px; padding: 0 5px;
+    flex: none; height: 30px; display: flex; align-items: center; gap: 4px; padding: 0 5px;
     background: #0c0c0c; border: 1px solid #555; border-radius: 3px; position: relative;
   }
   #lock-pane, #modem-pane { flex: none; display: flex; align-items: center; gap: 4px; color: #9a9a9a; font-size: 10px; }
@@ -103,13 +106,14 @@
   #modem-label:empty { display: none; }
   #modem-pane::after { content: ""; width: 20px; height: 2px; background: #1c1c1c; }
   #modem-pane.dialup::after { background: #00a500; }
-  #opts { height: 26px; padding: 0 16px; justify-content: center; border-radius: 6px; font-size: 14px; background: linear-gradient(#555, #333); }
+  #opts { height: 30px; padding: 0 16px; justify-content: center; border-radius: 6px; font-size: 14px; background: linear-gradient(#555, #333); }
 </style>
 </head>
 <body>
   <div id="panel">
     <div id="rail"><div id="tile"><div class="scale">{{LANTERN_IDLE}}</div></div><div id="rail-name">Options</div></div>
     <div id="body">
+      <div id="heading">Options</div>
       <div id="items">
         <button class="item disabled" id="back" data-cmd="back" title="Go back (Alt+Left)"><b>Back</b><span>The page before</span></button>
         <button class="item disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)"><b>Forward</b><span>The next page</span></button>
@@ -122,9 +126,11 @@
         <button class="item" data-cmd="search" title="Find on the web"><b>Find</b><span>Find on this page</span></button>
         <button class="item" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Text size and other settings"><b>Text size</b><span>Make text big or small</span></button>
         <button class="item" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Setup"><b>Setup</b><span>Adjust your box</span></button>
-        <div id="field"><label for="url">Go to</label><div id="fieldrow"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Type an address (Ctrl+L)"><button class="key" id="go" title="Go to this address">Go</button></div></div>
       </div>
-      <button class="key" id="done" data-cmd="panel" title="Close the Options panel">Done</button>
+      <div id="lower">
+        <div id="field"><label for="url">Go to</label><div id="fieldrow"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Type an address (Ctrl+L)"><button class="key" id="go" title="Go to this address">Go</button></div></div>
+        <button class="key" id="done" data-cmd="panel" title="Close the Options panel">Done</button>
+      </div>
     </div>
   </div>
   <div id="bar">

@@ -258,7 +258,7 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
         )),
         UiMode::Applet1995 => Some((
             include_str!("../../ui/chrome/applet-1995/pages.css"),
-            "#ffffff",
+            "#c0c0c0",
         )),
         UiMode::Classic1999 => Some((
             include_str!("../../ui/chrome/classic-1999/pages.css"),
