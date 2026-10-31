@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <title>Lantern Toolbar</title>
-<!-- Workstation, PC (1995): a Windows menu bar over one row of small icon
-     buttons and the URL combo, with the activity box at the right spanning
-     both rows (docs/ui-modes/modes.md). -->
+<!-- Workstation, PC (1995): a Windows 3.1 menu bar over a row of square
+     bevelled icon buttons in groups and a URL row (Stop and Go buttons, the
+     combo), with the activity box at the right spanning both rows
+     (docs/ui-modes/modes.md). -->
 <style>
   :root {
     --face: #c0c0c0;
-    --thin: inset 1px 1px #fff, inset -1px -1px #808080;
-    --thin-down: inset 1px 1px #808080, inset -1px -1px #fff;
+    --up: inset 1px 1px #fff, inset -1px -1px #808080, inset 2px 2px #dfdfdf;
+    --down: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
     --sunken: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf;
-    --raised: inset 1px 1px #fff, inset -1px -1px #000, inset 2px 2px #dfdfdf, inset -2px -2px #808080;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -27,66 +27,64 @@
     border: 0; margin: 0; padding: 0; outline: none;
   }
 
-  /* ---- Menu bar ---- */
-  #menubar { height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px; }
-  .menu { height: 18px; padding: 0 7px; background: none; }
-  .menu:hover, .menu:focus-visible { box-shadow: var(--thin); }
-  .menu:active { box-shadow: var(--thin-down); }
+  /* ---- Menu bar: white, with a black rule under it ---- */
+  #menubar { height: 20px; flex: none; display: flex; align-items: center; padding: 0 2px; background: #fff; border-bottom: 1px solid #000; }
+  .menu { height: 18px; padding: 0 10px; background: none; font-size: 13px; }
+  .menu:hover, .menu:focus-visible, .menu:active { background: #000080; color: #fff; }
 
   /* ---- Rows ---- */
-  #bands { height: 52px; flex: none; display: flex; }
+  #bands { height: 66px; flex: none; display: flex; border-top: 1px solid #fff; }
   #stack { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  #tools { height: 28px; flex: none; display: flex; align-items: center; padding: 0 4px; }
-  .row { height: 24px; flex: none; display: flex; align-items: center; padding: 0 4px; gap: 4px; }
-  .row > label, .row > .lab { width: 92px; flex: none; text-align: right; white-space: nowrap; }
+  #tools { height: 36px; flex: none; display: flex; align-items: center; padding: 0 4px; gap: 6px; }
+  .grp { display: flex; }
+  #address { height: 30px; flex: none; display: flex; align-items: center; padding: 0 4px 2px; }
 
-  /* ---- Small icon buttons ---- */
-  .tb { width: 26px; height: 26px; flex: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--thin); }
+  /* ---- Square icon buttons: black edge, white and grey bevels ---- */
+  .tb { width: 27px; height: 27px; flex: none; display: flex; align-items: center; justify-content: center; border: 1px solid #000; box-shadow: var(--up); }
+  .grp .tb + .tb { margin-left: -1px; }
   .tb svg { display: block; flex: none; }
   .tb svg.off { display: none; }
-  .tb:active:not(.disabled) { box-shadow: var(--thin-down); }
+  .tb:active:not(.disabled) { box-shadow: var(--down); }
   .tb:active:not(.disabled) svg { transform: translate(1px, 1px); }
-  .tb:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .tb:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
   .tb.disabled svg.on { display: none; }
   .tb.disabled svg.off { display: block; }
-  .sep { width: 8px; height: 26px; flex: none; }
 
-  /* ---- Title field ---- */
-  #title {
-    flex: 1; min-width: 0; height: 20px; padding: 3px 4px; background: #fff; box-shadow: var(--sunken);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-
-  /* ---- URL combo ---- */
+  /* ---- URL row ---- */
+  #address .tb + .tb { margin-left: -1px; }
   #field {
-    flex: 1; min-width: 0; height: 22px; padding: 2px; position: relative; display: flex;
+    flex: 1; min-width: 0; height: 24px; margin: 0 6px 0 4px; padding: 2px; position: relative; display: flex;
     background: #fff; box-shadow: var(--sunken);
   }
   #url {
-    flex: 1; min-width: 0; height: 18px; border: 0; margin: 0; padding: 1px 3px; outline: none;
-    background: transparent; color: #000; font: inherit; user-select: text;
+    flex: 1; min-width: 0; height: 20px; border: 0; margin: 0; padding: 2px 3px; outline: none;
+    background: transparent; color: #000; font: bold 12px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; user-select: text;
   }
   #url::selection { background: #000080; color: #fff; }
   #field svg.lock { display: none; flex: none; margin: 3px 4px 0 0; }
   #field.secure svg.lock { display: block; }
   #drop {
-    width: 16px; height: 18px; flex: none; display: flex; align-items: center; justify-content: center;
-    box-shadow: var(--raised);
+    width: 22px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center;
+    border: 1px solid #000; box-shadow: var(--up);
   }
-  #drop::before { content: ""; border: 3px solid transparent; border-top: 4px solid #000; border-bottom: 0; }
-  #drop:active { box-shadow: var(--sunken); }
+  #drop::before { content: ""; border: 4px solid transparent; border-top: 5px solid #000; border-bottom: 0; }
+  #drop:active { box-shadow: var(--down); }
 
   /* ---- Activity box ---- */
-  #act { width: 48px; flex: none; display: flex; padding: 2px 2px 2px 0; }
+  #act { width: 70px; flex: none; display: flex; padding: 3px 3px 3px 0; }
   #throbber {
     flex: 1; display: flex; align-items: center; justify-content: center;
-    background: var(--face);
+    background: var(--face); border: 1px solid #000; box-shadow: var(--up);
   }
+  #throbber:active { box-shadow: var(--down); }
   #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
   #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
   @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
   #throbber.loading svg.idle { display: none; }
   #throbber.loading .lit-box { display: block; }
+  /* The accept check is grey, like the X, as the original showed it at rest. */
+  #go svg.on { display: none; }
+  #go svg.off { display: block; }
 </style>
 </head>
 <body>
@@ -95,30 +93,47 @@
     <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu"><u>E</u>dit</button>
     <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings"><u>O</u>ptions</button>
     <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu"><u>N</u>avigate</button>
-    <button class="menu" data-cmd="menu" data-arg="hotlist" data-anchor aria-haspopup="menu">Hot<u>l</u>ist</button>
-    <button class="menu" data-cmd="menu" data-arg="annotate" data-anchor aria-haspopup="menu"><u>A</u>nnotate</button>
+    <button class="menu" data-cmd="menu" data-arg="hotlists" data-anchor aria-haspopup="menu">Hotlis<u>t</u>s</button>
     <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu"><u>H</u>elp</button>
   </div>
   <div id="bands">
     <div id="stack">
       <div id="tools">
-        <button class="tb" id="open" data-cmd="focus-url" title="Open URL (Ctrl+L)" aria-label="Open URL">{{ICON_WPC_OPEN}}</button>
-        <button class="tb disabled" id="save" title="Save As" aria-label="Save As">{{ICON_WPC_SAVE}}</button>
-        <button class="tb" id="print" data-cmd="print" title="Print (Ctrl+P)" aria-label="Print">{{ICON_WPC_PRINT}}</button>
-        <div class="sep"></div>
-        <button class="tb disabled" id="back" data-cmd="back" title="Back (Alt+Left)" aria-label="Back">{{ICON_WPC_BACK}}</button>
-        <button class="tb disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)" aria-label="Forward">{{ICON_WPC_FORWARD}}</button>
-        <button class="tb" id="reload" data-cmd="reload" title="Reload (F5)" aria-label="Reload">{{ICON_WPC_RELOAD}}</button>
-        <button class="tb disabled" id="stop" data-cmd="stop" title="Stop (Esc)" aria-label="Stop">{{ICON_WPC_STOP}}</button>
-        <button class="tb" id="home" data-cmd="home" title="Home (Alt+Home)" aria-label="Home">{{ICON_WPC_HOME}}</button>
-        <div class="sep"></div>
-        <button class="tb disabled" id="find" title="Find" aria-label="Find">{{ICON_WPC_FIND}}</button>
-        <button class="tb" id="add" data-cmd="bookmark-add" title="Add Current To Hotlist (Ctrl+D)" aria-label="Add Current To Hotlist">{{ICON_WPC_ADD}}</button>
-        <button class="tb" id="hotlist" data-cmd="bookmarks" title="Hotlist" aria-label="Hotlist">{{ICON_WPC_HOTLIST}}</button>
+        <div class="grp">
+          <button class="tb" id="open" data-cmd="focus-url" title="Open Document (Ctrl+O)" aria-label="Open Document">{{ICON_WPC_OPEN}}</button>
+          <button class="tb disabled" id="save" title="Save As (Ctrl+S)" aria-label="Save As">{{ICON_WPC_SAVE}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb" id="print" data-cmd="print" title="Print (Ctrl+P)" aria-label="Print">{{ICON_WPC_PRINT}}</button>
+          <button class="tb disabled" id="preview" title="Print Preview" aria-label="Print Preview">{{ICON_WPC_PREVIEW}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb disabled" id="copy" title="Copy (Ctrl+C)" aria-label="Copy">{{ICON_WPC_COPY}}</button>
+          <button class="tb disabled" id="paste" title="Paste (Ctrl+V)" aria-label="Paste">{{ICON_WPC_PASTE}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb disabled" id="back" data-cmd="back" title="Back (Alt+Left)" aria-label="Back">{{ICON_WPC_BACK}}</button>
+          <button class="tb disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)" aria-label="Forward">{{ICON_WPC_FORWARD}}</button>
+          <button class="tb" id="reload" data-cmd="reload" title="Reload (F5)" aria-label="Reload">{{ICON_WPC_RELOAD}}</button>
+          <button class="tb" id="home" data-cmd="home" title="Home (Alt+Home)" aria-label="Home">{{ICON_WPC_HOME}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb disabled" id="find" title="Find" aria-label="Find">{{ICON_WPC_FIND}}</button>
+          <button class="tb" id="add" data-cmd="bookmark-add" title="Add Current To Hotlist (Ctrl+D)" aria-label="Add Current To Hotlist">{{ICON_WPC_ADD}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb disabled" id="note" title="Annotate" aria-label="Annotate">{{ICON_WPC_NOTE}}</button>
+          <button class="tb disabled" id="mail" title="Send Email" aria-label="Send Email">{{ICON_WPC_MAIL}}</button>
+        </div>
+        <div class="grp">
+          <button class="tb" id="help" data-cmd="menu" data-arg="help" data-anchor title="Help" aria-label="Help">{{ICON_WPC_HELP}}</button>
+        </div>
       </div>
-      <div class="row">
-        <label for="url">Document URL:</label>
-        <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="URL (Ctrl+L)">{{ICON_LOCK}}<button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button></div>
+      <div id="address">
+        <button class="tb disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)" aria-label="Stop">{{ICON_WPC_STOP}}</button>
+        <button class="tb" id="go" title="Go to this address (Enter)" aria-label="Go">{{ICON_WPC_GO}}</button>
+        <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="URL (Ctrl+L)">{{ICON_LOCK}}</div>
+        <button id="drop" data-cmd="focus-url" title="Type an address (Ctrl+L)" aria-label="Type an address"></button>
       </div>
     </div>
     <div id="act">
