@@ -1,4 +1,4 @@
-/* An early Windows browser's home document: grey page, Times, Windows 95 controls, bulleted links. */
+/* An early desktop browser's home document: grey page, Times, 3D-bevel controls, bulleted links. */
 html { background: #c0c0c0; }
 body { padding: 8px; font: 16px "Times New Roman", Times, serif; color: #000; }
 .panel { max-width: none; margin: 0; padding: 0; background: transparent; box-shadow: none; }
@@ -22,3 +22,4 @@ ul.marks li::before { content: none; }
 ul.marks a { overflow: visible; text-overflow: clip; white-space: normal; }
 .tips { color: #000; }
 kbd { font: 14px "Courier New", Courier, monospace; padding: 0; background: transparent; box-shadow: none; }
+button { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; }

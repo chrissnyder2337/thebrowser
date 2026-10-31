@@ -296,8 +296,13 @@ pub fn home_uri(bookmarks: &[Bookmark], mode: UiMode) -> String {
     }
     let mut vars = common_vars();
     vars.push(("BOOKMARK_LIST", list));
-    vars.push(("MODE_STYLE", mode_files(mode).home.unwrap_or("").to_owned()));
-    html_uri(&fill(HOME_HTML, &vars))
+    let mut html = fill(HOME_HTML, &vars);
+    // After the page's own styles, so the mode's sheet wins. It's compiled
+    // in, not filled, so it never meets user text.
+    if let Some(css) = mode_files(mode).home {
+        html = html.replacen("</head>", &format!("<style>\n{css}</style>\n</head>"), 1);
+    }
+    html_uri(&html)
 }
 
 fn bookmark_rows(bookmarks: &[Bookmark]) -> String {

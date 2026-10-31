@@ -160,8 +160,8 @@ Home, Reload, Stop), status text and the activity box.
 Modelled on HotJava 1.x–3 (screenshot in the catalog). Menu bar; icon
 buttons with small labels (Back, Forward, Home, Reload, Stop, Search,
 Print); activity box at the right; Address row; plain status bar.
-**Pages** (both Applet modes): white page, sans-serif text (Dialog), as in
-the catalog screenshot. Era look: none yet.
+**Pages**: white page, sans-serif text (Dialog), as in the catalog
+screenshot (the 1995 alpha drew a grey page, Times). Era look: none yet.
 **Fidelity** (reviewer verdict PASS after 3 rounds, against a screenshot of the original or, where none exists, its documentation): left as they are: lantern; XP-theme menu strip in the reference out of scope.
 
 ## Set-top TV family
