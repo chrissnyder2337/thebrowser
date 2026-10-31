@@ -4,7 +4,8 @@
 //! Playwright suite in tests/web can use them without CEF. Every UI mode's
 //! chrome pages go to `toolbar-<mode>.html` and `status-<mode>.html`, with
 //! the modes' keys and view heights in `ui-modes.json`, and each mode's page
-//! defaults script to `mode-pages-<mode>.js` (`mode-pages-off.js` removes them).
+//! defaults script to `mode-pages-<mode>.js` (`mode-pages-off.js` removes them),
+//! and each scrollbar style's script to `scrollbars-<style>.js`.
 //!
 //! Usage: `LD_LIBRARY_PATH="$CEF_PATH" cargo run --example dump-pages -- <dir>`
 //!
@@ -135,6 +136,10 @@ fn main() -> ExitCode {
             ),
             ("menus", keys(menus::bar_keys(mode))),
             ("uiMenus", keys(menus::browser_ui_keys(mode))),
+            (
+                "scrollbars",
+                Json::str(ui_mode::scrollbars(mode).map_or("", |(style, _)| style)),
+            ),
         ]));
     }
     let (cef, chromium) = pages::cef_versions();
@@ -178,7 +183,18 @@ fn main() -> ExitCode {
         if let Some(script) = ui_mode::page_defaults_script(&settings) {
             scripts.push((format!("mode-pages-{}.js", mode.key()), script));
         }
+        // One script per scrollbar style, named after the style.
+        if let Some((style, _)) = ui_mode::scrollbars(mode) {
+            let name = format!("scrollbars-{style}.js");
+            if !scripts.iter().any(|(n, _)| *n == name) {
+                scripts.push((name, ui_mode::scrollbars_script(mode)));
+            }
+        }
     }
+    scripts.push((
+        "scrollbars-off.js".to_owned(),
+        ui_mode::scrollbars_script(UiMode::Lantern),
+    ));
     for (name, script) in scripts {
         let path = dir.join(name);
         if let Err(err) = fs::write(&path, script) {

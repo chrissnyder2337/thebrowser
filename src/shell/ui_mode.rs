@@ -267,6 +267,54 @@ fn page_defaults(mode: UiMode) -> Option<(&'static str, &'static str)> {
     }
 }
 
+const SCROLLBARS_JS: &str = include_str!("../../ui/chrome/scrollbars.js");
+
+/// The scrollbars a mode's browser drew (`ui/chrome/scrollbars/<style>.css`):
+/// its era's toolkit, or none for the text terminals and TV boxes. Lantern
+/// keeps the system's.
+pub fn scrollbars(mode: UiMode) -> Option<(&'static str, &'static str)> {
+    macro_rules! style {
+        ($name:literal) => {
+            Some((
+                $name,
+                include_str!(concat!("../../ui/chrome/scrollbars/", $name, ".css")),
+            ))
+        };
+    }
+    match mode {
+        UiMode::Lantern => None,
+        UiMode::Workstation1993
+        | UiMode::Workstation1996
+        | UiMode::Applet1995
+        | UiMode::Suite1997 => style!("motif"),
+        UiMode::WorkstationPc1995
+        | UiMode::Desktop1995
+        | UiMode::Desktop1996
+        | UiMode::Desktop1997
+        | UiMode::Desktop1999
+        | UiMode::Toolbar1995
+        | UiMode::Toolbar1996
+        | UiMode::Applet1997
+        | UiMode::Workspace1997 => style!("win95"),
+        UiMode::Pc1993 => style!("win31"),
+        UiMode::Classic1992 => style!("mac1bit"),
+        UiMode::Classic1994 => style!("system7"),
+        UiMode::Classic1999 => style!("platinum"),
+        UiMode::Cube1990 => style!("next"),
+        UiMode::Dos1996 => style!("dos"),
+        UiMode::Terminal1992 | UiMode::Terminal1999 | UiMode::Tv1996 | UiMode::Tv1997 => {
+            style!("none")
+        }
+    }
+}
+
+/// Script that gives a content frame's page the mode's scrollbars, or takes
+/// them out (an empty sheet).
+pub fn scrollbars_script(mode: UiMode) -> String {
+    let css = scrollbars(mode).map_or("", |(_, css)| css);
+    format!("{}({});", SCROLLBARS_JS.trim_end(), js_string(css))
+}
+
 /// Script that puts the mode's browser defaults under a content frame's page
 /// (`ui/chrome/page-defaults.js`), or takes them out. None when there's
 /// nothing to put in, so loads skip it.
@@ -416,6 +464,22 @@ pub fn relayout() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_mode_but_lantern_has_its_scrollbars() {
+        for mode in UiMode::ALL {
+            assert_eq!(
+                scrollbars(mode).is_some(),
+                mode != UiMode::Lantern,
+                "{mode:?}"
+            );
+            if let Some((_, css)) = scrollbars(mode) {
+                assert!(css.contains("::-webkit-scrollbar"), "{mode:?}");
+            }
+        }
+        // Lantern's script takes the sheet back out.
+        assert!(scrollbars_script(UiMode::Lantern).ends_with(r#"("");"#));
+    }
 
     #[test]
     fn page_defaults_follow_the_setting() {

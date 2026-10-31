@@ -1,0 +1,6 @@
+/* No scrollbars (ui/chrome/scrollbars/): text terminals and TV set-top boxes had none; pages still scroll.
+   Adopted into every content frame by scrollbars.js; !important so a
+   site's own scrollbar styles don't win, and the standard scrollbar-color
+   and scrollbar-width are reset so these pseudo-elements apply. */
+* { scrollbar-color: auto !important; scrollbar-width: auto !important; }
+::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }

@@ -206,6 +206,19 @@ menus):
 - **Modes that need their look.** A text terminal can't show a modern page,
   so for modes where `UiMode::needs_era_look()` is true the default
   `defaults` setting gives the era look too; `as-is` still turns it off.
+### Scrollbars
+
+Scrollbars belong to the browser, not the page, so each mode draws its era's
+(`ui/chrome/scrollbars/<style>.css`, mapped in `ui_mode::scrollbars`):
+Windows 3.1 and 95, Motif, one-bit Mac, System 7, Platinum, NeXT (both
+arrows at the far end), DOS VGA, and none for the text terminals and TV
+boxes. `ui/chrome/scrollbars.js` adopts the sheet into every content frame
+when it starts and finishes loading and when the mode changes, last and with
+`!important`, so a site's own scrollbar styles don't win; it also resets the
+standard `scrollbar-color` and `scrollbar-width`, which would otherwise turn
+the `::-webkit-scrollbar` rules off. Lantern keeps the system's.
+`scrollbars.spec.js` has a golden per style.
+
 ### Shortcut
 
 **Ctrl+Shift+M** (Cmd+Shift+M on macOS) opens the Browser UI menu at the top

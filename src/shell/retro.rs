@@ -107,6 +107,9 @@ pub fn on_load_start(frame: &Frame) {
         return;
     }
     let settings = with_shell(|shell| shell.settings);
+    if ui_mode::scrollbars(settings.ui_mode).is_some() {
+        run(frame, &ui_mode::scrollbars_script(settings.ui_mode));
+    }
     if settings.page_look() != RetroStyle::Off {
         run(frame, &style_script(settings.page_look()));
     }
@@ -132,6 +135,10 @@ pub fn on_load_end(frame: &Frame) {
     if is_internal(&frame_url(frame)) {
         return;
     }
+    // Again once loaded: the document may have been replaced since the start.
+    if ui_mode::scrollbars(settings.ui_mode).is_some() {
+        run(frame, &ui_mode::scrollbars_script(settings.ui_mode));
+    }
     // Only once loaded: whether the page has style sheets of its own decides.
     if let Some(script) = ui_mode::page_defaults_script(&settings) {
         run(frame, &script);
@@ -151,6 +158,7 @@ pub fn refresh() {
         true,
     );
     run_in_content(&style_script(settings.page_look()), true);
+    run_in_content(&ui_mode::scrollbars_script(settings.ui_mode), true);
     if !settings.splash_intro {
         run_in_content(REMOVE_SPLASH, false);
     }
