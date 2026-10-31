@@ -1,42 +1,47 @@
-# The menu bar of an early Java-toolkit browser on Windows, 1996.
+# The menu bar of the first Java-toolkit browser on a Motif workstation, 1995.
 menu File
-- New Window
-open-url Open Location...
-- Open File...
-- Save As...
----
+open-url Open...
+reload Reload
 print Print...
+view-source View Source...
 ---
-close-window Close
-- Exit
-menu Edit
-- Cut
-- Copy
-- Paste
+close-window Quit
+menu Options
+- Security...
+settings Properties...
 ---
-search Find...
+- Underline Anchors
+- Delay image/applet loading
 ---
-settings Preferences...
+- Flush Cache
+- Progress Monitor
+---
 retro Retro looks
 browser-ui Browser UI
-menu View
-reload Reload
-stop Stop
----
-view-source Page Source
-zoom-in Larger Text
-zoom-out Smaller Text
-zoom-reset Normal Text
-menu Places
-back Back
+menu Navigate
 forward Forward
+back Back
 home Home
 ---
 - History...
-add-bookmark Add to Bookmarks
-bookmarks Bookmarks...
-menu Help
-- Help Contents
-- Release Notes
+add-bookmark Add Current to Hotlist
+bookmarks Show Hotlist
+menu Goto
+add-bookmark Add Current
 ---
+bookmarks Goto List...
+menu Help
+- README
+- Copyright Notice
 about About...
+- Using the Browser
+- Latest Info
+- Demos
+- Meet the People
+---
+- Submit a Bug Report
+- Register
+---
+- Documentation
+- How to Search the Documentation
+- Search Documentation...

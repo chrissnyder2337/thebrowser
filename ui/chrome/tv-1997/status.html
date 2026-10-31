@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <title>Lantern Status</title>
 <!-- Set-top TV (1997): the same charcoal-and-gold bar as 1996 (title, progress,
-     Options key); with html.panel-open the Options panel grows above it: a
-     stack of main keys on the left, a row of pictogram tiles on the right, a
-     "Now showing" screen and the Go to field (docs/ui-modes/modes.md). -->
+     Options key); with html.panel-open the Options panel grows above it in the
+     style of a set-top Setup screen: a maroon rail with the lantern tile and the
+     panel name, three columns of heading-and-description items, a Done key
+     (docs/ui-modes/modes.md). -->
 <style>
   :root { --gold: #e1c433; }
   * { box-sizing: border-box; }
@@ -29,35 +30,40 @@
   .key:active:not(.disabled):not(.inert) { transform: translateY(1px); box-shadow: 0 1px 1px rgba(0, 0, 0, .6); }
   .key:focus-visible { outline: 2px solid var(--gold); outline-offset: 0; }
   .key.disabled, .key.inert { color: #77704a; background: linear-gradient(#4a4a4a, #383838 50%, #2e2e2e); box-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
-  .key svg { flex: none; width: 16px; height: 16px; }
-  .key svg.off, .key.disabled svg.on, .key.inert svg.on { display: none; }
-  .key.disabled svg.off, .key.inert svg.off { display: block; }
 
-  /* ---- Options panel (closed by default) ---- */
-  #panel {
-    display: none; flex: 1; min-height: 0; padding: 6px 12px;
-    background: linear-gradient(#2a2a2a, #202020); border-top: 1px solid #666;
+  /* ---- Options panel (closed by default): a Setup-screen look ---- */
+  #panel { display: none; flex: 1; min-height: 0; border-top: 1px solid #666; background: #3a4048; }
+  html.panel-open #panel { display: flex; }
+  #rail {
+    width: 78px; flex: none; position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 10px;
+    background: linear-gradient(#80606b, #6c4c58); box-shadow: inset -2px 0 3px rgba(0, 0, 0, .35);
   }
-  html.panel-open #panel { display: grid; }
-  #panel { grid-template-columns: 150px 1fr; grid-template-rows: repeat(6, 24px); gap: 3px 12px; align-content: center; }
-  #stack { grid-column: 1; grid-row: 1 / 7; display: grid; grid-template-rows: repeat(6, 24px); gap: 3px; }
-  #stack .key { padding: 0 10px; }
-  #tiles { grid-column: 2; grid-row: 1 / 3; display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }
-  #tiles .key { flex-direction: column; justify-content: center; gap: 3px; padding: 0 1px; font-size: 11px; }
-  #screen {
-    grid-column: 2; grid-row: 3 / 6; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 0 14px; min-width: 0;
-    background: #0c0c0c; border-radius: 8px; box-shadow: inset 0 2px 4px #000, 0 1px rgba(255, 255, 255, .15);
+  #tile {
+    width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; overflow: hidden;
+    background: linear-gradient(#59525c, #2a252d); box-shadow: 0 2px 3px rgba(0, 0, 0, .5), inset 0 1px rgba(255, 255, 255, .25);
   }
-  #screen small { font-size: 11px; color: #9a9a9a; }
-  #screen b { font-size: 16px; color: var(--gold); font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #field { grid-column: 2; grid-row: 6; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  #tile .scale { width: 32px; height: 48px; transform: scale(.85); }
+  #rail-name {
+    position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 28px; font-weight: bold; color: #a27d89;
+    writing-mode: vertical-rl; transform: rotate(180deg); line-height: 78px; height: 100px; text-shadow: 0 1px #4e3640;
+  }
+  #body { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 8px 18px 8px 16px; background: linear-gradient(#454c55, #343a42); }
+  #items { flex: 1; min-height: 0; display: grid; grid-template-rows: repeat(4, 1fr); grid-auto-flow: column; grid-auto-columns: 1fr; column-gap: 14px; }
+  .item { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; text-align: left; }
+  .item b { color: #44cfd8; font-size: 14px; line-height: 15px; white-space: nowrap; }
+  .item span { color: #fff; font-size: 11px; line-height: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item:hover:not(.disabled):not(.inert), .item:focus-visible, #field:focus-within { border-color: #f2d21c; }
+  .item.disabled, .item.inert { opacity: .42; }
+  #field { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 0 6px; border: 2px solid transparent; border-radius: 6px; }
+  #field label { color: #44cfd8; font-size: 14px; font-weight: bold; line-height: 14px; }
+  #fieldrow { display: flex; align-items: center; gap: 6px; }
   #url {
-    flex: 1; min-width: 0; height: 24px; padding: 0 12px; border: 0; border-radius: 12px;
-    background: #0c0c0c; color: var(--gold); font: 14px Helvetica, Arial, sans-serif; outline: none;
-    box-shadow: inset 0 2px 4px #000, 0 1px rgba(255, 255, 255, .15);
+    flex: 1; min-width: 0; height: 17px; padding: 0 8px; border: 0; border-radius: 8px;
+    background: #0c0c0c; color: var(--gold); font: 12px Helvetica, Arial, sans-serif; outline: none;
+    box-shadow: inset 0 1px 3px #000, 0 1px rgba(255, 255, 255, .15);
   }
-  #url:focus { outline: 2px solid var(--gold); }
-  #go { flex: none; height: 24px; padding: 0 20px; justify-content: center; }
+  #go { flex: none; height: 17px; padding: 0 10px; font-size: 11px; justify-content: center; border-radius: 8px; }
+  #done { align-self: flex-end; flex: none; height: 26px; padding: 0 26px; margin-top: 4px; justify-content: center; color: #fff; }
 
   /* ---- Status bar ---- */
   #bar {
@@ -102,27 +108,24 @@
 </head>
 <body>
   <div id="panel">
-    <div id="stack">
-      <button class="key disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_T97_BACK}}Back</button>
-      <button class="key disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_T97_FORWARD}}Forward</button>
-      <button class="key" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_T97_HOME}}Home</button>
-      <button class="key" data-cmd="search" title="Search the web">{{ICON_T97_SEARCH}}Search</button>
-      <button class="key" data-cmd="bookmarks" title="Favorites">{{ICON_T97_FAVORITES}}Favorites</button>
-      <button class="key" data-cmd="focus-url" title="Type an address (Ctrl+L)">{{ICON_T97_GOTO}}Go to</button>
+    <div id="rail"><div id="tile"><div class="scale">{{LANTERN_IDLE}}</div></div><div id="rail-name">Options</div></div>
+    <div id="body">
+      <div id="items">
+        <button class="item disabled" id="back" data-cmd="back" title="Go back (Alt+Left)"><b>Back</b><span>The page before</span></button>
+        <button class="item disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)"><b>Forward</b><span>The next page</span></button>
+        <button class="item" id="home" data-cmd="home" title="Go to the start page (Alt+Home)"><b>Home</b><span>Your start page</span></button>
+        <button class="item" id="reload" data-cmd="reload" title="Reload this page (F5)"><b>Reload</b><span>Load this page again</span></button>
+        <button class="item disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)"><b>Stop</b><span>Stop loading</span></button>
+        <button class="item" data-cmd="search" title="Search the web"><b>Search</b><span>Find on the Web</span></button>
+        <button class="item" data-cmd="bookmarks" title="Favorites"><b>Favorites</b><span>Your saved pages</span></button>
+        <button class="item" data-cmd="bookmark-add" title="Save this page as a favorite (Ctrl+D)"><b>Save</b><span>Save to Favorites</span></button>
+        <button class="item" data-cmd="search" title="Find on the web"><b>Find</b><span>Find on this page</span></button>
+        <button class="item" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Text size and other settings"><b>Text size</b><span>Make text big or small</span></button>
+        <button class="item" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Setup"><b>Setup</b><span>Adjust your box</span></button>
+        <div id="field"><label for="url">Go to</label><div id="fieldrow"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Type an address (Ctrl+L)"><button class="key" id="go" title="Go to this address">Go</button></div></div>
+      </div>
+      <button class="key" id="done" data-cmd="panel" title="Close the Options panel">Done</button>
     </div>
-    <div id="tiles">
-      <button class="key" data-cmd="bookmark-add" title="Save this page as a favorite (Ctrl+D)">{{ICON_T97_SAVE}}Save</button>
-      <button class="key inert" title="Not available">{{ICON_T97_SEND}}Send</button>
-      <button class="key inert" title="Not available">{{ICON_T97_INFO}}Info</button>
-      <button class="key" data-cmd="search" title="Find on the web">{{ICON_T97_FIND}}Find</button>
-      <button class="key" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Text size and other settings">{{ICON_T97_TEXTSIZE}}Text size</button>
-      <button class="key inert" title="Not available">{{ICON_T97_PRINT}}Print</button>
-      <button class="key" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_T97_RELOAD}}Reload</button>
-      <button class="key disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_T97_STOP}}Stop</button>
-      <button class="key" data-cmd="menu" data-arg="setup" data-anchor aria-haspopup="menu" title="Setup">{{ICON_T97_SETUP}}Setup</button>
-    </div>
-    <div id="screen"><small>Now showing</small><b data-title></b></div>
-    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off" title="Type an address (Ctrl+L)"><button class="key" id="go" title="Go to this address">Go</button></div>
   </div>
   <div id="bar">
     <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern"><div class="scale">{{LANTERN_IDLE}}<div class="lit-box">{{LANTERN_LIT}}</div></div></div>

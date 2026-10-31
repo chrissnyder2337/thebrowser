@@ -3,37 +3,90 @@
 <head>
 <meta charset="utf-8">
 <title>Lantern Status</title>
-<!-- Applet browser (1995): a thin quiet strip under the page; the status text
-     itself sits in the toolbar's last line (docs/ui-modes/modes.md). -->
+<!-- Applet browser (1995): a row of icon-only round buttons under the page
+     (Back, Forward, Home, Reload, Stop) with the activity box at the right,
+     then the status line (docs/ui-modes/modes.md). -->
 <style>
-  :root { --face: #d6d6d6; }
+  :root {
+    --face: #b8b8b8;
+    --up: inset 1px 1px #e6e8f0, inset -1px -1px #5c6074, inset 2px 2px #d0d3e0, inset -2px -2px #868aa0;
+    --down: inset 1px 1px #5c6074, inset -1px -1px #e6e8f0, inset 2px 2px #868aa0, inset -2px -2px #d0d3e0;
+  }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100vh; overflow: hidden; user-select: none;
     background: var(--face); color: #000;
-    font: 11px Arial, "Liberation Sans", Helvetica, sans-serif;
+    font: 13px Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
     cursor: default;
   }
-  body { display: flex; align-items: center; justify-content: flex-end; gap: 3px; padding: 0 3px; border-top: 1px solid #404040; }
-  .pane { height: 16px; flex: none; display: flex; align-items: center; padding: 0 4px; }
-  #modem-pane { gap: 4px; }
-  #modem-pane svg { height: 11px; width: auto; }
+  body { display: flex; flex-direction: column; box-shadow: inset 0 1px #e6e8f0; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Button row ---- */
+  #tools { height: 56px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  .ib {
+    width: 36px; height: 36px; flex: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 1px #505050, inset 0 0 0 3px #d8d8d8, inset 0 0 0 5px #707070, inset 1px 1px 0 5px #fff;
+  }
+  .ib:active:not(.disabled) { box-shadow: 0 0 0 1px #505050, inset 0 0 0 3px #707070, inset 0 0 0 5px #d8d8d8, inset -1px -1px 0 5px #fff; }
+  .ib:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+  .ib svg.off { display: none; }
+  .ib.disabled svg.on { display: none; }
+  .ib.disabled svg.off { display: block; }
+  #spacer { flex: 1; }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 44px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--down);
+  }
+  #throbber .lit-box { width: 32px; height: 48px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  /* ---- Status line ---- */
+  #line { height: 26px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 6px 3px; }
+  .pane { height: 22px; flex: none; display: flex; align-items: center; padding: 0 6px; box-shadow: var(--down); }
+  #text { flex: 1; min-width: 0; }
+  #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #modem-pane { gap: 5px; }
   #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
   #modem-pane.dialup svg.on { display: block; }
   #modem-label { white-space: nowrap; }
-  #meter-pane { width: 80px; padding: 3px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
-  #meter { width: 100%; height: 8px; display: flex; gap: 1px; visibility: hidden; }
+  #meter-pane { width: 100px; padding: 3px 4px; }
+  #meter { width: 100%; height: 12px; display: flex; gap: 1px; visibility: hidden; }
   #meter.on { visibility: visible; }
-  #meter i { width: 6px; height: 8px; flex: none; background: #000080; }
-  #lock-pane { width: 20px; justify-content: center; padding: 0; }
-  #lock-pane svg { display: none; height: 11px; width: auto; }
+  #meter i { width: 8px; height: 12px; flex: none; background: #3a2ca8; }
+  #lock-pane { width: 26px; justify-content: center; padding: 0; }
+  #lock-pane svg { display: none; }
   #lock-pane.secure svg { display: block; }
 </style>
 </head>
 <body>
-  <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
-  <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
-  <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>
+  <div id="tools">
+    <button class="ib disabled" id="back" data-cmd="back" title="Back (Alt+Left)">{{ICON_A95_BACK}}</button>
+    <button class="ib disabled" id="forward" data-cmd="forward" title="Forward (Alt+Right)">{{ICON_A95_FORWARD}}</button>
+    <button class="ib" id="home" data-cmd="home" title="Home (Alt+Home)">{{ICON_A95_HOME}}</button>
+    <button class="ib" id="reload" data-cmd="reload" title="Reload (F5)">{{ICON_A95_RELOAD}}</button>
+    <button class="ib disabled" id="stop" data-cmd="stop" title="Stop (Esc)">{{ICON_A95_STOP}}</button>
+    <span id="spacer"></span>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+  <div id="line">
+    <div class="pane" id="text"><span id="msg">Done</span></div>
+    <div class="pane" id="meter-pane" title="Progress"><div id="meter" data-blocks="10"></div></div>
+    <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
+    <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>
+  </div>
 <script>
 {{CHROME_JS}}
 </script>
