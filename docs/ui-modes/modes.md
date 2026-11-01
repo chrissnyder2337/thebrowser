@@ -186,7 +186,7 @@ with the panel's name written up it, a big heading, two columns of teal
 items over white descriptions (Back, Forward, Home, Reload, Stop, Search,
 Favorites, Save, Find, Text size, Setup), a yellow focus box, a Go to row
 and a Done key. Choosing an item closes the panel.
-**Fidelity** (reviewer verdict PASS after 4 rounds, against screenshots of the Plus home screen and Setup page): left as they are: Go to row and greyed items (the original had neither); lock and modem panes in the bar; lantern.
+**Fidelity** (reviewer verdict PASS after 5 rounds, the full-screen panel against the Plus Setup page and the bar against the Plus home screen): left as they are: Go to row and greyed items (the original had neither); text without a dark outline; lock and modem panes in the bar; lantern. Start page: PASS.
 
 ## More families
 
