@@ -26,6 +26,9 @@ Update the tables below in the same commit as the work they describe.
 | 5b. Page styles | Each mode's browser defaults under pages, and its era look on request (`mode_pages`) | Done |
 | 6. Settings page | A Browser UI section (mode, page styles) and every retro look; new settings goldens (approved by the maintainer) | Done |
 | 7. Layout extras | `ui_mode::Layout`: hidden views, a side view, a frame view over the page, an inset border, the status view's expanding panel; menu bars from `menus.txt` | Done |
+| 7b. Scrollbars | Each mode's era scrollbars on pages (`ui/chrome/scrollbars/`) | Done |
+| 7c. Start pages | Each mode's look for the start page (`ui/chrome/<mode>/home.css`), reviewed for every mode | Done |
+| 7d. Full-screen panel | `full_panel`: the Set-top TV (1997) Options panel takes the window, like the original's Setup page | Done |
 | 8. More modes | See below. Each mode's pages and icons are drafted by a subagent from the brief, wired in and tested, then compared with a screenshot of the original by a separate reviewer until it passes | Done |
 
 ## Modes
