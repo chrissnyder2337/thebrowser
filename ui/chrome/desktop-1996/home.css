@@ -23,3 +23,10 @@ ul.marks a { overflow: visible; text-overflow: clip; white-space: normal; }
 .tips { color: #000; font-size: 14px; }
 kbd { font: 13px "Courier New", Courier, monospace; padding: 0; background: transparent; box-shadow: none; }
 button { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; }
+
+/* A plain page: bold Times headings, no banner or panels. */
+.head { margin: 0 0 8px; padding: 0; background: none; border: 0; color: inherit; justify-content: flex-start; text-align: left; flex-direction: row; }
+.head h1, .head p, h1 small { color: #000; }
+fieldset { margin: 12px 0 0; padding: 0; border: 0; background: none; box-shadow: none; }
+legend { position: static; display: block; padding: 0; margin: 0 0 6px; background: none; color: #000; font: bold 24px "Times New Roman", Times, serif; }
+p { text-align: left; }
