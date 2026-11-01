@@ -119,6 +119,9 @@ tests/smoke.sh                  bundle smoke test under xvfb-run
 .claude/skills/release/         Claude Code skill for cutting and debugging releases
 .claude/skills/steward/         Claude Code skill: conventions for getting PRs merged
 .claude/skills/retro-look/      Claude Code skill: changing or adding a retro look, with tests
+.claude/skills/chrome-command/  Claude Code skill: adding a toolbar or status-bar command end to end
+.claude/skills/cef-upgrade/     Claude Code skill: moving to a new CEF / `cef` crate release
+.claude/skills/factory-issue/   Claude Code skill: taking a factory:ready issue from plan to PR
 ```
 
 Notes for Claude Code sessions are in [CLAUDE.md](../CLAUDE.md).

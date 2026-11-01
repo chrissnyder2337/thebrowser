@@ -193,6 +193,15 @@ pub fn normalize_url_input(input: &str) -> Option<String> {
     Some(search_url(text))
 }
 
+/// Whether Chromium can parse `url`. CEF's `LoadURL` drops a URL it can't
+/// parse without any load error, so the URL bar would show the text and
+/// nothing would happen. Uses CEF's own parser (GURL), so it needs ICU for
+/// non-ASCII hosts: call it once CEF is initialized.
+pub fn is_loadable_url(url: &str) -> bool {
+    let mut parts = Urlparts::default();
+    parse_url(Some(&CefString::from(url)), Some(&mut parts)) != 0
+}
+
 pub fn search_url(query: &str) -> String {
     format!("https://duckduckgo.com/?q={}", encode_component(query))
 }
@@ -290,6 +299,30 @@ mod tests {
             normalize_url_input("lanterns").as_deref(),
             Some("https://duckduckgo.com/?q=lanterns")
         );
+    }
+
+    #[test]
+    fn loadable_urls() {
+        // ASCII only: tests don't initialize CEF, so ICU isn't loaded.
+        for bad in [
+            "http://[::1",
+            "http:[::1",
+            "https://[nope]/",
+            "http://a:99999/",
+        ] {
+            assert!(!is_loadable_url(bad), "{bad}");
+        }
+        for good in [
+            "http://[::1]:80/",
+            "https://example.com",
+            "http:///example.com",
+            "about:blank",
+            "data:text/html,<b>[</b>",
+            "file:///tmp/a%20b.html",
+            "view-source:https://example.com",
+        ] {
+            assert!(is_loadable_url(good), "{good}");
+        }
     }
 
     #[test]
