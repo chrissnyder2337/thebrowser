@@ -21,3 +21,7 @@ ul.marks a { white-space: normal; }
 hr { border: 0; border-top: 1px solid #000; margin: 14px 0 10px; }
 .tips { color: #000; }
 kbd { background: none; box-shadow: none; border: 1px solid #000; padding: 0 3px; }
+
+/* No form boxes then: sections are bold headings. */
+fieldset { margin: 12px 0 0; padding: 0; border: 0; background: none; box-shadow: none; }
+legend { position: static; display: block; padding: 0; margin: 0 0 6px; background: none; font: bold 14px Chicago, ChicagoFLF, Charcoal, Geneva, Helvetica, Arial, sans-serif; }

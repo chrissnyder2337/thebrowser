@@ -30,3 +30,6 @@ ul.marks a { white-space: normal; overflow: visible; }
 hr { border: 0; height: 0; margin: 14px 0; background: none; border-top: 1px solid #000; }
 .tips { color: #000; }
 kbd { font: 12px Courier, "Courier New", monospace; padding: 0 2px; background: none; box-shadow: none; border: 1px solid #000; }
+
+/* Document windows were mid-grey. */
+html, body { background: #aaa; }

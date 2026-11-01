@@ -17,3 +17,13 @@ ul.marks li::before { background: #666699; box-shadow: none; }
 hr { border: 0; border-top: 1px solid #999; margin: 14px 0; }
 .tips { color: #333; }
 kbd { font: bold 12px Arial, Helvetica, sans-serif; background: #ccc; box-shadow: inset 1px 1px #fff, inset -1px -1px #999; }
+
+/* Plain headings and a black rule, as the page area drew them. */
+.head { gap: 14px; padding-bottom: 0; margin-bottom: 12px; border-bottom: 0; }
+h1 { font: bold 26px Arial, Helvetica, sans-serif; color: #000; }
+h1 small { font: 12px Arial, Helvetica, sans-serif; color: #000; }
+a { color: #0000ee; } a:visited { color: #551a8b; }
+fieldset { margin: 12px 0 0; padding: 0; border: 0; background: none; box-shadow: none; }
+legend { position: static; display: block; padding: 0; margin: 0 0 6px; background: none; color: #000; font: bold 16px Arial, Helvetica, sans-serif; }
+hr { border: 0; border-top: 1px solid #000; margin: 14px 0; }
+ul.marks li::before { background: #000; box-shadow: none; }
