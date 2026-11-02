@@ -5,7 +5,7 @@ how the browser is put together, see [architecture.md](architecture.md).
 
 ## Building and running
 
-Lantern pins `cef = "=154.5.0"` (CEF 154.0.34, Chromium 154.0.8037.98). The
+Lantern pins `cef = "=156.3.0"` (CEF 156.0.15, Chromium 156.0.8078.80). The
 generated bindings track a specific CEF release, so upgrade the pin and the CEF
 binaries together.
 
@@ -29,7 +29,7 @@ On Windows (PowerShell) use `$env:USERPROFILE/.local/share/cef` and
 Install the version that matches the pinned crate:
 
 ```sh
-cargo install cef --version "=154.5.0" --bin bundle-cef-app --locked
+cargo install cef --version "=156.3.0" --bin bundle-cef-app --locked
 ```
 
 ### 3. Build and run

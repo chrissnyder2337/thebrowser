@@ -14,7 +14,7 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   # Must match the `cef` pin in Cargo.toml.
-  CEF_CRATE_VERSION: "154.5.0"
+  CEF_CRATE_VERSION: "156.3.0"
 
 jobs:
   mutant:
