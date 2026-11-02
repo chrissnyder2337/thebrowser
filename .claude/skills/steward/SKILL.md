@@ -133,6 +133,15 @@ rewrite them to pass.
   `Oracle override (maintainer approval)` job, which waits on the `oracle`
   GitHub Environment until the maintainer approves it. A label or a
   workflow input never skips it, and the guard isn't edited to pass.
+- **Point the maintainer at the run.** Approval happens on the waiting CI
+  run's page: **Review deployments**, tick **oracle**, then **Approve and
+  deploy**. Give them that run's link, and list every changed golden and
+  assertion in the PR description.
+- **Design around the oracle where you can.** Adding an entry to an existing
+  test's list, such as a new template placeholder in a test that names them
+  all, changes an existing assertion. Prefer a design that doesn't need it.
+  After `--update-snapshots`, check `git status` for existing goldens you
+  didn't mean to touch.
 
 ## Before every push
 
@@ -150,6 +159,10 @@ for t in x86_64-apple-darwin x86_64-pc-windows-msvc; do
   CARGO_TARGET_DIR=target/xcheck cargo check --target "$t" --features cef/dox --bins --lib
 done
 ```
+
+When you pipe a check into `grep` or `tail`, run it under `set -o pipefail`,
+or chain with `&&` only on the check itself. Otherwise a failing test's exit
+status is lost and the next command, a commit or a push, runs anyway.
 
 Then the web-layer and bundle tests:
 
@@ -277,7 +290,11 @@ release publish.
 
 ## Pull request descriptions
 
-Use **Why** (when it isn't obvious), **Changes**, and **Testing**. Testing
+Use **Why** (when it isn't obvious), **Changes**, and **Testing**. Name the
+commit the testing ran on, and update the description when later pushes
+change what it says. Before calling a PR done, check that GitHub reports it
+mergeable. If `main` has moved and conflicts, merge `main` in, resolve, and
+run the checks again on the merge. Testing
 lists what was actually run and what it showed: commands, pages, numbers,
 screenshots checked. Don't claim anything you didn't run, and say plainly
 what wasn't tested, e.g. "type-checked for macOS and Windows, not run there".
