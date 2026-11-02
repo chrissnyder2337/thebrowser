@@ -1,14 +1,14 @@
 diff --git a/src/shell/pages.rs b/src/shell/pages.rs
-index 47f0a97..a37896c 100644
+index f59ae52..32315af 100644
 --- a/src/shell/pages.rs
 +++ b/src/shell/pages.rs
-@@ -120,7 +120,8 @@ pub fn toolbar_uri() -> String {
-         ));
-     });
-     let vars: Vec<(&str, String)> = vars.iter().map(|(k, v)| (k.as_str(), v.clone())).collect();
--    html_uri(&fill(TOOLBAR_HTML, &vars))
-+    let _ = fill(TOOLBAR_HTML, &vars);
+@@ -242,7 +242,8 @@ fn fill_chrome(template: &str) -> String {
+ }
+ 
+ pub fn toolbar_uri(mode: UiMode) -> String {
+-    fill_chrome(mode_files(mode).toolbar)
++    let _ = fill_chrome(mode_files(mode).toolbar);
 +    html_uri("<!doctype html><title>toolbar</title><body></body>")
  }
  
- pub fn status_uri() -> String {
+ pub fn status_uri(mode: UiMode) -> String {

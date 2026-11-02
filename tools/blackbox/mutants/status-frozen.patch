@@ -1,12 +1,12 @@
-diff --git a/ui/status.html b/ui/status.html
-index 1bf4b61..acdee5a 100644
---- a/ui/status.html
-+++ b/ui/status.html
-@@ -72,6 +72,7 @@
- 
+diff --git a/ui/chrome/chrome.js b/ui/chrome/chrome.js
+index 4c09d11..effe3b9 100644
+--- a/ui/chrome/chrome.js
++++ b/ui/chrome/chrome.js
+@@ -123,6 +123,7 @@
+   var lastLinks = null;
    window.lantern = {
      update: function (s) {
-+      return;
-       if ("text" in s) { msg.textContent = s.text; msg.parentNode.title = s.text; }
-       if ("progress" in s) setBlocks(Math.round(Math.max(0, Math.min(1, s.progress)) * BLOCKS));
-       if ("loading" in s) meter.classList.toggle("on", !!s.loading);
++      if (msg) return;
+       if ("url" in s && url) {
+         state.url = s.url;
+         if (!editing || document.activeElement !== url) { editing = false; url.value = s.url; }

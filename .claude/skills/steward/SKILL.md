@@ -215,6 +215,13 @@ number). It is never triggered from a PR.
 - **Checking the checker:** whenever scenarios or `tools/blackbox/` change,
   and monthly, dispatch `mutants.yml`, then `blackbox.yml` once per broken
   build. Each one must fail a scenario.
+- **Keep the broken builds applying.** The patches in
+  `tools/blackbox/mutants/` name exact files and lines. A PR that moves or
+  reshapes what they patch (`src/shell/pages.rs`, `ui/chrome/chrome.js`,
+  `ui/chrome/lantern/`, `retro.rs`, the dial-up code) must run
+  `git apply --check` on each one and regenerate any that fail, with the
+  same intent. Otherwise `mutants.yml` fails at "Apply the patch" and the
+  checker goes unchecked.
 
 ## Claude review
 
