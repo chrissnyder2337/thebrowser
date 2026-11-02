@@ -111,6 +111,7 @@ resources/mac, resources/win    bundle resources and generated .icns/.ico
 tools/make_icons.py             regenerates all app icons from ui/lantern.txt
 tools/bump-version.sh           bumps the version and opens the release pull request
 tools/oracle-guard.sh           CI check: product changes may not rewrite existing goldens or assertions
+tools/ui-shot.sh                screenshots Lantern in a UI mode under Xvfb, for fidelity checks
 tools/blackbox/                 black-box tester: the bb driver, judge prompt and broken-build patches (docs/blackbox-scenarios.md)
 examples/dump-pages.rs          writes the chrome and internal pages to files for Playwright
 tests/web/, tests/fixtures/     Playwright tests and the fixture pages they style
@@ -120,6 +121,7 @@ tests/smoke.sh                  bundle smoke test under xvfb-run
 .claude/skills/steward/         Claude Code skill: conventions for getting PRs merged
 .claude/skills/retro-look/      Claude Code skill: changing or adding a retro look, with tests
 .claude/skills/chrome-command/  Claude Code skill: adding a toolbar or status-bar command end to end
+.claude/skills/ui-mode/         Claude Code skill: changing or adding a UI mode, and its fidelity loop
 .claude/skills/cef-upgrade/     Claude Code skill: moving to a new CEF / `cef` crate release
 .claude/skills/factory-issue/   Claude Code skill: taking a factory:ready issue from plan to PR
 ```

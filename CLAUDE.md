@@ -76,6 +76,7 @@ doc comments that say why). Commit messages follow the log: a short
 [steward](.claude/skills/steward/SKILL.md),
 [release](.claude/skills/release/SKILL.md),
 [chrome-command](.claude/skills/chrome-command/SKILL.md),
+[ui-mode](.claude/skills/ui-mode/SKILL.md),
 [cef-upgrade](.claude/skills/cef-upgrade/SKILL.md),
 [factory-issue](.claude/skills/factory-issue/SKILL.md). Security rules for edits:
 [.claude/claude-security-guidance.md](.claude/claude-security-guidance.md).
