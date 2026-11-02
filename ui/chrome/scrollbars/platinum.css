@@ -1,0 +1,16 @@
+/* Platinum (Mac OS 8 and 9) (ui/chrome/scrollbars/): a sunken grey track, a lavender ridged thumb and soft buttons.
+   Adopted into every content frame by scrollbars.js; !important so a
+   site's own scrollbar styles don't win, and the standard scrollbar-color
+   and scrollbar-width are reset so these pseudo-elements apply. */
+* { scrollbar-color: auto !important; scrollbar-width: auto !important; }
+::-webkit-scrollbar { width: 15px !important; height: 15px !important; background: #c8c8c8 !important; }
+::-webkit-scrollbar-track { background: #c8c8c8 !important; box-shadow: inset 1px 1px #999, inset -1px -1px #eee !important; }
+::-webkit-scrollbar-thumb { background: #ccccff !important; border: 1px solid #333 !important; border-radius: 0 !important; box-shadow: inset 1px 1px #eef, inset -1px -1px #669 !important; min-height: 15px; min-width: 15px; }
+::-webkit-scrollbar-button { display: block !important; width: 15px !important; height: 15px !important; background-color: #dddddd !important; border: 1px solid #555 !important; box-shadow: inset 1px 1px #fff, inset -1px -1px #999 !important; background-repeat: no-repeat !important; background-position: center !important; }
+::-webkit-scrollbar-button:active { box-shadow: inset 1px 1px #999, inset -1px -1px #fff !important; }
+::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='4.0,1 7,6 1,6' fill='%23222'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='1,2 7,2 4.0,7' fill='%23222'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='1,4.0 6,1 6,7' fill='%23222'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='2,1 7,4.0 2,7' fill='%23222'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:start:increment, ::-webkit-scrollbar-button:end:decrement { display: none !important; }
+::-webkit-scrollbar-corner { background: #dddddd !important; }

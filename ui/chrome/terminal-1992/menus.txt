@@ -1,0 +1,35 @@
+# Text terminal (1992): a browser with no menu bar, only prompt screens.
+# The key-help line's H)elp, O)ptions and P)rint keys open them.
+menu Main
+home Main screen
+back Previous document
+forward Next document
+reload Reload
+stop Interrupt
+---
+search Search
+bookmarks View bookmarks
+add-bookmark Add bookmark
+open-url Go to a URL
+view-source Show page source
+print Print
+---
+close-window Quit
+menu Options
+- Editor
+- Display and character set
+- Bookmark file
+- Searching type
+- User mode
+- Show images
+---
+settings Settings...
+retro Retro looks
+browser-ui Browser UI
+menu Help
+- Help on using the browser
+- Keystroke commands
+- Frequently asked questions
+- Help on version
+---
+about About Lantern

@@ -1,0 +1,6 @@
+/* Classic desktop (1992): plain pages drawn the way a one-bit desktop browser
+   did, in a single bitmap-style font: Geneva, black on white (the page color
+   is set in ui_mode.rs). One rule per line, each selector wrapped in :where()
+   (checked by a unit test). */
+:where(html) { color: #000; font-family: Geneva, Chicago, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+:where(h1, h2, h3, h4, h5, h6) { font-family: Chicago, ChicagoFLF, Charcoal, Geneva, Helvetica, Arial, sans-serif; }

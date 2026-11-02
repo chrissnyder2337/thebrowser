@@ -1,0 +1,63 @@
+# The menu bar of a Windows workstation browser, 1995.
+menu File
+open-url Open Document...
+- Open Local File...
+- Save As...
+- Save as Text
+---
+print Print...
+- Print Preview
+- Print Setup...
+---
+- Newsgroups...
+- Send Email...
+---
+- Collaborate...
+---
+view-source Document Source...
+---
+close-window Exit
+menu Edit
+- Copy
+- Paste
+---
+- Find...
+- Find Next
+---
+- Select All
+menu Options
+- Show Toolbar
+- Show Status Bar
+- Show Location Bar
+---
+- Presentation Mode
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu Navigate
+back Back
+forward Forward
+---
+reload Reload
+home Home
+stop Stop Transfer
+---
+- Session History
+add-bookmark Add Current To Hotlist
+bookmarks Advanced Hotlist Manager...
+---
+- AutoSurf...
+menu Hotlists
+- Starting Points
+- Default Hotlist
+- Personal Hotlist
+menu Help
+- Contents
+- Search for Help On
+- How to Use Help
+---
+- Online Resources
+---
+about About...
+- Mail Technical Support...

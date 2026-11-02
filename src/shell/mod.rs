@@ -9,12 +9,14 @@ pub mod bookmarks;
 pub mod client;
 pub mod commands;
 pub mod dialup;
+pub mod menus;
 pub mod pages;
 pub mod resources;
 pub mod retro;
 pub mod selftest;
 pub mod settings;
 pub mod state;
+pub mod ui_mode;
 pub mod util;
 pub mod window;
 

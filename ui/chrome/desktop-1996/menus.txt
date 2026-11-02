@@ -1,0 +1,59 @@
+# The menu bar of a mid-90s desktop browser, 1996.
+menu File
+- New Window
+open-url Open...
+- Save
+- Save As File...
+---
+- Page Setup...
+print Print...
+- Send To
+---
+- Create Shortcut
+- Properties
+---
+close-window Close
+menu Edit
+- Cut
+- Copy
+- Paste
+- Select All
+---
+search Find (on this page)...
+menu View
+- Toolbar
+- Status Bar
+---
+- Fonts
+---
+stop Stop
+reload Refresh
+view-source Source
+---
+settings Options...
+retro Retro looks
+browser-ui Browser UI
+menu Go
+back Back
+forward Forward
+---
+home Start Page
+search Search the Web
+- Best of the Web
+---
+- Read Mail
+- Read News
+---
+- Open History Folder
+menu Favorites
+add-bookmark Add To Favorites...
+bookmarks Open Favorites...
+menu Help
+- Help Topics
+- Web Tutorial
+---
+- Online Support
+- Frequently Asked Questions
+- Product Updates
+---
+about About...

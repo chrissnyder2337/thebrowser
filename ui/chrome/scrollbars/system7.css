@@ -1,0 +1,16 @@
+/* System 7 (ui/chrome/scrollbars/): grey boxes with black outlines on a light grey track.
+   Adopted into every content frame by scrollbars.js; !important so a
+   site's own scrollbar styles don't win, and the standard scrollbar-color
+   and scrollbar-width are reset so these pseudo-elements apply. */
+* { scrollbar-color: auto !important; scrollbar-width: auto !important; }
+::-webkit-scrollbar { width: 16px !important; height: 16px !important; background: #d4d4d4 !important; }
+::-webkit-scrollbar-track { background: #d4d4d4 !important; box-shadow: none !important; }
+::-webkit-scrollbar-thumb { background: #bbbbbb !important; border: 1px solid #000 !important; border-radius: 0 !important; box-shadow: inset 1px 1px #eee, inset -1px -1px #777 !important; min-height: 16px; min-width: 16px; }
+::-webkit-scrollbar-button { display: block !important; width: 16px !important; height: 16px !important; background-color: #cccccc !important; border: 1px solid #000 !important; box-shadow: inset 1px 1px #fff, inset -1px -1px #888 !important; background-repeat: no-repeat !important; background-position: center !important; }
+::-webkit-scrollbar-button:active { box-shadow: inset 1px 1px #888 !important; }
+::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='4.0,1 7,6 1,6' fill='%23000'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='1,2 7,2 4.0,7' fill='%23000'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='1,4.0 6,1 6,7' fill='%23000'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpolygon points='2,1 7,4.0 2,7' fill='%23000'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:start:increment, ::-webkit-scrollbar-button:end:decrement { display: none !important; }
+::-webkit-scrollbar-corner { background: #cccccc !important; }

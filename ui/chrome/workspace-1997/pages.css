@@ -1,0 +1,5 @@
+/* Workspace (1997): plain pages the way a late-90s multi-window browser drew
+   them by default: Times in black on a white page (the color is set in
+   ui_mode.rs). One rule per line, each selector wrapped in :where() (checked
+   by a unit test). */
+:where(html) { color: #000; font-family: "Times New Roman", Times, serif; }

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Classic desktop (1992): a one-bit menu bar across the top of the screen,
+     a small glyph at the left and the activity box where the application
+     menu sat (docs/ui-modes/modes.md). -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #fff; color: #000;
+    font: bold 13px Chicago, ChicagoFLF, Charcoal, Geneva, sans-serif; letter-spacing: .5px;
+    cursor: default;
+  }
+  body { display: flex; align-items: stretch; border-bottom: 1px solid #000; padding: 0 4px 0 6px; }
+  button {
+    font: inherit; color: inherit; background: #fff;
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+  #glyph { width: 22px; flex: none; display: flex; align-items: center; justify-content: center; }
+  #glyph svg { width: 11px; height: 13px; display: block; }
+  .menu { height: 19px; padding: 0 9px; white-space: nowrap; }
+  .menu:hover, .menu:active, .menu:focus-visible { background: #000; color: #fff; }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 17px; height: 17px; margin: 1px 0 0 auto; flex: none; overflow: hidden;
+    border: 1px solid #000; background: #fff; position: relative;
+  }
+  #throbber:active { background: #000; }
+  #throbber svg.idle { position: absolute; left: 2px; top: 0; width: 11px; height: 16px; }
+  #throbber .lit-box { position: absolute; left: 2px; top: 0; width: 11px; height: 16px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 44px; height: 16px; display: block; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-44px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+</style>
+</head>
+<body>
+  <span id="glyph" aria-hidden="true"><svg viewBox="0 0 11 13" shape-rendering="crispEdges"><path d="M5.5 0 11 6.5 5.5 13 0 6.5z" fill="#000"/><path d="M5.5 3 8 6.5 5.5 10 3 6.5z" fill="#fff"/></svg></span>
+  <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+  <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
+  <button class="menu" data-cmd="menu" data-arg="navigate" data-anchor aria-haspopup="menu">Navigate</button>
+  <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu">Bookmarks</button>
+  <button class="menu" data-cmd="menu" data-arg="options" data-anchor aria-haspopup="menu" title="Retro looks, Browser UI and settings">Options</button>
+  <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+    {{LANTERN_IDLE}}
+    <div class="lit-box">{{LANTERN_LIT}}</div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

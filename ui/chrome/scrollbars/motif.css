@@ -1,0 +1,16 @@
+/* Motif (ui/chrome/scrollbars/): a sunken trough, a raised slider and bevelled arrows.
+   Adopted into every content frame by scrollbars.js; !important so a
+   site's own scrollbar styles don't win, and the standard scrollbar-color
+   and scrollbar-width are reset so these pseudo-elements apply. */
+* { scrollbar-color: auto !important; scrollbar-width: auto !important; }
+::-webkit-scrollbar { width: 15px !important; height: 15px !important; background: #a8a8a8 !important; }
+::-webkit-scrollbar-track { background: #a8a8a8 !important; box-shadow: inset 2px 2px #6e6e6e, inset -2px -2px #d8d8d8 !important; }
+::-webkit-scrollbar-thumb { background: #bfbfbf !important; border: none !important; border-radius: 0 !important; box-shadow: inset 2px 2px #e4e4e4, inset -2px -2px #5a5a5a !important; min-height: 15px; min-width: 15px; }
+::-webkit-scrollbar-button { display: block !important; width: 15px !important; height: 15px !important; background-color: #a8a8a8 !important; border: none !important; box-shadow: none !important; background-repeat: no-repeat !important; background-position: center !important; }
+::-webkit-scrollbar-button:active { box-shadow: none !important; }
+::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpolygon points='5.5,1 10,9 1,9' fill='%23bfbfbf' stroke='%235a5a5a' stroke-width='1'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpolygon points='1,2 10,2 5.5,10' fill='%23bfbfbf' stroke='%235a5a5a' stroke-width='1'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpolygon points='1,5.5 9,1 9,10' fill='%23bfbfbf' stroke='%235a5a5a' stroke-width='1'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Cpolygon points='2,1 10,5.5 2,10' fill='%23bfbfbf' stroke='%235a5a5a' stroke-width='1'/%3E%3C/svg%3E") !important; }
+::-webkit-scrollbar-button:start:increment, ::-webkit-scrollbar-button:end:decrement { display: none !important; }
+::-webkit-scrollbar-corner { background: #bfbfbf !important; }

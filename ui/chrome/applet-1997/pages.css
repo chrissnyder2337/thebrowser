@@ -1,0 +1,5 @@
+/* Applet browser (1997): plain pages as the Java-toolkit browsers drew them:
+   black Dialog-style sans-serif text on a white page (the color is set in
+   ui_mode.rs). Links keep Chromium's blue and purple. One rule per line, each
+   selector wrapped in :where() (checked by a unit test). */
+:where(html) { color: #000; font-family: Arial, Helvetica, sans-serif; }

@@ -1,0 +1,19 @@
+/* A late-90s Windows browser's start page: flat white page, Times text, a navy header rule, Win95 controls. */
+html { background: #fff; }
+body { padding: 8px 8px 24px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; }
+.panel { max-width: none; margin: 0; padding: 0; background: #fff; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 14px; padding-bottom: 8px; margin-bottom: 14px; border-bottom: 3px solid #000080; }
+h1 { font: bold 32px Arial, Helvetica, sans-serif; color: #000080; }
+h1 small { font: 12px Arial, Helvetica, sans-serif; color: #000; }
+p { line-height: normal; }
+fieldset { margin: 14px 0 0; padding: 14px 12px 10px; background: #fff; border: 2px groove #dfdfdf; box-shadow: none; }
+legend { position: static; margin-left: 4px; padding: 0 4px; background: #fff; font: 13px Arial, Helvetica, sans-serif; }
+input[type=search] { font: 13px Arial, Helvetica, sans-serif; }
+button, .btn { font: 13px Arial, Helvetica, sans-serif; }
+ul.marks li::before { background: #000080; box-shadow: none; }
+ul.marks a { font-size: 16px; }
+hr { border: 0; border-top: 2px groove #dfdfdf; margin: 14px 0; }
+.tips { color: #000; font-size: 14px; }
+kbd { font: 13px Arial, Helvetica, sans-serif; background: #c0c0c0; }

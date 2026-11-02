@@ -1,0 +1,4 @@
+/* Cube workstation (1990): plain pages the way the first browser drew them:
+   Helvetica, black text on a white page (the color is set in ui_mode.rs).
+   One rule per line, each selector wrapped in :where() (checked by a unit test). */
+:where(html) { color: #000; font-family: Helvetica, "Helvetica Neue", Arial, sans-serif; font-size: 13px; }

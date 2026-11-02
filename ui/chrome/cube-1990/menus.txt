@@ -1,0 +1,65 @@
+# The application menus of the first browser, on a NeXT workstation, 1990.
+menu Info
+about Panel...
+- Help
+---
+settings Preferences...
+retro Retro looks
+browser-ui Browser UI
+menu Navigate
+back Back up
+forward Next
+- Previous
+home Home
+---
+- Panel...
+menu Document
+- Open file...
+open-url Open given document address...
+- New file...
+---
+- Save
+- Save as...
+- Save a copy in...
+---
+- Miniaturize
+- Open master template document
+- Close all other windows
+close-window Close
+menu Find
+search Find Panel...
+- Find Next
+- Find Previous
+---
+- Enter Selection
+- Jump to Selection
+menu Edit
+- Cut
+- Copy
+- Paste
+- Paste Font
+---
+- Select All...
+menu Links
+- Mark all
+- Mark selection
+- Link to marked
+- Link to New
+---
+- Follow link
+- Unlink
+---
+- Help
+menu Style
+- Copy style
+- Paste style
+---
+- Format panel...
+menu Windows
+- Arrange in Front
+- Miniaturize Window
+close-window Close Window
+menu Services
+- Mail
+- Grab
+- Spell

@@ -2,13 +2,14 @@
 //! the navigation helpers they share.
 
 use super::{
-    bookmarks, dialup,
+    bookmarks, dialup, menus,
     pages::{self, ACTION_HOST},
     retro, settings,
     state::{
-        Role, content_browser, defer, exec_js, internal_url_key, push_all, push_status,
+        Role, content_browser, defer, exec_js, internal_url_key, push_all, push_ready, push_status,
         push_toolbar, save_bookmarks, set_notice, with_shell,
     },
+    ui_mode,
     util::{is_loadable_url, normalize_url_input, parse_query, percent_decode},
 };
 use cef::*;
@@ -41,23 +42,51 @@ pub fn handle_chrome_title(role: Role, title: &str) -> bool {
         return false;
     };
     match (role, command.name.as_str()) {
-        (Role::Toolbar, "ready") => {
-            with_shell(|shell| shell.toolbar_ready = true);
-            push_toolbar();
+        (Role::Content, _) => return false,
+        (_, "ready") => {
+            with_shell(|shell| shell.set_ready(role, true));
+            push_ready(role);
         }
-        (Role::Status, "ready") => {
-            with_shell(|shell| shell.status_ready = true);
-            push_status();
+        (Role::Toolbar | Role::Side | Role::Frame, name) => {
+            run_chrome_command(role, name, &command.arg)
         }
-        (Role::Toolbar, name) => run_toolbar_command(name, &command.arg),
-        // Clicking the modem pane in the status bar.
-        (Role::Status, "settings") => show_settings(false),
-        _ => {}
+        // Some UI modes put navigation buttons under the page
+        // (ui/chrome/<mode>/status.html), but the status bar can't open
+        // bookmarks' URLs or menus.
+        (Role::Status, name) if STATUS_COMMANDS.contains(&name) => {
+            if !matches!(name, "panel" | "menu" | "focus-url") {
+                ui_mode::close_full_panel();
+            }
+            run_chrome_command(role, name, &command.arg)
+        }
+        (Role::Status, name) => eprintln!("lantern: not a status bar command {name:?}"),
     }
     true
 }
 
-fn run_toolbar_command(name: &str, arg: &str) {
+/// The commands the status bar may send.
+const STATUS_COMMANDS: [&str; 14] = [
+    "back",
+    "forward",
+    "reload",
+    "stop",
+    "home",
+    "search",
+    "bookmarks",
+    "bookmark-add",
+    "focus-url",
+    "settings",
+    "panel",
+    // A typed address: the TV modes' Go to box is in their bottom panel.
+    "go",
+    // Opens one of the mode's own menus (menus.txt), for browsers whose
+    // menu keys sat at the bottom (the text terminal's O)ptions).
+    "menu",
+    // The activity box (chrome.js sends it), in modes that keep it below the page.
+    "about",
+];
+
+fn run_chrome_command(role: Role, name: &str, arg: &str) {
     match name {
         "back" => go_back(),
         "forward" => go_forward(),
@@ -70,8 +99,21 @@ fn run_toolbar_command(name: &str, arg: &str) {
         "bookmark-add" => add_bookmark(),
         "bookmarks" => show_bookmarks(),
         "about" => show_about(),
-        "retro-menu" => retro::show_menu(arg),
-        _ => eprintln!("lantern: unknown toolbar command {name:?}"),
+        "retro-menu" => menus::show_retro(role, arg),
+        "menu" => menus::show(role, arg),
+        "focus-url" => focus_url_bar(),
+        "panel" => ui_mode::toggle_panel(),
+        // The modem pane in the status bar.
+        "settings" => show_settings(false),
+        // The originals' toolbar buttons for what's otherwise in the menus.
+        "print" => print(),
+        "view-source" => view_source(),
+        "zoom-in" => zoom(0.5),
+        "zoom-out" => zoom(-0.5),
+        "fullscreen" => toggle_fullscreen(),
+        // A document window's close box (the Classic desktop modes).
+        "close-window" => super::state::close_all_browsers(false),
+        _ => eprintln!("lantern: unknown chrome command {name:?}"),
     }
 }
 
@@ -105,6 +147,50 @@ pub fn stop() {
     with_content(|b| b.stop_load());
 }
 
+/// Print the page (the menus' Print item).
+pub fn print() {
+    with_content(|b| {
+        if let Some(host) = b.host() {
+            host.print();
+        }
+    });
+}
+
+/// Show the page's source (the menus' View Source item).
+pub fn view_source() {
+    // Not for Lantern's own data: pages, whose source is the generated page.
+    if with_shell(|shell| shell.internal_label.is_some()) {
+        return;
+    }
+    with_content(|b| {
+        if let Some(frame) = b.main_frame() {
+            frame.view_source();
+        }
+    });
+}
+
+/// Zoom the page by `step` levels; 0 resets it.
+pub fn zoom(step: f64) {
+    with_content(|b| {
+        if let Some(host) = b.host() {
+            let level = if step == 0.0 {
+                0.0
+            } else {
+                host.zoom_level() + step
+            };
+            host.set_zoom_level(level.clamp(-4.0, 6.0));
+        }
+    });
+}
+
+/// Fill the screen with the window, or come back (the menus' Full Screen).
+pub fn toggle_fullscreen() {
+    if let Some(window) = with_shell(|shell| shell.window.clone()) {
+        let on = window.is_fullscreen() == 0;
+        window.set_fullscreen(on.into());
+    }
+}
+
 pub fn focus_content() {
     with_content(|b| {
         if let Some(host) = b.host() {
@@ -115,13 +201,19 @@ pub fn focus_content() {
 
 /// Focus the toolbar view and select the URL field.
 pub fn focus_url_bar() {
-    let Some(toolbar) = with_shell(|shell| shell.toolbar.clone()) else {
+    let role = pages::url_role(with_shell(|shell| shell.settings.ui_mode));
+    // The TV modes keep the address in a panel that may be closed.
+    let (layout, open) = ui_mode::current();
+    if role == Role::Status && layout.status_open > 0 && !open {
+        ui_mode::toggle_panel();
+    }
+    let Some(view) = with_shell(|shell| shell.browser(role)) else {
         return;
     };
-    if let Some(host) = toolbar.host() {
+    if let Some(host) = view.host() {
         host.set_focus(1);
     }
-    exec_js(&toolbar, "window.lantern&&lantern.focusUrl()");
+    exec_js(&view, "window.lantern&&lantern.focusUrl()");
 }
 
 /// Load a URL in the content view (a real web address, not an internal page).
@@ -194,8 +286,8 @@ pub fn show_internal(label: &str, uri: String) {
 }
 
 pub fn show_home() {
-    let list = with_shell(|shell| shell.bookmarks.clone());
-    show_internal(pages::HOME, pages::home_uri(&list));
+    let (list, mode) = with_shell(|shell| (shell.bookmarks.clone(), shell.settings.ui_mode));
+    show_internal(pages::HOME, pages::home_uri(&list, mode));
     focus_content();
 }
 
@@ -205,12 +297,12 @@ thread_local! {
 
 /// Home page with its search box focused (via a unique `#search-N` fragment).
 pub fn show_search() {
-    let list = with_shell(|shell| shell.bookmarks.clone());
+    let (list, mode) = with_shell(|shell| (shell.bookmarks.clone(), shell.settings.ui_mode));
     let seq = SEARCH_SEQ.with(|seq| {
         seq.set(seq.get().wrapping_add(1));
         seq.get()
     });
-    let uri = format!("{}#search-{seq}", pages::home_uri(&list));
+    let uri = format!("{}#search-{seq}", pages::home_uri(&list, mode));
     show_internal(pages::HOME, uri);
     focus_content();
 }
@@ -233,10 +325,14 @@ pub fn show_settings(saved: bool) {
 
 /// Apply settings submitted from the settings page and remember them.
 fn save_settings(params: &[(String, String)]) {
-    let (updated, content) = with_shell(|shell| {
+    let (before, updated, content) = with_shell(|shell| {
+        let before = shell.settings.ui_mode;
         shell.settings.apply_query(params);
-        (shell.settings, shell.content.clone())
+        (before, shell.settings, shell.content.clone())
     });
+    if updated.ui_mode != before {
+        ui_mode::apply();
+    }
     settings::save(&updated);
     if let Some(content) = content {
         dialup::apply_network(&content, &updated);
@@ -251,6 +347,13 @@ pub fn show_error(failed_url: &str, error_code: i32, error_text: &str) {
         failed_url,
         pages::error_uri(failed_url, error_code, error_text),
     );
+}
+
+/// Re-render the start page if it's showing, in the new mode's look.
+pub fn refresh_home_page() {
+    if with_shell(|shell| shell.internal_label.clone()).as_deref() == Some(pages::HOME) {
+        show_home();
+    }
 }
 
 /// Re-render the current internal page if it lists bookmarks.

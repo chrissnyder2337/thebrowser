@@ -1,13 +1,17 @@
-//! The top-level window and the three browser view delegates.
+//! The top-level window, the panels its views sit in, and the browser view
+//! delegates. The window is a column: the toolbar view; a middle row of the
+//! side view and an inset panel (the frame view over the page); the status
+//! view. A UI mode's `ui_mode::Layout` sizes, shows and hides them.
 
-use super::state::{Role, with_shell};
+use super::{
+    state::{Role, with_shell},
+    ui_mode,
+};
 use cef::*;
 use std::cell::RefCell;
 
 /// Window face gray (ARGB).
 pub const FACE_GRAY: u32 = 0xFFC0C0C0;
-pub const TOOLBAR_HEIGHT: i32 = 112;
-pub const STATUS_HEIGHT: i32 = 24;
 
 wrap_window_delegate! {
     pub struct LanternWindowDelegate {
@@ -20,7 +24,11 @@ wrap_window_delegate! {
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
-            Size { width: 520, height: TOOLBAR_HEIGHT + STATUS_HEIGHT + 120 }
+            let (layout, open) = ui_mode::current();
+            let height = layout.toolbar + layout.status_height(open) + layout.frame
+                + layout.inset[0] + layout.inset[2] + 2 * layout.well + 120;
+            let width = 520 + layout.side + layout.inset[1] + layout.inset[3] + 2 * layout.well;
+            Size { width, height }
         }
     }
 
@@ -34,28 +42,55 @@ wrap_window_delegate! {
             };
             window.set_background_color(FACE_GRAY);
 
-            let layout_settings = BoxLayoutSettings {
-                horizontal: 0,
-                cross_axis_alignment: AxisAlignment::STRETCH,
-                ..Default::default()
+            let views = self.views.borrow();
+            let view_for = |role: Role| {
+                views
+                    .iter()
+                    .find(|(r, _)| *r == role)
+                    .map(|(_, v)| {
+                        if role != Role::Content {
+                            v.set_background_color(FACE_GRAY);
+                        }
+                        View::from(v)
+                    })
             };
-            let layout = window.set_to_box_layout(Some(&layout_settings));
-
-            for (role, browser_view) in self.views.borrow().iter() {
-                if *role != Role::Content {
-                    browser_view.set_background_color(FACE_GRAY);
-                }
-                let mut view = View::from(browser_view);
-                window.add_child_view(Some(&mut view));
-                if let Some(layout) = layout.as_ref() {
-                    let flex = if *role == Role::Content { 1 } else { 0 };
-                    layout.set_flex_for_view(Some(&mut view), flex);
-                }
-            }
+            let (Some(main), Some(middle), Some(inset), Some(well)) =
+                (
+                    panel_create(None),
+                    panel_create(None),
+                    panel_create(Some(&mut InsetPanelDelegate::new(false))),
+                    panel_create(Some(&mut InsetPanelDelegate::new(true))),
+                )
+            else {
+                return;
+            };
+            let outer = box_layout(window, true);
+            add(window, outer.as_ref(), Some(View::from(&main)), 1);
+            let column = box_layout(&main, false);
+            let row = box_layout(&middle, true);
+            add(&main, column.as_ref(), view_for(Role::Toolbar), 0);
+            add(&main, column.as_ref(), Some(View::from(&middle)), 1);
+            add(&main, column.as_ref(), view_for(Role::Status), 0);
+            add(&middle, row.as_ref(), view_for(Role::Side), 0);
+            add(&middle, row.as_ref(), Some(View::from(&inset)), 1);
+            inset.add_child_view(Some(&mut View::from(&well)));
+            well.add_child_view(view_for(Role::Frame).as_mut());
+            well.add_child_view(view_for(Role::Content).as_mut());
+            let (layout, _) = ui_mode::current();
+            lay_out_inset(&inset, &well, &layout, view_for(Role::Content));
+            drop(views);
+            with_shell(|shell| {
+                shell.middle = Some(middle.clone());
+                shell.main = Some(main.clone());
+                shell.inset = Some(inset.clone());
+                shell.well = Some(well.clone());
+            });
 
             window.set_title(Some(&CefString::from("Lantern")));
             set_window_icons(window);
             with_shell(|shell| shell.window = Some(window.clone()));
+            // Hide the views this mode doesn't use and place the side view.
+            ui_mode::relayout();
             window.show();
 
             if let Some((_, content)) = self.views.borrow().iter().find(|(r, _)| *r == Role::Content) {
@@ -65,13 +100,19 @@ wrap_window_delegate! {
 
         fn on_window_destroyed(&self, _window: Option<&mut Window>) {
             self.views.borrow_mut().clear();
-            with_shell(|shell| shell.window = None);
+            with_shell(|shell| {
+                shell.window = None;
+                shell.middle = None;
+                shell.main = None;
+                shell.inset = None;
+                shell.well = None;
+            });
         }
 
         fn can_close(&self, _window: Option<&mut Window>) -> ::std::os::raw::c_int {
             // Ask each browser; CEF re-invokes the close once unload handlers finish.
             let browsers: Vec<Browser> = with_shell(|shell| {
-                [Role::Content, Role::Toolbar, Role::Status]
+                Role::ALL
                     .into_iter()
                     .filter_map(|role| shell.browser(role))
                     .collect()
@@ -104,6 +145,155 @@ wrap_window_delegate! {
     }
 }
 
+// Colors the inset panel (or, with `well`, the well panel) from the current
+// layout. Views lose their background color on every theme change, so it's
+// set again there.
+wrap_panel_delegate! {
+    struct InsetPanelDelegate {
+        well: bool,
+    }
+
+    impl ViewDelegate {
+        fn on_theme_changed(&self, view: Option<&mut View>) {
+            if let Some(view) = view {
+                let (layout, _) = ui_mode::current();
+                view.set_background_color(if self.well { layout.well_color } else { layout.inset_color });
+            }
+        }
+    }
+
+    impl PanelDelegate {}
+}
+
+/// A view's size in the current layout; `across` is its size along the
+/// other axis (the box layouts stretch it).
+fn chrome_size(role: Role, across: i32) -> Size {
+    let (layout, open) = ui_mode::current();
+    match role {
+        Role::Toolbar => Size {
+            width: across,
+            height: layout.toolbar,
+        },
+        Role::Status => Size {
+            width: across,
+            height: layout.status_height(open),
+        },
+        Role::Frame => Size {
+            width: across,
+            height: layout.frame,
+        },
+        Role::Side => Size {
+            width: layout.side,
+            height: across,
+        },
+        Role::Content => Size {
+            width: across,
+            height: if across > 0 { 600 } else { 0 },
+        },
+    }
+}
+
+fn box_layout(panel: &impl ImplPanel, horizontal: bool) -> Option<BoxLayout> {
+    let settings = BoxLayoutSettings {
+        horizontal: horizontal.into(),
+        cross_axis_alignment: AxisAlignment::STRETCH,
+        ..Default::default()
+    };
+    panel.set_to_box_layout(Some(&settings))
+}
+
+fn add(panel: &impl ImplPanel, layout: Option<&BoxLayout>, view: Option<View>, flex: i32) {
+    let Some(mut view) = view else {
+        return;
+    };
+    panel.add_child_view(Some(&mut view));
+    if let Some(layout) = layout {
+        layout.set_flex_for_view(Some(&mut view), flex);
+    }
+}
+
+/// Put the side view where `layout` wants it: beside the page in the middle
+/// row, or beside everything in the window's outer row; first or last.
+pub fn place_side(
+    window: &Window,
+    main: &Panel,
+    middle: &Panel,
+    side: View,
+    layout: &ui_mode::Layout,
+) {
+    let outer = Panel::from(window);
+    let (to, from) = if layout.side_full {
+        (&outer, middle)
+    } else {
+        (middle, &outer)
+    };
+    if index_of(from, &side) >= 0 {
+        from.remove_child_view(Some(&mut side.clone()));
+    }
+    let index = if layout.side_left { 0 } else { 1 };
+    if index_of(to, &side) < 0 {
+        to.add_child_view_at(Some(&mut side.clone()), index);
+    } else {
+        to.reorder_child_view(Some(&mut side.clone()), index);
+    }
+    // Setting a box layout again drops the children's flex, so give the
+    // other child of each row all the room the side view leaves.
+    let row = box_layout(&outer, true);
+    if let Some(row) = row {
+        row.set_flex_for_view(Some(&mut View::from(main)), 1);
+    }
+}
+
+/// Give the status view the whole column (`full`: a full-screen panel, the
+/// page hidden) or only its own height, with the middle row taking the rest.
+pub fn fill_with_status(main: &Panel, middle: &Panel, status: View, full: bool) {
+    middle.set_visible((!full).into());
+    // Setting a box layout again drops the children's flex.
+    if let Some(column) = box_layout(main, false) {
+        column.set_flex_for_view(Some(&mut View::from(middle)), 1);
+        column.set_flex_for_view(Some(&mut status.clone()), i32::from(full));
+    }
+}
+
+/// The index of `view` among `panel`'s children, or -1.
+fn index_of(panel: &Panel, view: &View) -> i32 {
+    (0..panel.child_view_count() as i32)
+        .find(|&i| {
+            panel
+                .child_view_at(i)
+                .is_some_and(|child| child.is_same(Some(&mut view.clone())) != 0)
+        })
+        .unwrap_or(-1)
+}
+
+/// Lay out the inset panel for `layout`: a border around the well, and in
+/// the well, a line around the frame view over the page.
+pub fn lay_out_inset(inset: &Panel, well: &Panel, layout: &ui_mode::Layout, content: Option<View>) {
+    let [top, left, bottom, right] = layout.inset;
+    let border = |top, left, bottom, right| BoxLayoutSettings {
+        horizontal: 0,
+        inside_border_insets: Insets {
+            top,
+            left,
+            bottom,
+            right,
+        },
+        cross_axis_alignment: AxisAlignment::STRETCH,
+        ..Default::default()
+    };
+    if let Some(outer) = inset.set_to_box_layout(Some(&border(top, left, bottom, right))) {
+        outer.set_flex_for_view(Some(&mut View::from(well)), 1);
+    }
+    inset.set_background_color(layout.inset_color);
+    let w = layout.well;
+    if let (Some(inner), Some(mut content)) =
+        (well.set_to_box_layout(Some(&border(w, w, w, w))), content)
+    {
+        inner.set_flex_for_view(Some(&mut content), 1);
+    }
+    well.set_background_color(layout.well_color);
+}
+
 const ICON_SMALL_PNG: &[u8] = include_bytes!("../../ui/appicon/lantern_32.png");
 const ICON_LARGE_PNG: &[u8] = include_bytes!("../../ui/appicon/lantern_256.png");
 
@@ -131,20 +321,13 @@ wrap_browser_view_delegate! {
     }
 
     impl ViewDelegate {
+        // Chrome sizes follow the UI mode (ui_mode::relayout).
         fn preferred_size(&self, _view: Option<&mut View>) -> Size {
-            match self.role {
-                Role::Toolbar => Size { width: 800, height: TOOLBAR_HEIGHT },
-                Role::Status => Size { width: 800, height: STATUS_HEIGHT },
-                Role::Content => Size { width: 800, height: 600 },
-            }
+            chrome_size(self.role, 800)
         }
 
         fn minimum_size(&self, _view: Option<&mut View>) -> Size {
-            match self.role {
-                Role::Toolbar => Size { width: 0, height: TOOLBAR_HEIGHT },
-                Role::Status => Size { width: 0, height: STATUS_HEIGHT },
-                Role::Content => Size { width: 0, height: 0 },
-            }
+            chrome_size(self.role, 0)
         }
     }
 

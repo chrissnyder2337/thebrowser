@@ -1,0 +1,33 @@
+/* An early Windows 3.1 browser's home page: cream document, Times New Roman, Windows 3.1 controls. */
+html { background: #ffffe8; }
+body { padding: 8px 12px 24px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; color: #000; }
+a { color: #1c1c9c; text-decoration: underline; }
+a:visited { color: #6a1c6a; }
+a:active { color: #c00000; }
+.panel { max-width: none; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption, svg.logo { display: none; }
+.inner { padding: 0; }
+.head { display: block; margin: 0 0 4px; }
+h1 { font: bold 28px/1.15 "Times New Roman", Times, serif; margin: 8px 0 6px; }
+h1 small { font: italic 16px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 12px; line-height: 1.2; }
+fieldset { margin: 0; padding: 0; box-shadow: none; position: static; min-width: 0; }
+legend { position: static; float: left; width: 100%; padding: 0; margin: 12px 0 6px; background: none;
+  font: bold 20px/1.15 "Times New Roman", Times, serif; }
+legend + * { clear: both; }
+.search { gap: 8px; align-items: center; margin: 0 0 12px; }
+input[type=search] { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Arial, Helvetica, sans-serif; height: 24px; padding: 2px 4px;
+  background: #fff; box-shadow: none; border: 1px solid #000; }
+input::selection { background: #000; color: #fff; }
+button { font: bold 12px "MS Sans Serif", "Microsoft Sans Serif", Arial, Helvetica, sans-serif; color: #000; background: #c0c0c0;
+  height: 26px; line-height: 20px; min-width: 70px; padding: 0 10px;
+  border: 2px solid; border-color: #fff #808080 #808080 #fff; box-shadow: 0 0 0 1px #000; margin: 1px; }
+button:active { border-color: #808080 #fff #fff #808080; padding: 1px 9px 0 11px; box-shadow: 0 0 0 1px #000; }
+button:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+ul.marks { columns: 1; margin: 0 0 12px; padding: 0 0 0 40px; list-style: disc; }
+ul.marks li { display: list-item; padding: 0; line-height: 1.25; }
+ul.marks li::before { content: none; }
+ul.marks a { white-space: normal; overflow: visible; }
+hr { border: 0; height: 0; margin: 14px 0; background: none; border-top: 2px solid #808080; border-bottom: 1px solid #fff; }
+.tips { color: #000; }
+kbd { font: 15px "Courier New", Courier, monospace; padding: 0; background: none; box-shadow: none; }

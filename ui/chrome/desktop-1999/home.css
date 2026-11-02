@@ -1,0 +1,18 @@
+/* A late-90s Windows browser's start page, second generation: white page, Verdana text, a pale blue header band, flat controls. */
+html { background: #fff; }
+body { padding: 0 0 24px; font: 13px Verdana, Tahoma, Arial, sans-serif; -webkit-font-smoothing: auto; }
+.panel { max-width: none; margin: 0; padding: 0; background: #fff; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0 16px; }
+.head { gap: 16px; margin: 0 -16px 16px; padding: 10px 16px; background: #d4e0f4; border-bottom: 1px solid #6c8cc4; }
+h1 { font: bold 26px Verdana, Tahoma, Arial, sans-serif; color: #003399; }
+h1 small { font: 11px Verdana, Tahoma, sans-serif; color: #333; }
+p { line-height: 1.5; }
+fieldset { margin: 14px 0 0; padding: 14px 12px 10px; background: #fff; border: 1px solid #808080; box-shadow: none; }
+legend { position: static; margin-left: 4px; padding: 0 4px; background: #fff; color: #003399; font-weight: bold; }
+input[type=search] { font: 13px Verdana, Tahoma, sans-serif; }
+button, .btn { font: 12px Verdana, Tahoma, sans-serif; }
+ul.marks li::before { background: #003399; box-shadow: none; }
+hr { border: 0; border-top: 1px solid #6c8cc4; margin: 14px 0; }
+.tips { color: #333; font-size: 12px; }
+kbd { font: 12px Verdana, Tahoma, sans-serif; background: #ece9d8; box-shadow: inset 0 0 0 1px #808080; }

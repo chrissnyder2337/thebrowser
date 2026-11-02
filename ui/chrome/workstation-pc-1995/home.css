@@ -1,0 +1,27 @@
+/* A 1995 Windows browser's home page: grey document, Times, Windows 95 controls, centred title band. */
+html { background: #c0c0c0; }
+body { padding: 8px 12px 24px; font: 16px "Times New Roman", Times, serif; -webkit-font-smoothing: auto; color: #000; }
+a { color: #0000ff; }
+a:visited { color: #800080; }
+a:active { color: #ff0000; }
+.panel { max-width: none; margin: 0; padding: 0; background: none; box-shadow: none; }
+.caption, svg.logo { display: none; }
+.inner { padding: 0; }
+.head { display: block; text-align: center; margin: 0 0 6px; }
+h1 { font: bold 32px/1.15 "Times New Roman", Times, serif; margin: 10px 0 6px; }
+h1 small { font: italic 16px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 12px; line-height: 1.2; }
+fieldset { margin: 0; padding: 0; box-shadow: none; position: static; min-width: 0; }
+legend { position: static; float: left; width: 100%; padding: 0; margin: 12px 0 6px; background: none;
+  font: bold 24px/1.15 "Times New Roman", Times, serif; }
+legend + * { clear: both; }
+.search { gap: 8px; align-items: center; margin: 0 0 12px; }
+input[type=search] { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; }
+button { font: 13px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Arial, sans-serif; }
+ul.marks { columns: 1; margin: 0 0 12px; padding: 0 0 0 40px; list-style: disc; }
+ul.marks li { display: list-item; padding: 0; line-height: 1.25; }
+ul.marks li::before { content: none; }
+ul.marks a { white-space: normal; overflow: visible; }
+hr { border: 0; height: 2px; margin: 14px 0; background: none; border-top: 1px solid #808080; border-bottom: 1px solid #fff; }
+.tips { color: #000; }
+kbd { font: 15px "Courier New", Courier, monospace; padding: 0; background: none; box-shadow: none; }

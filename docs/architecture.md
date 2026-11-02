@@ -25,7 +25,10 @@ building browser UI with web tech on top of Chromium. They talk to Rust like thi
   `lantern|<seq>|<command>|<encodeURIComponent(arg)>`. The toolbar's display
   handler sees it in `on_title_change`, decodes it and acts on the content
   browser. Commands: `ready`, `back`, `forward`, `reload`, `stop`, `home`,
-  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`, `retro-menu`.
+  `search`, `go`, `open`, `bookmark-add`, `bookmarks`, `about`, `retro-menu`,
+  `menu` (`<menu>,x,y`: a mode's File, Navigate, Options or Help menu),
+  `focus-url` and `settings`. Both chrome views may send any of them, since
+  some UI modes put buttons under the page.
 - **Rust → chrome page.** `execute_java_script("lantern.update({...})")` pushes
   state (URL, nav buttons, loading, quick links; status text, progress, padlock).
 - **Internal page → Rust.** The bookmarks, about and error pages link to
@@ -59,10 +62,18 @@ it all out again without a reload. The splash intro is `ui/retro/splash.js`;
 it runs as the page starts loading, so it covers the load the way the
 originals did. The Retro menu is a native CEF menu (`Window::show_menu`)
 anchored under the button, because an HTML menu would be clipped to the
-toolbar view.
+toolbar view (`menus.rs`).
 
 Research for new looks: [`docs/research/90s-browsers/`](research/90s-browsers/)
 catalogs the browsers of the 1990s, version by version, with screenshots.
+
+## UI modes
+
+A UI mode swaps the toolbar and status bar for another 1990s browser's
+layout. Every chrome page shares one controller, `ui/chrome/chrome.js`
+(title channel, `lantern.update`), and each mode supplies only markup and
+CSS in `ui/chrome/<mode>/`. The spec, the per-mode layouts and the status
+of the work are in [`docs/ui-modes/`](ui-modes/).
 
 ## Source layout
 
@@ -81,12 +92,16 @@ src/shell/art.rs                pixel-art text → inline SVG
 src/shell/bookmarks.rs          bookmark TSV + per-OS data directory
 src/shell/settings.rs           user settings (dial-up mode, modem speed profiles, retro look)
 src/shell/dialup.rs             dial-up simulator: network emulation and the image pacer
-src/shell/retro.rs              retro looks: the Retro menu and running ui/retro/*.js
+src/shell/retro.rs              retro looks: running ui/retro/*.js, the look and splash settings
+src/shell/menus.rs              native menus: Retro, Browser UI and the UI modes' menu bars
+src/shell/ui_mode.rs            UI modes: view heights, switching and relayout
 src/shell/selftest.rs           --self-test=<file>: report the first load and quit
 src/shell/util.rs               percent/HTML/JS escaping, URL-bar normalization, tiny JSON
-ui/toolbar.html, status.html    chrome pages (self-contained HTML/CSS/JS)
+ui/chrome/chrome.js             controller shared by every chrome page (title channel, lantern.update)
+ui/chrome/<mode>/               each UI mode's toolbar.html and status.html (markup and CSS), and its pages.css
+ui/chrome/page-defaults.js      puts a UI mode's browser defaults (pages.css) under content pages
 ui/retro/runtime.js             retro looks engine (sheets, shadow trees, floating boxes, rescans)
-ui/retro/{geocities,early-web,portal}.js the looks
+ui/retro/{geocities,early-web,portal,terminal}.js the looks
 ui/retro/splash.js              Flash-style splash intro
 ui/pages/*.html, common.css     internal page templates ({{PLACEHOLDER}} substitution)
 ui/dialup-images.js             "slow images" pacer injected into content pages

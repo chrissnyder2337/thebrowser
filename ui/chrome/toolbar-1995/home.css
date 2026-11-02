@@ -1,0 +1,30 @@
+/* An early graphical browser's plain home document: grey page, Times, a rule, bulleted links. */
+html { background: #c0c0c0; }
+body { padding: 8px; font: 16px "Times New Roman", Times, serif; color: #000; }
+.panel { max-width: none; margin: 0; padding: 0; background: transparent; box-shadow: none; }
+.caption { display: none; }
+.inner { padding: 0; }
+.head { gap: 12px; align-items: flex-end; margin-bottom: 0; }
+.head svg.logo { width: 64px; height: 96px; }
+h1 { font: bold 32px "Times New Roman", Times, serif; margin: 0 0 8px; }
+h1 small { font: 16px "Times New Roman", Times, serif; color: #000; }
+p { margin: 0 0 16px; line-height: normal; }
+.head p { margin: 0 0 12px; }
+fieldset { margin: 0; padding: 0; box-shadow: none; }
+legend { position: static; display: block; padding: 0; margin: 14px 0 8px; background: transparent;
+  font: bold 24px "Times New Roman", Times, serif; }
+hr { border: 0; height: 2px; margin: 8px 0; background: transparent;
+  border-top: 1px solid #808080; border-bottom: 1px solid #fff; }
+.search { margin-top: 0; gap: 8px; max-width: 480px; }
+input[type=search] { font: 13px "Courier New", Courier, monospace; height: 24px; padding: 3px 4px; background: #fff;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #fff, inset 2px 2px #000, inset -2px -2px #dfdfdf; }
+button { font: 13px Arial, Helvetica, sans-serif; min-width: 70px; height: 24px; line-height: 22px; padding: 0 10px;
+  background: #c0c0c0; border: 1px solid #000;
+  box-shadow: inset 1px 1px #fff, inset -1px -1px #808080; }
+button:active { box-shadow: inset 1px 1px #808080; padding: 1px 9px 0 11px; }
+ul.marks { display: block; list-style: disc; padding-left: 40px; columns: 1; margin: 0 0 16px; }
+ul.marks li { display: list-item; padding: 0; }
+ul.marks li::before { content: none; }
+ul.marks a { overflow: visible; text-overflow: clip; white-space: normal; }
+.tips { color: #000; }
+kbd { font: 14px "Courier New", Courier, monospace; padding: 0; background: transparent; box-shadow: none; }

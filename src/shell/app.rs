@@ -2,7 +2,7 @@
 
 use super::{
     bookmarks, client, commands, pages, selftest,
-    settings::{self, RetroStyle},
+    settings::{self, RetroStyle, UiMode},
     state::{Role, with_shell},
     util::normalize_url_input,
     window::{FACE_GRAY, LanternBrowserViewDelegate, LanternWindowDelegate},
@@ -76,7 +76,15 @@ wrap_browser_process_handler! {
                     .and_then(|key| RetroStyle::from_key(&key))
                     .or_else(|| has_switch(command_line, "geocities").then_some(RetroStyle::GeoCities));
                 if let Some(style) = style {
-                    user_settings.retro_style = style;
+                    if style == RetroStyle::Off {
+                        user_settings.looks_off();
+                    } else {
+                        user_settings.retro_style = style;
+                    }
+                }
+                // --ui=<mode> picks a UI mode for this run the same way.
+                if let Some(mode) = switch_value(command_line, "ui").and_then(|key| UiMode::from_key(&key)) {
+                    user_settings.ui_mode = mode;
                 }
                 // --self-test=<file> reports the first load to <file> and quits.
                 if let Some(path) = switch_value(command_line, "self-test") {
@@ -87,13 +95,14 @@ wrap_browser_process_handler! {
                 shell.bookmarks = list.clone();
                 shell.settings = user_settings;
             });
+            super::ui_mode::use_layout(user_settings.ui_mode, false);
 
             // The content view starts on the home page unless --url= was given.
             let start = command_line.as_ref().and_then(url_switch);
             let content_url = match start.as_deref().and_then(normalize_url_input) {
                 Some(url) => url,
                 None => {
-                    let uri = pages::home_uri(&list);
+                    let uri = pages::home_uri(&list, user_settings.ui_mode);
                     with_shell(|shell| {
                         shell.internal_label = Some(pages::HOME.to_owned());
                         shell
@@ -104,15 +113,18 @@ wrap_browser_process_handler! {
                 }
             };
 
-            let views: Vec<(Role, BrowserView)> = [
-                (Role::Toolbar, pages::toolbar_uri()),
-                (Role::Content, content_url),
-                (Role::Status, pages::status_uri()),
-            ]
-            .into_iter()
-            .filter_map(|(role, url)| create_browser_view(role, &url).map(|view| (role, view)))
-            .collect();
-            assert_eq!(views.len(), 3, "failed to create the browser views");
+            let views: Vec<(Role, BrowserView)> = Role::ALL
+                .into_iter()
+                .map(|role| {
+                    let url = match role {
+                        Role::Content => content_url.clone(),
+                        _ => pages::chrome_uri(role, user_settings.ui_mode),
+                    };
+                    (role, url)
+                })
+                .filter_map(|(role, url)| create_browser_view(role, &url).map(|view| (role, view)))
+                .collect();
+            assert_eq!(views.len(), Role::ALL.len(), "failed to create the browser views");
 
             // Create the window. It shows itself in on_window_created.
             let mut delegate = LanternWindowDelegate::new(RefCell::new(views));

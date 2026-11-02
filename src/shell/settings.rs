@@ -104,10 +104,23 @@ pub enum RetroStyle {
     EarlyWeb,
     /// A 1997 web portal: a narrow column of small Arial, banner ad included.
     Portal,
+    /// A text-mode browser in an 80-column terminal: monospace on black, no
+    /// images. The Text terminal UI mode's era look.
+    Terminal,
+    /// A TV set-top box: one column of large type on grey-blue, the selected
+    /// link in a yellow box. The Set-top TV UI modes' era look.
+    SetTop,
 }
 
 impl RetroStyle {
-    pub const ALL: [Self; 4] = [Self::Off, Self::GeoCities, Self::EarlyWeb, Self::Portal];
+    pub const ALL: [Self; 6] = [
+        Self::Off,
+        Self::GeoCities,
+        Self::EarlyWeb,
+        Self::Portal,
+        Self::Terminal,
+        Self::SetTop,
+    ];
 
     pub fn key(self) -> &'static str {
         match self {
@@ -115,6 +128,8 @@ impl RetroStyle {
             Self::GeoCities => "geocities",
             Self::EarlyWeb => "early-web",
             Self::Portal => "portal",
+            Self::Terminal => "terminal",
+            Self::SetTop => "settop",
         }
     }
 
@@ -129,6 +144,256 @@ impl RetroStyle {
             Self::GeoCities => "GeoCities homepage (1998)",
             Self::EarlyWeb => "Early web (1995)",
             Self::Portal => "Web portal (1997)",
+            Self::Terminal => "Text terminal (1999)",
+            Self::SetTop => "Set-top TV (1996)",
+        }
+    }
+}
+
+/// Which 1990s browser layout the toolbar and status bar wear (see
+/// `ui/chrome/` and docs/ui-modes/). Names describe the era, never a product
+/// (steward skill, "Branding rule").
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum UiMode {
+    /// Lantern's own toolbar.
+    #[default]
+    Lantern,
+    /// A Motif workstation browser: menu bar, Title and URL fields, and a row
+    /// of text buttons under the page.
+    Workstation1993,
+    /// A mid-90s browser's grouped icon-and-label buttons, Location field and
+    /// a row of directory buttons (here, the quick links).
+    Toolbar1996,
+    /// A mid-90s desktop browser: bands of large labelled buttons whose
+    /// icons are grey until hovered, Address and Links bands.
+    Desktop1996,
+    /// A browser written for the Java platform: flat icon buttons with small
+    /// labels and an Address row, in the toolkit's warm grey.
+    Applet1997,
+    /// A text-mode browser: a menu bar and URL prompt on top, a status line
+    /// and text buttons at the bottom, monospace on black.
+    Terminal1999,
+    /// A text-mode browser: the title at the top right, a status line, an
+    /// address prompt and two lines of key help at the bottom.
+    Terminal1992,
+    /// An early Windows browser: a menu bar, a strip with the activity box and
+    /// the page title, and the address in the status line.
+    Pc1993,
+    /// The first toolbar browser: icon-over-label buttons, a Location field and
+    /// a row of directory buttons.
+    Toolbar1995,
+    /// An early desktop browser: one row of small icon buttons, an Address
+    /// row, and the activity box beside both.
+    Desktop1995,
+    /// A late-90s browser suite: three toolbars with collapse tabs (navigation,
+    /// location, personal) and a component bar in the status bar.
+    Suite1997,
+    /// A late-90s desktop browser: the menu bar as a band, flat buttons with
+    /// labels, Address and Links bands, and a zone pane.
+    Desktop1997,
+    /// A desktop browser at the end of the decade: a menu band with a small
+    /// activity box, flat buttons, and an Address band with Go.
+    Desktop1999,
+    /// A one-bit desktop browser: the menu bar across the top, a document
+    /// window with a striped title bar, navigation in the menus.
+    Classic1992,
+    /// A desktop browser in a document window: the menu bar across the top,
+    /// and the activity box, buttons and Link field inside the window.
+    Classic1994,
+    /// A TV set-top box: the page fills the screen, a slim bar at the bottom,
+    /// and an Options panel that rises over it.
+    Tv1996,
+    /// A graphical DOS browser: Title and URL rows over the page and a
+    /// full-height panel of big icon buttons, shortcuts and system stats.
+    Dos1996,
+    /// The first workstation browser: a vertical application menu and floating
+    /// Navigation and Open panels beside a document window on a dark desktop.
+    Cube1990,
+    /// The second-generation TV set-top box: a slim bar at the bottom and a
+    /// restyled Options panel with a column of buttons and a row of tiles.
+    Tv1997,
+    /// A workspace browser: page windows inside the main window, a Hot List
+    /// panel beside them, and a zoom box next to the address.
+    Workspace1997,
+    /// A Motif workstation browser at version 2.7: a toolbar of icon buttons and
+    /// a URL row over the page, the meter and Stop in the status bar.
+    Workstation1996,
+    /// The workstation browser on Windows: a menu bar, one row of small icon
+    /// buttons, a URL combo and the activity box beside both.
+    WorkstationPc1995,
+    /// The first browser written for the Java platform: a Document URL field
+    /// over the page, round buttons and the activity box under it.
+    Applet1995,
+    /// A late-90s desktop browser in a Platinum document window: big colour
+    /// icon buttons, a URL row and a link bar inside the window.
+    Classic1999,
+}
+
+impl UiMode {
+    pub const ALL: [Self; 24] = [
+        Self::Lantern,
+        Self::Workstation1993,
+        Self::Toolbar1996,
+        Self::Desktop1996,
+        Self::Applet1997,
+        Self::Terminal1999,
+        Self::Terminal1992,
+        Self::Pc1993,
+        Self::Toolbar1995,
+        Self::Desktop1995,
+        Self::Suite1997,
+        Self::Desktop1997,
+        Self::Desktop1999,
+        Self::Classic1992,
+        Self::Classic1994,
+        Self::Tv1996,
+        Self::Dos1996,
+        Self::Cube1990,
+        Self::Tv1997,
+        Self::Workspace1997,
+        Self::Workstation1996,
+        Self::WorkstationPc1995,
+        Self::Applet1995,
+        Self::Classic1999,
+    ];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::Lantern => "lantern",
+            Self::Workstation1993 => "workstation-1993",
+            Self::Toolbar1996 => "toolbar-1996",
+            Self::Desktop1996 => "desktop-1996",
+            Self::Applet1997 => "applet-1997",
+            Self::Terminal1999 => "terminal-1999",
+            Self::Terminal1992 => "terminal-1992",
+            Self::Pc1993 => "pc-1993",
+            Self::Toolbar1995 => "toolbar-1995",
+            Self::Desktop1995 => "desktop-1995",
+            Self::Suite1997 => "suite-1997",
+            Self::Desktop1997 => "desktop-1997",
+            Self::Desktop1999 => "desktop-1999",
+            Self::Classic1992 => "classic-1992",
+            Self::Classic1994 => "classic-1994",
+            Self::Tv1996 => "tv-1996",
+            Self::Dos1996 => "dos-1996",
+            Self::Cube1990 => "cube-1990",
+            Self::Tv1997 => "tv-1997",
+            Self::Workspace1997 => "workspace-1997",
+            Self::Workstation1996 => "workstation-1996",
+            Self::WorkstationPc1995 => "workstation-pc-1995",
+            Self::Applet1995 => "applet-1995",
+            Self::Classic1999 => "classic-1999",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|mode| mode.key() == key)
+    }
+
+    /// Name for menus.
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Lantern => "Lantern (default)",
+            Self::Workstation1993 => "Workstation (1993)",
+            Self::Toolbar1996 => "Toolbar (1996)",
+            Self::Desktop1996 => "Desktop (1996)",
+            Self::Applet1997 => "Applet browser (1997)",
+            Self::Terminal1999 => "Text terminal (1999)",
+            Self::Terminal1992 => "Text terminal (1992)",
+            Self::Pc1993 => "Early PC (1993)",
+            Self::Toolbar1995 => "Toolbar (1995)",
+            Self::Desktop1995 => "Desktop (1995)",
+            Self::Suite1997 => "Suite (1997)",
+            Self::Desktop1997 => "Desktop (1997)",
+            Self::Desktop1999 => "Desktop (1999)",
+            Self::Classic1992 => "Classic desktop (1992)",
+            Self::Classic1994 => "Classic desktop (1994)",
+            Self::Tv1996 => "Set-top TV (1996)",
+            Self::Dos1996 => "DOS graphics (1996)",
+            Self::Cube1990 => "Cube workstation (1990)",
+            Self::Tv1997 => "Set-top TV (1997)",
+            Self::Workspace1997 => "Workspace (1997)",
+            Self::Workstation1996 => "Workstation (1996)",
+            Self::WorkstationPc1995 => "Workstation, PC (1995)",
+            Self::Applet1995 => "Applet browser (1995)",
+            Self::Classic1999 => "Classic desktop (1999)",
+        }
+    }
+
+    /// Whether pages only make sense in this mode's era look (a terminal
+    /// can't show a modern page), so the default `mode_pages` gives it.
+    pub fn needs_era_look(self) -> bool {
+        matches!(
+            self,
+            Self::Terminal1999 | Self::Tv1997 | Self::Tv1996 | Self::Terminal1992
+        )
+    }
+
+    /// The retro look that renders pages the way this mode's browsers did.
+    pub fn era_look(self) -> RetroStyle {
+        match self {
+            Self::Lantern => RetroStyle::Off,
+            Self::Workstation1993 => RetroStyle::EarlyWeb,
+            Self::Toolbar1996 => RetroStyle::EarlyWeb,
+            Self::Desktop1996 => RetroStyle::Off,
+            Self::Applet1997 => RetroStyle::Off,
+            Self::Terminal1999 => RetroStyle::Terminal,
+            Self::Terminal1992 => RetroStyle::Terminal,
+            Self::Pc1993 => RetroStyle::EarlyWeb,
+            Self::Toolbar1995 => RetroStyle::EarlyWeb,
+            Self::Desktop1995 => RetroStyle::Off,
+            Self::Suite1997 => RetroStyle::Portal,
+            Self::Desktop1997 => RetroStyle::Off,
+            Self::Desktop1999 => RetroStyle::Off,
+            Self::Classic1992 => RetroStyle::EarlyWeb,
+            Self::Classic1994 => RetroStyle::EarlyWeb,
+            Self::Tv1996 => RetroStyle::SetTop,
+            Self::Dos1996 => RetroStyle::EarlyWeb,
+            Self::Cube1990 => RetroStyle::EarlyWeb,
+            Self::Tv1997 => RetroStyle::SetTop,
+            Self::Workspace1997 => RetroStyle::Off,
+            Self::Workstation1996 => RetroStyle::EarlyWeb,
+            Self::WorkstationPc1995 => RetroStyle::EarlyWeb,
+            Self::Applet1995 => RetroStyle::Off,
+            Self::Classic1999 => RetroStyle::Off,
+        }
+    }
+}
+
+/// How pages look under a UI mode, when no retro look is picked.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum ModePages {
+    /// As their sites made them.
+    AsIs,
+    /// With the mode's browser defaults (page color, fonts, link colors)
+    /// wherever the site doesn't set its own (`ui/chrome/<mode>/pages.css`).
+    #[default]
+    Defaults,
+    /// In the mode's era look (`UiMode::era_look`).
+    EraLook,
+}
+
+impl ModePages {
+    pub const ALL: [Self; 3] = [Self::AsIs, Self::Defaults, Self::EraLook];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            Self::AsIs => "as-is",
+            Self::Defaults => "defaults",
+            Self::EraLook => "era-look",
+        }
+    }
+
+    pub fn from_key(key: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|pages| pages.key() == key)
+    }
+
+    /// Name for menus.
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::AsIs => "Pages as their sites made them",
+            Self::Defaults => "Pages with this browser's defaults",
+            Self::EraLook => "Pages in this browser's era look",
         }
     }
 }
@@ -144,6 +409,8 @@ pub struct Settings {
     pub retro_style: RetroStyle,
     /// Show a Flash-style splash intro when entering a site.
     pub splash_intro: bool,
+    pub ui_mode: UiMode,
+    pub mode_pages: ModePages,
 }
 
 impl Settings {
@@ -165,6 +432,10 @@ impl Settings {
                     settings.retro_style = RetroStyle::from_key(value).unwrap_or_default()
                 }
                 "splash_intro" => settings.splash_intro = parse_bool(value),
+                "ui_mode" => settings.ui_mode = UiMode::from_key(value).unwrap_or_default(),
+                "mode_pages" => {
+                    settings.mode_pages = ModePages::from_key(value).unwrap_or_default()
+                }
                 // Written by the first release of GeoCities mode.
                 "geocities" if parse_bool(value) => settings.retro_style = RetroStyle::GeoCities,
                 _ => {}
@@ -175,12 +446,47 @@ impl Settings {
 
     fn serialize(&self) -> String {
         format!(
-            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\n",
+            "dialup_mode={}\nmodem_speed={}\nretro_style={}\nsplash_intro={}\nui_mode={}\nmode_pages={}\n",
             self.dialup_mode.key(),
             self.modem_speed.key(),
             self.retro_style.key(),
-            self.splash_intro
+            self.splash_intro,
+            self.ui_mode.key(),
+            self.mode_pages.key()
         )
+    }
+
+    /// The look pages get: the retro look the user picked, else the UI
+    /// mode's era look if they asked for it.
+    /// Retro looks off, including a UI mode's era look ("Off means off").
+    pub fn looks_off(&mut self) {
+        self.retro_style = RetroStyle::Off;
+        if self.page_look() != RetroStyle::Off {
+            // A mode that needs its look gives it under the defaults too.
+            self.mode_pages = if self.ui_mode.needs_era_look() {
+                ModePages::AsIs
+            } else {
+                ModePages::Defaults
+            };
+        }
+    }
+
+    pub fn page_look(&self) -> RetroStyle {
+        let era = match self.mode_pages {
+            ModePages::AsIs => false,
+            ModePages::Defaults => self.ui_mode.needs_era_look(),
+            ModePages::EraLook => true,
+        };
+        if self.retro_style == RetroStyle::Off && era {
+            self.ui_mode.era_look()
+        } else {
+            self.retro_style
+        }
+    }
+
+    /// Whether pages get the UI mode's browser defaults underneath.
+    pub fn mode_defaults(&self) -> bool {
+        self.mode_pages != ModePages::AsIs
     }
 
     /// Apply `dialup=<mode>&speed=<speed>&retro=<style>&splash=<0|1>` query
@@ -205,6 +511,16 @@ impl Settings {
                     }
                 }
                 "splash" => self.splash_intro = parse_bool(value),
+                "ui" => {
+                    if let Some(mode) = UiMode::from_key(value) {
+                        self.ui_mode = mode;
+                    }
+                }
+                "pages" => {
+                    if let Some(pages) = ModePages::from_key(value) {
+                        self.mode_pages = pages;
+                    }
+                }
                 _ => {}
             }
         }
@@ -258,6 +574,8 @@ mod tests {
                 modem_speed: ModemSpeed::K28_8,
                 retro_style: RetroStyle::Portal,
                 splash_intro: true,
+                ui_mode: UiMode::Lantern,
+                mode_pages: ModePages::Defaults,
             }
         );
         assert_eq!(Settings::parse(&settings.serialize()), settings);
@@ -301,6 +619,113 @@ mod tests {
     }
 
     #[test]
+    fn ui_modes_round_trip() {
+        for mode in UiMode::ALL {
+            assert_eq!(UiMode::from_key(mode.key()), Some(mode));
+            let saved = Settings {
+                ui_mode: mode,
+                ..Settings::default()
+            }
+            .serialize();
+            assert_eq!(Settings::parse(&saved).ui_mode, mode);
+        }
+        assert_eq!(Settings::parse("ui_mode=kiosk\n").ui_mode, UiMode::Lantern);
+    }
+
+    #[test]
+    fn page_look_prefers_the_users_look() {
+        let mut settings = Settings {
+            ui_mode: UiMode::Workstation1993,
+            ..Settings::default()
+        };
+        assert_eq!(settings.mode_pages, ModePages::Defaults);
+        assert!(settings.mode_defaults());
+        assert_eq!(settings.page_look(), RetroStyle::Off);
+        settings.mode_pages = ModePages::EraLook;
+        assert_eq!(settings.page_look(), RetroStyle::EarlyWeb);
+        settings.retro_style = RetroStyle::Portal;
+        assert_eq!(settings.page_look(), RetroStyle::Portal);
+        settings.mode_pages = ModePages::AsIs;
+        assert!(!settings.mode_defaults());
+        assert_eq!(UiMode::Lantern.era_look(), RetroStyle::Off);
+        for pages in ModePages::ALL {
+            assert_eq!(ModePages::from_key(pages.key()), Some(pages));
+            let saved = Settings {
+                mode_pages: pages,
+                ..Settings::default()
+            }
+            .serialize();
+            assert_eq!(Settings::parse(&saved).mode_pages, pages);
+        }
+    }
+
+    #[test]
+    fn terminal_pages_default_to_the_era_look() {
+        let mut settings = Settings {
+            ui_mode: UiMode::Terminal1999,
+            ..Settings::default()
+        };
+        assert_eq!(settings.page_look(), RetroStyle::Terminal);
+        settings.mode_pages = ModePages::AsIs;
+        assert_eq!(settings.page_look(), RetroStyle::Off);
+        settings.mode_pages = ModePages::Defaults;
+        settings.retro_style = RetroStyle::GeoCities;
+        assert_eq!(settings.page_look(), RetroStyle::GeoCities);
+        assert_eq!(RetroStyle::from_key("terminal"), Some(RetroStyle::Terminal));
+    }
+
+    #[test]
+    fn looks_off_turns_era_looks_off_too() {
+        for (mode, pages) in [
+            (UiMode::Terminal1999, ModePages::Defaults),
+            (UiMode::Tv1996, ModePages::EraLook),
+            (UiMode::Workstation1993, ModePages::EraLook),
+            (UiMode::Lantern, ModePages::Defaults),
+        ] {
+            let mut settings = Settings {
+                ui_mode: mode,
+                mode_pages: pages,
+                retro_style: RetroStyle::Portal,
+                ..Settings::default()
+            };
+            settings.looks_off();
+            assert_eq!(settings.page_look(), RetroStyle::Off, "{mode:?}");
+        }
+        // Without an era look in play, the page style setting stays.
+        let mut settings = Settings::default();
+        settings.looks_off();
+        assert_eq!(settings.mode_pages, ModePages::Defaults);
+    }
+
+    /// The branding rule (steward skill): modes are named after an era and a
+    /// kind of machine, never after a real browser.
+    #[test]
+    fn ui_modes_avoid_product_names() {
+        let banned = [
+            "netscape",
+            "navigator",
+            "explorer",
+            "mosaic",
+            "opera",
+            "webtv",
+            "hotjava",
+            "macwww",
+            "cello",
+            "lynx",
+            "arachne",
+            "icab",
+            "omniweb",
+            "communicator",
+        ];
+        for mode in UiMode::ALL {
+            for text in [mode.key(), mode.name()] {
+                let text = text.to_ascii_lowercase();
+                assert!(!banned.iter().any(|b| text.contains(b)), "{text}");
+            }
+        }
+    }
+
+    #[test]
     fn speeds_are_ordered() {
         let rates: Vec<_> = ModemSpeed::ALL
             .iter()
@@ -320,6 +745,8 @@ mod tests {
             modem_speed: ModemSpeed::K33_6,
             retro_style: RetroStyle::GeoCities,
             splash_intro: true,
+            ui_mode: UiMode::Workstation1993,
+            mode_pages: ModePages::EraLook,
         };
         save_to(&path, &settings).unwrap();
         assert_eq!(load_from(&path), settings);

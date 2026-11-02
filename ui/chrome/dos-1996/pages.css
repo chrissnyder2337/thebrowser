@@ -1,0 +1,5 @@
+/* DOS graphics (1996): plain pages the way a graphical DOS browser drew them
+   by default: an Arial-like sans face at 16px, black text on a white page (the
+   color is set in ui_mode.rs). One rule per line, each selector wrapped in
+   :where() (checked by a unit test). */
+:where(html) { color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 16px; }

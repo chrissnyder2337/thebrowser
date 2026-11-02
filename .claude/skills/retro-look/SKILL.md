@@ -8,7 +8,7 @@ description: Change or add a Lantern retro look (ui/retro/*.js, run by ui/retro/
 A retro look restyles every page in the content view. Changes to a look are
 **tier 1**; anything that also touches `client.rs`, `commands.rs` or
 `util.rs` is tier 2 (steward skill → "Risk tiers"). Follow the branding rule:
-describe the era, never name a real product.
+name looks by era, never after a real product, and draw all artwork new.
 
 ## Anatomy
 

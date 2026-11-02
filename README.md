@@ -93,6 +93,46 @@ The URL field accepts full URLs (`http`, `https`, `file`, `about`, `data`,
 `lantern:bookmarks`, `lantern:settings` and `lantern:about` open the internal pages. Clicking the
 lantern opens the About page.
 
+### Browser UI modes
+
+The toolbar, status bar and window layout can take on the look of other
+1990s browsers. Pick one from **Retro ▾ → Browser UI**, from a mode's
+**Options** menu, or press **Ctrl+Shift+M** (**Cmd+Shift+M** on a Mac) in any
+mode. `--ui=<mode>` picks one for a single run. Each mode has its original's
+menu bar, buttons and status panes, its era's scrollbars, and its own look for
+the start page. [docs/ui-modes/](docs/ui-modes/) describes each one.
+
+- **Lantern (default)**: Lantern's own toolbar.
+- **Workstation**: NCSA Mosaic for X (1993: text buttons under the page;
+  1996: an icon toolbar) and Mosaic for Windows (Workstation, PC, 1995).
+- **Early PC (1993)**: a Windows 3.1 window modelled on Cello.
+- **Toolbar** and **Suite**: Netscape 1.1 (1995), Navigator 2–3 (1996) and
+  Communicator 4 (Suite, 1997).
+- **Desktop**: Internet Explorer 2 (1995), 3 (1996), 4 (1997) and 5 (1999).
+- **Classic desktop**: Mac browsers in a document window on a desktop:
+  MacWWW (1992), Mosaic for the Mac (1994) and iCab (1999).
+- **Applet browser**: HotJava's alpha (1995), with round buttons under the
+  page, and HotJava 1.x–3 (1997).
+- **Set-top TV**: WebTV (1996) and WebTV Plus (1997), with the page on a TV
+  screen, a bar under it, and an Options panel (full screen in 1997).
+- **Text terminal**: Lynx (1992) and Links (1999), monospace on black, with
+  pages in the Text terminal look.
+- **DOS graphics (1996)**: Arachne, with a column of buttons beside the page.
+- **Cube workstation (1990)**: WorldWideWeb on a NeXT, with a column of
+  panels and the page in its own window.
+- **Workspace (1997)**: Opera 3, with a hotlist beside a page window.
+
+Pages can follow the mode too, picked under **Browser UI**: as their sites
+made them, with the mode's browser defaults (a grey page and Times on plain
+pages that have no style sheets of their own; the default), or in the
+mode's era look (a full retro look). A retro look you pick yourself always
+wins.
+
+![Workstation (1993) mode showing a Wikipedia article](docs/ui-workstation-1993.png)
+
+Product names are trademarks of their owners. Lantern isn't affiliated with
+or endorsed by them; its icons and artwork are its own.
+
 ### Dial-up simulator
 
 Lantern can make the Web feel like 1998 again. Open **Settings** by clicking the

@@ -1,18 +1,19 @@
 //! Retro looks: restyle every page in the content view like a 1990s site (a
 //! GeoCities homepage, the early web of 1995, a '97 web portal), plus an optional
 //! Flash-style splash intro, by running `ui/retro/*.js` in its frames. The
-//! toolbar's Retro button opens a native menu to pick them.
+//! toolbar's Retro button opens a native menu to pick them (`menus.rs`).
 
 use super::{
-    commands, settings,
+    settings,
     settings::RetroStyle,
-    state::{content_browser, defer, push_toolbar, set_notice, with_shell},
+    state::{content_browser, push_toolbar, set_notice, with_shell},
+    ui_mode,
     util::{js_string, url_host},
 };
 use cef::*;
 
 const RUNTIME: &str = include_str!("../../ui/retro/runtime.js");
-const LOOKS: [(RetroStyle, &str); 3] = [
+const LOOKS: [(RetroStyle, &str); 5] = [
     (
         RetroStyle::GeoCities,
         include_str!("../../ui/retro/geocities.js"),
@@ -22,6 +23,11 @@ const LOOKS: [(RetroStyle, &str); 3] = [
         include_str!("../../ui/retro/early-web.js"),
     ),
     (RetroStyle::Portal, include_str!("../../ui/retro/portal.js")),
+    (
+        RetroStyle::Terminal,
+        include_str!("../../ui/retro/terminal.js"),
+    ),
+    (RetroStyle::SetTop, include_str!("../../ui/retro/settop.js")),
 ];
 const SPLASH: &str = include_str!("../../ui/retro/splash.js");
 
@@ -101,8 +107,11 @@ pub fn on_load_start(frame: &Frame) {
         return;
     }
     let settings = with_shell(|shell| shell.settings);
-    if settings.retro_style != RetroStyle::Off {
-        run(frame, &style_script(settings.retro_style));
+    if ui_mode::scrollbars(settings.ui_mode).is_some() {
+        run(frame, &ui_mode::scrollbars_script(settings.ui_mode));
+    }
+    if settings.page_look() != RetroStyle::Off {
+        run(frame, &style_script(settings.page_look()));
     }
     if !settings.splash_intro || frame.is_main() == 0 {
         return;
@@ -122,9 +131,20 @@ pub fn on_load_start(frame: &Frame) {
 
 /// A content frame finished loading: style what arrived since the start.
 pub fn on_load_end(frame: &Frame) {
-    let style = with_shell(|shell| shell.settings.retro_style);
-    if style != RetroStyle::Off && !is_internal(&frame_url(frame)) {
-        run(frame, &style_script(style));
+    let settings = with_shell(|shell| shell.settings);
+    if is_internal(&frame_url(frame)) {
+        return;
+    }
+    // Again once loaded: the document may have been replaced since the start.
+    if ui_mode::scrollbars(settings.ui_mode).is_some() {
+        run(frame, &ui_mode::scrollbars_script(settings.ui_mode));
+    }
+    // Only once loaded: whether the page has style sheets of its own decides.
+    if let Some(script) = ui_mode::page_defaults_script(&settings) {
+        run(frame, &script);
+    }
+    if settings.page_look() != RetroStyle::Off {
+        run(frame, &style_script(settings.page_look()));
     }
 }
 
@@ -132,7 +152,13 @@ pub fn on_load_end(frame: &Frame) {
 /// or the menu changed them).
 pub fn refresh() {
     let settings = with_shell(|shell| shell.settings);
-    run_in_content(&style_script(settings.retro_style), true);
+    run_in_content(
+        &ui_mode::page_defaults_script(&settings)
+            .unwrap_or_else(ui_mode::remove_page_defaults_script),
+        true,
+    );
+    run_in_content(&style_script(settings.page_look()), true);
+    run_in_content(&ui_mode::scrollbars_script(settings.ui_mode), true);
     if !settings.splash_intro {
         run_in_content(REMOVE_SPLASH, false);
     }
@@ -150,12 +176,22 @@ fn update(change: impl FnOnce(&mut settings::Settings)) -> settings::Settings {
 }
 
 pub fn set_style(style: RetroStyle) {
-    update(|s| s.retro_style = style);
+    update(|s| {
+        if style == RetroStyle::Off {
+            s.looks_off();
+        } else if !(s.retro_style == RetroStyle::Off && s.page_look() == style) {
+            // Picking the look the UI mode already gives (checked in the
+            // menu) keeps it the mode's, not a look of the user's own.
+            s.retro_style = style;
+        }
+    });
     set_notice(match style {
         RetroStyle::Off => "Back to the modern web.",
         RetroStyle::GeoCities => "GeoCities mode on. Welcome to the information superhighway!",
         RetroStyle::EarlyWeb => "Early web: it's 1995 and style sheets haven't been invented.",
         RetroStyle::Portal => "Welcome to LanternNet, your start page for the World Wide Web.",
+        RetroStyle::Terminal => "Text terminal: 80 columns, no pictures, all keyboard.",
+        RetroStyle::SetTop => "Set-top TV: big type for the sofa, and a yellow box on the link.",
     });
 }
 
@@ -170,42 +206,8 @@ pub fn set_splash(on: bool) {
     });
 }
 
-// Menu command ids: one per style, then the extras.
-const STYLE_COMMAND: i32 = 100;
-const SPLASH_COMMAND: i32 = 200;
-const SETTINGS_COMMAND: i32 = 201;
-
-fn run_menu_command(id: i32) {
-    if let Some(style) = usize::try_from(id - STYLE_COMMAND)
-        .ok()
-        .and_then(|i| RetroStyle::ALL.get(i))
-    {
-        set_style(*style);
-    } else if id == SPLASH_COMMAND {
-        set_splash(!with_shell(|shell| shell.settings.splash_intro));
-    } else if id == SETTINGS_COMMAND {
-        commands::show_settings(false);
-    }
-}
-
-wrap_menu_model_delegate! {
-    struct RetroMenuDelegate;
-
-    impl MenuModelDelegate {
-        fn execute_command(
-            &self,
-            _menu_model: Option<&mut MenuModel>,
-            command_id: ::std::os::raw::c_int,
-            _event_flags: EventFlags,
-        ) {
-            // Run after the menu has closed, outside its callback.
-            defer(move || run_menu_command(command_id));
-        }
-    }
-}
-
-/// Parse the toolbar's "x,y" anchor (CSS pixels in the toolbar view).
-fn parse_point(arg: &str) -> Point {
+/// Parse a chrome page's "x,y" menu anchor (CSS pixels in its view).
+pub(super) fn parse_point(arg: &str) -> Point {
     let mut parts = arg
         .split(',')
         .map(|n| n.trim().parse::<f64>().unwrap_or(0.0) as i32);
@@ -213,43 +215,6 @@ fn parse_point(arg: &str) -> Point {
         x: parts.next().unwrap_or(0),
         y: parts.next().unwrap_or(0),
     }
-}
-
-/// Show the Retro menu under the toolbar button. `arg` is the button's
-/// bottom-left corner, "x,y", in toolbar coordinates. A native menu, because
-/// an HTML one would be clipped to the toolbar view's height.
-pub fn show_menu(arg: &str) {
-    let (window, toolbar, current) =
-        with_shell(|shell| (shell.window.clone(), shell.toolbar.clone(), shell.settings));
-    let (Some(window), Some(mut toolbar)) = (window, toolbar) else {
-        return;
-    };
-    let mut delegate = RetroMenuDelegate::new();
-    let Some(mut menu) = menu_model_create(Some(&mut delegate)) else {
-        return;
-    };
-    for (i, style) in RetroStyle::ALL.into_iter().enumerate() {
-        let id = STYLE_COMMAND + i as i32;
-        menu.add_radio_item(id, Some(&CefString::from(style.name())), 1);
-        menu.set_checked(id, (current.retro_style == style).into());
-    }
-    menu.add_separator();
-    menu.add_check_item(
-        SPLASH_COMMAND,
-        Some(&CefString::from("Flash-style splash intro")),
-    );
-    menu.set_checked(SPLASH_COMMAND, current.splash_intro.into());
-    menu.add_separator();
-    menu.add_item(
-        SETTINGS_COMMAND,
-        Some(&CefString::from("Retro settings\u{2026}")),
-    );
-
-    let mut point = parse_point(arg);
-    if let Some(view) = browser_view_get_for_browser(Some(&mut toolbar)) {
-        view.convert_point_to_screen(Some(&mut point));
-    }
-    window.show_menu(Some(&mut menu), Some(&point), MenuAnchorPosition::TOPLEFT);
 }
 
 #[cfg(test)]

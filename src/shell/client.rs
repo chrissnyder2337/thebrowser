@@ -2,8 +2,10 @@
 //! browser view it serves.
 
 use super::{
-    commands, dialup, retro, selftest,
-    state::{Role, internal_url_key, push_all, push_status, update_window_title, with_shell},
+    commands, dialup, menus, pages, retro, selftest,
+    state::{
+        Role, internal_url_key, push_all, push_status, push_title, update_window_title, with_shell,
+    },
 };
 use cef::*;
 
@@ -96,8 +98,9 @@ wrap_display_handler! {
                 Role::Content => {
                     with_shell(|shell| shell.current_title = title);
                     update_window_title();
+                    push_title();
                 }
-                Role::Toolbar | Role::Status => {
+                Role::Toolbar | Role::Status | Role::Side | Role::Frame => {
                     commands::handle_chrome_title(self.role, &title);
                 }
             }
@@ -182,12 +185,7 @@ wrap_life_span_handler! {
             debug_assert_ne!(currently_on(ThreadId::UI), 0);
             let remaining = with_shell(|shell| {
                 shell.set_browser(self.role, None);
-                if self.role == Role::Toolbar {
-                    shell.toolbar_ready = false;
-                }
-                if self.role == Role::Status {
-                    shell.status_ready = false;
-                }
+                shell.set_ready(self.role, false);
                 shell.open_browsers = shell.open_browsers.saturating_sub(1);
                 shell.open_browsers
             });
@@ -316,14 +314,18 @@ wrap_request_handler! {
                 .unwrap_or_default();
             match self.role {
                 Role::Content => commands::handle_action_url(&url).into(),
-                Role::Toolbar | Role::Status => {
-                    // The chrome pages may only load (or reload) their own data: URL.
+                Role::Toolbar | Role::Status | Role::Side | Role::Frame => {
+                    // The chrome pages may only load their own data: page: the
+                    // first one, a reload, or the current UI mode's page.
                     let current = frame
                         .map(|f| CefString::from(&f.url()).to_string())
                         .unwrap_or_default();
-                    let initial = current.is_empty() || current == "about:blank";
-                    let allowed = url.starts_with("data:text/html") && (initial || url == current);
-                    (!allowed).into()
+                    let role = self.role;
+                    let expected = || {
+                        let mode = with_shell(|shell| shell.settings.ui_mode);
+                        pages::chrome_uri(role, mode)
+                    };
+                    (!pages::chrome_navigation_allowed(&url, &current, expected)).into()
                 }
             }
         }
@@ -360,6 +362,7 @@ mod vk {
     pub const D: i32 = 0x44;
     pub const L: i32 = 0x4C;
     pub const R: i32 = 0x52;
+    pub const M: i32 = 0x4D;
     pub const F5: i32 = 0x74;
     pub const OEM_4: i32 = 0xDB; // [
     pub const OEM_6: i32 = 0xDD; // ]
@@ -393,6 +396,9 @@ fn handle_shortcut(event: &KeyEvent) -> bool {
         vk::F5 if no_mods => commands::reload(),
         vk::R if only_primary => commands::reload(),
         vk::D if only_primary => commands::add_bookmark(),
+        vk::M if primary && shift && !alt && (mac || !cmd) && (!mac || !ctrl) => {
+            menus::show_browser_ui()
+        }
         vk::HOME if only_alt => commands::show_home(),
         vk::ESCAPE if no_mods => {
             // Esc only means "stop" while a page loads; otherwise let the page

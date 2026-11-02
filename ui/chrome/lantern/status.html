@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Status</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: #c0c0c0; color: #000;
+    font: 11px "MS Sans Serif", "Microsoft Sans Serif", Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-font-smoothing: none; font-smooth: never;
+    cursor: default;
+  }
+  body { display: flex; align-items: center; gap: 2px; padding: 2px 2px 1px; border-top: 1px solid #fff; }
+  .pane {
+    height: 20px; flex: none; display: flex; align-items: center;
+    box-shadow: inset 1px 1px #808080, inset -1px -1px #fff;
+    padding: 0 5px;
+  }
+  #text { flex: 1; min-width: 0; }
+  #text span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #meter-pane { width: 120px; padding: 3px; }
+  #meter { width: 100%; height: 14px; display: flex; gap: 2px; visibility: hidden; }
+  #meter.on { visibility: visible; }
+  #meter i { width: 8px; height: 14px; flex: none; background: #000080; }
+  #modem-pane { width: 64px; gap: 5px; padding: 0 4px; cursor: default; }
+  #modem-pane:active { box-shadow: inset 1px 1px #000, inset -1px -1px #fff; }
+  #modem-pane svg.on, #modem-pane.dialup svg.off { display: none; }
+  #modem-pane.dialup svg.on { display: block; }
+  #modem-label { white-space: nowrap; }
+  #lock-pane { width: 28px; justify-content: center; padding: 0; }
+  #lock-pane svg { display: none; }
+  #lock-pane.secure svg { display: block; }
+</style>
+</head>
+<body>
+  <div class="pane" id="text"><span id="msg">Ready.</span></div>
+  <div class="pane" id="modem-pane" role="button" data-cmd="settings" title="Dial-up simulator">{{ICON_MODEM}}<span id="modem-label"></span></div>
+  <div class="pane" id="meter-pane" title="Progress"><div id="meter"></div></div>
+  <div class="pane" id="lock-pane" title="">{{ICON_LOCK}}</div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

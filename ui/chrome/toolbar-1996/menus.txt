@@ -1,0 +1,90 @@
+# The menu bar of a mid-90s toolbar browser, 1996.
+menu File
+- New Web Browser
+- New Mail Message
+- Mail Document...
+---
+open-url Open Location...
+- Open File...
+---
+- Save as...
+---
+- Upload File...
+---
+- Page Setup...
+print Print...
+---
+close-window Close
+- Exit
+menu Edit
+- Undo
+---
+- Cut
+- Copy
+- Paste
+---
+- Select All
+---
+search Find...
+- Find Again
+menu View
+reload Reload
+- Reload Frame
+- Load Images
+- Refresh
+---
+view-source Document Source
+- Document Info
+menu Go
+back Back
+forward Forward
+home Home
+stop Stop Loading
+menu Bookmarks
+add-bookmark Add Bookmark
+bookmarks Go to Bookmarks...
+menu Options
+settings General Preferences...
+- Editor Preferences...
+- Mail and News Preferences...
+- Network Preferences...
+- Security Preferences...
+---
+- Show Toolbar
+- Show Location
+- Show Directory Buttons
+- Show Java Console
+---
+- Auto Load Images
+- Document Encoding
+---
+retro Retro looks
+browser-ui Browser UI
+menu Directory
+home Home Page
+- What's New?
+- What's Cool?
+---
+- Destinations
+search Net Search
+- People
+- Software
+menu Window
+- Mail
+- News
+- Address Book
+---
+bookmarks Bookmarks
+- History
+menu Help
+about About...
+- Registration Information
+- Software
+---
+- Handbook
+- Release Notes
+- Frequently Asked Questions
+- On Security
+---
+- How to Give Feedback
+- How to Get Support

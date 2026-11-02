@@ -1,0 +1,4 @@
+/* Text terminal (1992): plain pages the way a text-mode browser drew them,
+   light grey monospace text on black (the color is set in ui_mode.rs). One
+   rule per line, each selector wrapped in :where() (checked by a unit test). */
+:where(html) { color: #c0c0c0; font-family: "DejaVu Sans Mono", "Liberation Mono", Menlo, Consolas, "Courier New", monospace; }

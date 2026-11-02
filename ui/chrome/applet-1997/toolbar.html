@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lantern Toolbar</title>
+<!-- Applet browser (1997): a menu bar, one row of flat icon buttons with small
+     labels and the activity box at the far right, then an Address row
+     (docs/ui-modes/modes.md). -->
+<style>
+  :root {
+    --face: #d4d4d4;
+    --up: inset 1px 1px #fff, inset -1px -1px #808080;
+    --down: inset 1px 1px #808080, inset -1px -1px #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100vh; overflow: hidden; user-select: none;
+    background: var(--face); color: #000;
+    font: 11px Arial, "Liberation Sans", Helvetica, sans-serif;
+    cursor: default;
+  }
+  body { display: flex; flex-direction: column; }
+  button {
+    font: inherit; color: inherit; background: var(--face);
+    border: 0; margin: 0; padding: 0; outline: none;
+  }
+
+  /* ---- Menu bar ---- */
+  #menubar { height: 24px; flex: none; display: flex; align-items: center; padding: 0 2px; }
+  .menu { height: 22px; padding: 0 8px; background: transparent; }
+  .menu:hover, .menu:focus-visible { box-shadow: var(--up); }
+  .menu:active { box-shadow: var(--down); }
+
+  /* ---- Button row (borders drawn inside so the box is 47px) ---- */
+  #tools {
+    height: 47px; flex: none; display: flex; align-items: center; padding: 1px 1px 1px 4px; gap: 3px;
+    box-shadow: inset 0 1px #acaa99, inset 0 -1px #716f64;
+  }
+  .ib {
+    min-width: 56px; height: 43px; flex: none; padding: 0 5px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .ib:hover:not(.disabled) { box-shadow: var(--up); }
+  .ib:active:not(.disabled) { box-shadow: var(--down); }
+  .ib:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .ib svg { flex: none; }
+  .ib svg.off { display: none; }
+  .ib.disabled { color: #808080; }
+  .ib.disabled svg.on { display: none; }
+  .ib.disabled svg.off { display: block; }
+  #spacer { flex: 1; }
+
+  /* ---- Activity box ---- */
+  #throbber {
+    width: 40px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center;
+    background: #3a2a5a; overflow: hidden;
+  }
+  #throbber svg.idle { flex: none; }
+  #throbber .lit-box { width: 32px; height: 44px; overflow: hidden; display: none; }
+  #throbber svg.lit { width: 128px; height: 48px; margin-top: -2px; animation: flicker 0.6s steps(4) infinite; }
+  @keyframes flicker { from { transform: translateX(0); } to { transform: translateX(-128px); } }
+  #throbber.loading svg.idle { display: none; }
+  #throbber.loading .lit-box { display: block; }
+
+  /* ---- Address row ---- */
+  #addr { height: 28px; flex: none; display: flex; align-items: flex-end; gap: 0; padding: 0; }
+  #addr label { padding: 0 0 4px 8px; margin-right: 6px; white-space: nowrap; }
+  #field {
+    flex: 1; min-width: 0; height: 21px; align-self: flex-end; margin-bottom: 3px; position: relative;
+    background: #fff; box-shadow: inset 0 0 0 1px #808080, inset 0 0 0 2px #404040;
+  }
+  #url {
+    width: 100%; height: 17px; margin: 2px 0 0; border: 0; padding: 0 6px; outline: none;
+    background: transparent; color: #000; font: 12px Arial, "Liberation Sans", Helvetica, sans-serif; user-select: text;
+  }
+  #url::selection { background: #000080; color: #fff; }
+</style>
+</head>
+<body>
+  <div id="menubar">
+    <button class="menu" data-cmd="menu" data-arg="file" data-anchor aria-haspopup="menu">File</button>
+    <button class="menu" data-cmd="menu" data-arg="edit" data-anchor aria-haspopup="menu">Edit</button>
+    <button class="menu" data-cmd="menu" data-arg="view" data-anchor aria-haspopup="menu">View</button>
+    <button class="menu" data-cmd="menu" data-arg="go" data-anchor aria-haspopup="menu">Go</button>
+    <button class="menu" data-cmd="menu" data-arg="bookmarks" data-anchor aria-haspopup="menu">Bookmarks</button>
+    <button class="menu" data-cmd="menu" data-arg="help" data-anchor aria-haspopup="menu">Help</button>
+  </div>
+  <div id="tools">
+    <button class="ib disabled" id="back" data-cmd="back" title="Go back (Alt+Left)">{{ICON_A97_BACK}}Back</button>
+    <button class="ib disabled" id="forward" data-cmd="forward" title="Go forward (Alt+Right)">{{ICON_A97_FORWARD}}Forward</button>
+    <button class="ib" id="home" data-cmd="home" title="Go to the start page (Alt+Home)">{{ICON_A97_HOME}}Home</button>
+    <button class="ib" id="reload" data-cmd="reload" title="Reload this page (F5)">{{ICON_A97_RELOAD}}Reload</button>
+    <button class="ib disabled" id="stop" data-cmd="stop" title="Stop loading (Esc)">{{ICON_A97_STOP}}Stop</button>
+    <button class="ib" id="search" data-cmd="search" title="Search the web">{{ICON_A97_SEARCH}}Search</button>
+    <button class="ib" id="print" data-cmd="print" title="Print this page (Ctrl+P)">{{ICON_A97_PRINT}}Print</button>
+    <span id="spacer"></span>
+    <div id="throbber" title="About Lantern" role="button" aria-label="About Lantern">
+      {{LANTERN_IDLE}}
+      <div class="lit-box">{{LANTERN_LIT}}</div>
+    </div>
+  </div>
+  <div id="addr">
+    <label for="url">Address:</label>
+    <div id="field"><input id="url" type="text" spellcheck="false" autocomplete="off"></div>
+  </div>
+<script>
+{{CHROME_JS}}
+</script>
+</body>
+</html>

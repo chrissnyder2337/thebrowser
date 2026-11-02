@@ -20,12 +20,30 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-/// Which of the three browser views a client/handler serves.
+/// Which browser view a client/handler serves: the web page, or one of the
+/// chrome views around it (docs/ui-modes/spec.md, "The window").
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Role {
     Toolbar,
     Content,
     Status,
+    /// A panel beside the page (some UI modes; hidden otherwise).
+    Side,
+    /// A strip right above the page, inside its inset (a child window's
+    /// title bar; some UI modes; hidden otherwise).
+    Frame,
+}
+
+impl Role {
+    /// The chrome views: Lantern-built `data:` pages that talk to Rust.
+    pub const CHROME: [Self; 4] = [Self::Toolbar, Self::Status, Self::Side, Self::Frame];
+    pub const ALL: [Self; 5] = [
+        Self::Toolbar,
+        Self::Side,
+        Self::Frame,
+        Self::Content,
+        Self::Status,
+    ];
 }
 
 /// Number of bookmarks shown as quick links in the toolbar.
@@ -37,6 +55,16 @@ pub struct Shell {
     pub toolbar: Option<Browser>,
     pub content: Option<Browser>,
     pub status: Option<Browser>,
+    pub side: Option<Browser>,
+    pub frame: Option<Browser>,
+    /// The panels the window lays its views out in (window.rs), kept for
+    /// relayout when the UI mode changes.
+    pub middle: Option<Panel>,
+    /// The column of toolbar, middle row and status view, beside a
+    /// full-height side view.
+    pub main: Option<Panel>,
+    pub inset: Option<Panel>,
+    pub well: Option<Panel>,
     pub open_browsers: usize,
     pub is_closing: bool,
 
@@ -63,8 +91,10 @@ pub struct Shell {
     pub settings: Settings,
     /// Host the splash intro was last shown for, so it plays once per site.
     pub splash_host: Option<String>,
-    pub toolbar_ready: bool,
-    pub status_ready: bool,
+    /// Chrome views whose page has sent `ready` (in `Role::CHROME` order).
+    pub ready: [bool; 4],
+    /// Whether the mode's expanding panel (the TV Options panel) is open.
+    pub panel_open: bool,
 }
 
 thread_local! {
@@ -92,7 +122,32 @@ impl Shell {
             Role::Toolbar => self.toolbar.clone(),
             Role::Content => self.content.clone(),
             Role::Status => self.status.clone(),
+            Role::Side => self.side.clone(),
+            Role::Frame => self.frame.clone(),
         }
+    }
+
+    fn ready_slot(role: Role) -> Option<usize> {
+        Role::CHROME.iter().position(|r| *r == role)
+    }
+
+    pub fn is_ready(&self, role: Role) -> bool {
+        Self::ready_slot(role).is_some_and(|i| self.ready[i])
+    }
+
+    pub fn set_ready(&mut self, role: Role, ready: bool) {
+        if let Some(i) = Self::ready_slot(role) {
+            self.ready[i] = ready;
+        }
+    }
+
+    /// The chrome views that are ready for state pushes.
+    fn ready_chrome(&self) -> Vec<Browser> {
+        Role::CHROME
+            .into_iter()
+            .filter(|role| self.is_ready(*role))
+            .filter_map(|role| self.browser(role))
+            .collect()
     }
 
     pub fn set_browser(&mut self, role: Role, browser: Option<Browser>) {
@@ -100,6 +155,8 @@ impl Shell {
             Role::Toolbar => self.toolbar = browser,
             Role::Content => self.content = browser,
             Role::Status => self.status = browser,
+            Role::Side => self.side = browser,
+            Role::Frame => self.frame = browser,
         }
     }
 
@@ -150,14 +207,20 @@ impl Shell {
             ("loading", Json::Bool(self.is_loading)),
             ("secure", Json::Bool(self.is_secure())),
             ("bookmarks", Json::Arr(quick)),
-            ("retro", Json::str(self.settings.retro_style.key())),
-            ("retroName", Json::str(self.settings.retro_style.name())),
+            ("retro", Json::str(self.settings.page_look().key())),
+            ("retroName", Json::str(self.settings.page_look().name())),
+            ("title", Json::str(self.page_title())),
         ])
         .render()
     }
 
     fn status_json(&self) -> String {
         Json::Obj(vec![
+            // For UI modes with navigation buttons under the page.
+            ("canBack", Json::Bool(self.can_back)),
+            ("canFwd", Json::Bool(self.can_fwd)),
+            // Whether the mode's expanding panel (TV Options) is open.
+            ("panel", Json::Bool(self.panel_open)),
             ("text", Json::str(self.status_text())),
             ("progress", Json::Num(self.progress.clamp(0.0, 1.0))),
             ("loading", Json::Bool(self.is_loading)),
@@ -189,13 +252,21 @@ impl Shell {
         }
     }
 
+    /// The content page's title, for modes that show it in a field.
+    fn page_title(&self) -> &str {
+        let title = self.current_title.trim();
+        if title.starts_with("data:") {
+            ""
+        } else {
+            title
+        }
+    }
+
     /// Window title for the current content title.
     pub fn window_title(&self) -> String {
-        let title = self.current_title.trim();
-        if title.is_empty() || title.starts_with("data:") {
-            "Lantern".to_owned()
-        } else {
-            format!("{title} - Lantern")
+        match self.page_title() {
+            "" => "Lantern".to_owned(),
+            title => format!("{title} - Lantern"),
         }
     }
 }
@@ -209,26 +280,42 @@ pub fn exec_js(browser: &Browser, code: &str) {
     }
 }
 
-/// Push the full toolbar state (URL, nav buttons, quick links).
-pub fn push_toolbar() {
-    let target = with_shell(|shell| {
-        let browser = shell.toolbar.clone()?;
-        shell.toolbar_ready.then(|| (browser, shell.toolbar_json()))
-    });
-    if let Some((browser, json)) = target {
+/// Send `json` (from `state`) to every ready chrome view. A mode may put any
+/// control in any view, so every view gets every key; pages ignore the ones
+/// they have no element for.
+fn push_chrome(state: impl FnOnce(&Shell) -> String) {
+    let (browsers, json) = with_shell(|shell| (shell.ready_chrome(), state(shell)));
+    for browser in browsers {
         exec_js(&browser, &format!("window.lantern&&lantern.update({json})"));
     }
 }
 
+/// Push one chrome view its full state, when its page says it's ready.
+pub fn push_ready(role: Role) {
+    let target = with_shell(|shell| {
+        let browser = shell.browser(role)?;
+        Some((browser, shell.toolbar_json(), shell.status_json()))
+    });
+    if let Some((browser, toolbar, status)) = target {
+        for json in [toolbar, status] {
+            exec_js(&browser, &format!("window.lantern&&lantern.update({json})"));
+        }
+    }
+}
+
+/// Push the full toolbar state (URL, nav buttons, quick links).
+pub fn push_toolbar() {
+    push_chrome(Shell::toolbar_json);
+}
+
+/// Push just the content page's title (modes that show it).
+pub fn push_title() {
+    push_chrome(|shell| Json::Obj(vec![("title", Json::str(shell.page_title()))]).render());
+}
+
 /// Push the status bar state (text, progress, padlock).
 pub fn push_status() {
-    let target = with_shell(|shell| {
-        let browser = shell.status.clone()?;
-        shell.status_ready.then(|| (browser, shell.status_json()))
-    });
-    if let Some((browser, json)) = target {
-        exec_js(&browser, &format!("window.lantern&&lantern.update({json})"));
-    }
+    push_chrome(Shell::status_json);
 }
 
 pub fn push_all() {
@@ -269,7 +356,7 @@ pub fn close_all_browsers(force_close: bool) {
     }
 
     let browsers: Vec<Browser> = with_shell(|shell| {
-        [Role::Content, Role::Toolbar, Role::Status]
+        Role::ALL
             .into_iter()
             .filter_map(|role| shell.browser(role))
             .collect()
