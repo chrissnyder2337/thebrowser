@@ -33,6 +33,7 @@ struct ModeFiles {
 
 macro_rules! mode_files {
     ($key:literal $(, $extra:ident)*) => {{
+        // A mode with no extra files never assigns to `files`, so `mut` is unused there.
         #[allow(unused_mut)]
         let mut files = ModeFiles {
             toolbar: include_str!(concat!("../../ui/chrome/", $key, "/toolbar.html")),
